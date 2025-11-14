@@ -1,0 +1,153 @@
+<DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<title>inventory management system</title>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>INVETORY MANAGEMENT SYSTEM FOR SMALL AND MEDIUM SIZED ENTERPRISES IN KIAMBU COUNTY</h1>
+</header>
+ 
+<nav>
+<ul>
+<li><a href="#home">home page</a></li><br>
+<li><a href="#dashboard"class="active">dashboard</a></li><br>
+<li><a href="#inventory">inventory</a></li><br>
+<li><a href="#reports">reports</a></li><br>
+<li><a href="#settings">settings</a></li><br>
+</ul>
+</nav>
+
+<main>
+<section id="home">
+<h2>welcome to the inventory management system</h2>
+<p> A reliable slution for small and medium sized enterprises in Kiambu County to track products,manage stock levels, and optimize sales operations.</p>
+</section>
+<section id="dashboard">
+<h2>dashboard summary</h2>
+<div class="summary-container">
+<div class="summary-box box-total">
+<h3>total products</h3>
+<p class="count">248</p>
+</div>
+</div>
+<div class="summary-box box-lowstock">
+<h3> low stock</h3>
+<p class="count">15</p>
+</div>
+<div class="summary-box box-sales">
+<h3> recent sales(24h)</h3>
+<p class="count">42</p>
+</div>
+<section id="inventory">
+<h2>current inventory</h2>
+<table border="1">
+<thead>
+<tr>
+<th>product name</th>
+<th>quantity</th>
+<th>price(KES)/th>
+<th>actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fresh Milk</td>
+<td>120</td>
+<td>60.0</td>
+<td>
+<button class="edit-btn">edit</button>
+<button class="delete-btn">delete</button>
+</td>
+</tr>
+<tr>
+<td>loaf of bread</td>
+<td>85</td>
+<td>65.00</td>
+<td>
+<button class="edit-btn">edit</button>
+<button class="delete-btn">delete</button>
+</td>
+</tr>
+<tr>
+<td>kienyeji eggs(tray)</td>
+<td>12</td>
+<td>450.00</td>
+<td>
+<button class="edit-btn">edit</button>
+<button class="delete-btn">delete</button>
+</td>
+</tr>
+</table>
+</section>
+<section id="add-product">
+<h2>add new product<h2>
+<form action="|" method="POST">
+<div class= "form-group">
+<label for="product_name">product name</label>
+<input type= "text" id="product_name" name="product_name" required>
+</div>
+<div class= "form-group">
+<label for="quantity">quantity</label>
+<input type= "number" id="quantity" name="quantity" required>
+</div>
+<div class= "form-group">
+<label for="price">price(KES)</label>
+<input type= "text" id="price" name="price" placeholder="e.g 120.50" required>
+</div>
+<div class= "form-group">
+<label for="category">category</label>
+<select id="category" name="category">
+<option value="dairy">dairy</option>
+<option value="bakery">bakery</option>
+<option value="produce">fresh produce</option>
+<option value="dry_goods">dry goods</option>
+<option value="other">other</option>
+</select>
+</div>
+<section id="settings">
+<h2> system settings</h2>
+<div class="settings-group">
+<h3< general preferences</h3>
+<label>
+enable low stock levels<br>
+<span class="toggle-switch active"></span>
+</label>
+<label>
+default currency<br>
+<select style="width:100px">
+<option>KES</option>
+<option>USD</option>
+</select
+</label>
+</div>
+<div class="settings-group">
+<h3>user management</h3>
+<p style=font-size:0.9rem; color: #555">manage users and permissions(requires advanced backbend).</p>
+</div>
+</section>
+<button type="submit">saved</button>
+</form>
+</section>
+</main>
+<footer>
+<p>©MWANGI MILKA 2025 kiambu,Kenya</p>
+<p>CONTACT:Phone:0112873218 email:mwangimilka@gmail.com</p>
+</footer>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
