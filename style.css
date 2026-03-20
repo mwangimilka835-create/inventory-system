@@ -349,6 +349,26 @@ background-color:var(--color-secondary);
         table { width: 100%; border: 1px solid black; }
         th, td { border: 1px solid black; padding: 8px; }
     }
+/* This part only works when you click Print */
+@media print {
+    /* Hide the navigation menu, the blue 'welcome' box, and the input forms */
+    .dashboard, .add-new-product, button, .system-settings, .footer, img {
+        display: none !important;
+    }
+
+    /* Make the table take up the whole page width on paper */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* Add clear black borders so it looks like a real report */
+    th, td {
+        border: 1px solid black !important;
+        padding: 10px;
+        color: black !important;
+    }
+    }
 </style>
 
 
