@@ -326,7 +326,8 @@ padding:0.5rem 0;
 border-bottom:1px dashed #f3f4f6;
 }
 .toggle-switch{
-width:40px;height:20px;
+width:40px;
+height:20px;
 }
 .toggle-switch{ 
 background-color:#f3f4f6;
@@ -339,7 +340,16 @@ position:relative;
 background-color:var(--color-secondary);
 }
 }
+<style>
+    /* ... your existing CSS for table, body, etc. ... */
 
+    /* PASTE THE NEW CODE HERE */
+    @media print {
+        button, .form-container, img, h1 { display: none !important; }
+        table { width: 100%; border: 1px solid black; }
+        th, td { border: 1px solid black; padding: 8px; }
+    }
+</style>
 
 
 
