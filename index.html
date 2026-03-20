@@ -171,7 +171,12 @@ document.addEventListener('click', function (event) {
 
         // 4. Add the buttons cell
         let actionCell = row.insertCell(3);
-        actionCell.innerHTML = '<button style="background:red;color:white;border:none;border-radius:3px;padding:2px 5px;" onclick="this.parentElement.parentElement.remove()">delete</button>';
+        actionCell.innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+        <button style="font-size: 10px; background: #eee; border: 1px solid #ccc; border-radius: 3px;">edit</button>
+        <button style="font-size: 10px; background: #ff4d4d; color: white; border: none; border-radius: 3px;" onclick="this.closest('tr').remove()">delete</button>
+    </div>
+`;
 
         // 5. Clear the form
         allInputs[0].value = "";
