@@ -145,37 +145,40 @@ default currency<br>
 </footer>
 </div>
 <script>
-// 1. Tell the script to wait for the "Save Product" button click
 document.addEventListener('click', function (event) {
-    if (event.target && event.target.textContent === 'Save Product') {
+    // This finds ANY button that says "Save" or "saved"
+    if (event.target && (event.target.textContent.toLowerCase().includes('save'))) {
         
-        // 2. Locate your input boxes by their labels
-        let nameInput = document.querySelector('input[placeholder="product name"]');
-        let qtyInput = document.querySelector('input[type="number"]');
-        let priceInput = document.querySelector('input[placeholder="e.g 120.50"]');
+        // 1. Get all your input boxes
+        let inputs = document.querySelectorAll('input');
+        let name = inputs[0].value;  // First box
+        let qty = inputs[1].value;   // Second box
+        let price = inputs[2] ? inputs[2].value : "0"; // Third box
 
-        // 3. Validation: Don't add empty rows
-        if (!nameInput.value || !qtyInput.value) {
+        if (!name || !qty) {
             alert("Please enter a name and quantity!");
             return;
         }
 
-        // 4. Find the Inventory Table
+        // 2. Find the table
         let table = document.querySelector('table');
-        
-        // 5. Add the new row at the bottom
-        let row = table.insertRow(-1); 
-        
-        // 6. Fill the cells (Name, Quantity, Price)
-        row.insertCell(0).innerHTML = nameInput.value;
-        row.insertCell(1).innerHTML = qtyInput.value;
-        row.insertCell(2).innerHTML = priceInput.value || "0.00";
+        if (!table) {
+            alert("Table not found! Make sure you have a <table> tag.");
+            return;
+        }
 
-        // 7. Success! Clear the boxes for the next item
-        alert(nameInput.value + " added to table!");
-        nameInput.value = "";
-        qtyInput.value = "";
-        priceInput.value = "";
+        // 3. Add the row
+        let row = table.insertRow(-1); 
+        row.insertCell(0).innerHTML = name;
+        row.insertCell(1).innerHTML = qty;
+        row.insertCell(2).innerHTML = price;
+
+        // 4. Clear and Alert
+        inputs[0].value = "";
+        inputs[1].value = "";
+        if(inputs[2]) inputs[2].value = "";
+        
+        alert(name + " added successfully!");
     }
 });
 </script>
