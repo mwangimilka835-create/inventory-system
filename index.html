@@ -145,38 +145,36 @@ default currency<br>
 </footer>
 </div>
  <script>
-document.getElementById('saveBtn').onclick = function() {
-    // 1. Get the values from your input boxes
-    let nameInput = document.querySelector('input[placeholder="product name"]');
-    let qtyInput = document.querySelector('input[type="number"]');
-    let priceInput = document.querySelector('input[placeholder="e.g 120.50"]');
+// We use the 'saved' button you clicked in the video
+document.querySelector('button').onclick = function() {
+    
+    // 1. Capture the data you typed (Egg, 20, 400)
+    let name = document.querySelector('input[placeholder="product name"]').value;
+    let qty = document.querySelector('input[type="number"]').value;
+    let price = document.querySelector('input[placeholder="e.g 120.50"]').value;
 
-    // 2. Check if they are empty
-    if(nameInput.value === "" || qtyInput.value === "") {
-        alert("Please enter a product name and quantity!");
+    if(name === "" || qty === "") {
+        alert("Please enter both a name and quantity!");
         return;
     }
 
-    // 3. Find your inventory table body
+    // 2. Find the 'current inventory' table
     let table = document.querySelector('table');
     
-    // 4. Create a new row at the bottom
+    // 3. Create a new row at the very bottom
     let row = table.insertRow(-1); 
     
-    // 5. Insert the data into the cells
-    let cell1 = row.insertCell(0);
-    let cell2 = row.insertCell(1);
-    let cell3 = row.insertCell(2);
+    // 4. Fill in the columns
+    row.insertCell(0).innerHTML = name;
+    row.insertCell(1).innerHTML = qty;
+    row.insertCell(2).innerHTML = price;
 
-    cell1.innerHTML = nameInput.value;
-    cell2.innerHTML = qtyInput.value;
-    cell3.innerHTML = priceInput.value || "0.00";
+    // 5. Clear the form so you can add another item
+    document.querySelector('input[placeholder="product name"]').value = "";
+    document.querySelector('input[type="number"]').value = "";
+    document.querySelector('input[placeholder="e.g 120.50"]').value = "";
 
-    // 6. Success message and Clear the form
-    alert(nameInput.value + " added successfully!");
-    nameInput.value = "";
-    qtyInput.value = "";
-    priceInput.value = "";
+    alert(name + " added to the inventory table!");
 };
  </script>
 </body>
