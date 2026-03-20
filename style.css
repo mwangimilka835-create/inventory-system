@@ -349,26 +349,63 @@ background-color:var(--color-secondary);
         table { width: 100%; border: 1px solid black; }
         th, td { border: 1px solid black; padding: 8px; }
     }
-/* This part only works when you click Print */
+/* --- PRINT RULES START --- */
 @media print {
-    /* Hide the navigation menu, the blue 'welcome' box, and the input forms */
-    .dashboard, .add-new-product, button, .system-settings, .footer, img {
+    /* Hide the navigation, forms, settings, and buttons */
+    .dashboard, .add-new-product, .system-settings, .footer, button, img, h1 {
         display: none !important;
     }
 
-    /* Make the table take up the whole page width on paper */
+    /* Make the body white and remove the yellow background */
+    body {
+        background-color: white !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Center and clean up the table */
     table {
         width: 100%;
         border-collapse: collapse;
+        margin-top: 20px;
     }
 
-    /* Add clear black borders so it looks like a real report */
     th, td {
-        border: 1px solid black !important;
+        border: 1px solid black !important; /* Thick black lines for paper */
         padding: 10px;
         color: black !important;
+        text-align: left;
     }
+}
+/* --- PRINT RULES START --- */
+@media print {
+    /* Hide the navigation, forms, settings, and buttons */
+    .dashboard, .add-new-product, .system-settings, .footer, button, img, h1 {
+        display: none !important;
     }
+
+    /* Make the body white and remove the yellow background */
+    body {
+        background-color: white !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Center and clean up the table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid black !important; /* Thick black lines for paper */
+        padding: 10px;
+        color: black !important;
+        text-align: left;
+    }
+}
+/* --- PRINT RULES END --- */
 </style>
 
 
