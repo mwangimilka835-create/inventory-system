@@ -144,39 +144,41 @@ default currency<br>
 <p>CONTACT:Phone:0112873218 email:mwangimilka@gmail.com</p>
 </footer>
 </div>
- <script>
-// We use the 'saved' button you clicked in the video
-document.querySelector('button').onclick = function() {
-    
-    // 1. Capture the data you typed (Egg, 20, 400)
-    let name = document.querySelector('input[placeholder="product name"]').value;
-    let qty = document.querySelector('input[type="number"]').value;
-    let price = document.querySelector('input[placeholder="e.g 120.50"]').value;
+<script>
+// 1. Tell the script to wait for the "Save Product" button click
+document.addEventListener('click', function (event) {
+    if (event.target && event.target.textContent === 'Save Product') {
+        
+        // 2. Locate your input boxes by their labels
+        let nameInput = document.querySelector('input[placeholder="product name"]');
+        let qtyInput = document.querySelector('input[type="number"]');
+        let priceInput = document.querySelector('input[placeholder="e.g 120.50"]');
 
-    if(name === "" || qty === "") {
-        alert("Please enter both a name and quantity!");
-        return;
+        // 3. Validation: Don't add empty rows
+        if (!nameInput.value || !qtyInput.value) {
+            alert("Please enter a name and quantity!");
+            return;
+        }
+
+        // 4. Find the Inventory Table
+        let table = document.querySelector('table');
+        
+        // 5. Add the new row at the bottom
+        let row = table.insertRow(-1); 
+        
+        // 6. Fill the cells (Name, Quantity, Price)
+        row.insertCell(0).innerHTML = nameInput.value;
+        row.insertCell(1).innerHTML = qtyInput.value;
+        row.insertCell(2).innerHTML = priceInput.value || "0.00";
+
+        // 7. Success! Clear the boxes for the next item
+        alert(nameInput.value + " added to table!");
+        nameInput.value = "";
+        qtyInput.value = "";
+        priceInput.value = "";
     }
-
-    // 2. Find the 'current inventory' table
-    let table = document.querySelector('table');
-    
-    // 3. Create a new row at the very bottom
-    let row = table.insertRow(-1); 
-    
-    // 4. Fill in the columns
-    row.insertCell(0).innerHTML = name;
-    row.insertCell(1).innerHTML = qty;
-    row.insertCell(2).innerHTML = price;
-
-    // 5. Clear the form so you can add another item
-    document.querySelector('input[placeholder="product name"]').value = "";
-    document.querySelector('input[type="number"]').value = "";
-    document.querySelector('input[placeholder="e.g 120.50"]').value = "";
-
-    alert(name + " added to the inventory table!");
-};
- </script>
+});
+</script>
 </body>
 </html>
 
