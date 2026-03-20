@@ -145,6 +145,14 @@ default currency<br>
 </footer>
 </div>
 <script>
+ // This makes the 'Delete' buttons on your ORIGINAL rows work!
+document.querySelector('table').addEventListener('click', function(e) {
+    if (e.target && e.target.innerHTML.toLowerCase() === 'delete') {
+        if(confirm("Are you sure you want to remove this item?")) {
+            e.target.closest('tr').remove();
+        }
+    }
+});
 // We look for the button by its exact position to avoid text errors
 document.addEventListener('click', function (event) {
     if (event.target.tagName === 'BUTTON' && event.target.innerHTML.toLowerCase().includes('save')) {
