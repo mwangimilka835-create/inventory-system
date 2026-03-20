@@ -144,6 +144,35 @@ default currency<br>
 <p>CONTACT:Phone:0112873218 email:mwangimilka@gmail.com</p>
 </footer>
 </div>
+ <script>
+document.querySelector('button[type="button"]').addEventListener('click', function() {
+    // 1. Get the values from your input boxes
+    let name = document.querySelector('input[placeholder="product name"]').value;
+    let qty = document.querySelector('input[type="number"]').value;
+    let price = document.querySelector('input[placeholder="e.g 120.50"]').value;
+
+    if(name === "" || qty === "") {
+        alert("Please enter a product name and quantity!");
+        return;
+    }
+
+    // 2. Find your inventory table
+    let table = document.querySelector('table');
+    
+    // 3. Create a new row
+    let row = table.insertRow(-1); 
+    
+    // 4. Insert the data into the cells
+    row.insertCell(0).innerHTML = name;
+    row.insertCell(1).innerHTML = qty;
+    row.insertCell(2).innerHTML = price;
+
+    // 5. Clear the form for the next item
+    document.querySelector('input[placeholder="product name"]').value = "";
+    document.querySelector('input[type="number"]').value = "";
+    alert(name + " added to inventory!");
+});
+ </script>
 </body>
 </html>
 
