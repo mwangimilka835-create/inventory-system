@@ -375,7 +375,6 @@ background-color:var(--color-secondary);
         padding: 10px;
         color: black !important;
         text-align: left;
-    }
 }
 /* --- PRINT RULES START --- */
 @media print {
