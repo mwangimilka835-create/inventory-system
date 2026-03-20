@@ -145,58 +145,40 @@ default currency<br>
 </footer>
 </div>
 <script>
+// We look for the button by its exact position to avoid text errors
 document.addEventListener('click', function (event) {
-    // 1. Find the button you clicked
-    const btn = event.target;
-    
-    // 2. Only run if it's a 'Save' button (case-insensitive)
-    if (btn.tagName === 'BUTTON' && btn.textContent.toLowerCase().includes('save')) {
+    if (event.target.tagName === 'BUTTON' && event.target.innerHTML.toLowerCase().includes('save')) {
         
-        // 3. Find your inputs
-        const nameInput = document.querySelector('input[placeholder*="name"]');
-        const qtyInput = document.querySelector('input[type="number"]');
-        const priceInput = document.querySelector('input[placeholder*="e.g"]');
+        // 1. Get the 3 input boxes by their order on the screen
+        let allInputs = document.getElementsByTagName('input');
+        let name = allInputs[0].value;
+        let qty = allInputs[1].value;
+        let price = allInputs[2].value || "0";
 
-        const name = nameInput.value.trim();
-        const qty = qtyInput.value.trim();
-        const price = priceInput.value.trim() || "0";
-
-        if (!name || !qty) {
-            alert("Please enter a name and quantity!");
+        if (name === "" || qty === "") {
+            alert("Please fill in Name and Quantity");
             return;
         }
 
-        // 4. Find the table and add the row
-        const table = document.querySelector('table');
-        const row = table.insertRow(-1); 
+        // 2. Find the table and add the row
+        let table = document.getElementsByTagName('table')[0];
+        let row = table.insertRow(-1);
 
-        // 5. Add the data cells
+        // 3. Add the data cells
         row.insertCell(0).innerHTML = name;
         row.insertCell(1).innerHTML = qty;
         row.insertCell(2).innerHTML = price;
 
-        // 6. Add the Edit/Delete buttons so it matches your style
-        const actionCell = row.insertCell(3);
-        actionCell.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-                <button style="font-size: 10px; background: #eee; border: 1px solid #ccc; border-radius: 3px;">edit</button>
-                <button class="delete-btn" style="font-size: 10px; background: #ff4d4d; color: white; border: none; border-radius: 3px;">delete</button>
-            </div>
-        `;
+        // 4. Add the buttons cell
+        let actionCell = row.insertCell(3);
+        actionCell.innerHTML = '<button style="background:red;color:white;border:none;border-radius:3px;padding:2px 5px;" onclick="this.parentElement.parentElement.remove()">delete</button>';
 
-        // 7. Clear the form
-        nameInput.value = "";
-        qtyInput.value = "";
-        priceInput.value = "";
+        // 5. Clear the form
+        allInputs[0].value = "";
+        allInputs[1].value = "";
+        allInputs[2].value = "";
         
-        alert(name + " added successfully!");
-    }
-
-    // 8. BONUS: Make the 'Delete' buttons actually work!
-    if (btn.classList.contains('delete-btn')) {
-        if(confirm("Delete this item?")) {
-            btn.closest('tr').remove();
-        }
+        alert("Success: " + name + " added!");
     }
 });
 </script>
