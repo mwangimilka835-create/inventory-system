@@ -145,33 +145,39 @@ default currency<br>
 </footer>
 </div>
  <script>
-document.querySelector('button[type="button"]').addEventListener('click', function() {
+document.getElementById('saveBtn').onclick = function() {
     // 1. Get the values from your input boxes
-    let name = document.querySelector('input[placeholder="product name"]').value;
-    let qty = document.querySelector('input[type="number"]').value;
-    let price = document.querySelector('input[placeholder="e.g 120.50"]').value;
+    let nameInput = document.querySelector('input[placeholder="product name"]');
+    let qtyInput = document.querySelector('input[type="number"]');
+    let priceInput = document.querySelector('input[placeholder="e.g 120.50"]');
 
-    if(name === "" || qty === "") {
+    // 2. Check if they are empty
+    if(nameInput.value === "" || qtyInput.value === "") {
         alert("Please enter a product name and quantity!");
         return;
     }
 
-    // 2. Find your inventory table
+    // 3. Find your inventory table body
     let table = document.querySelector('table');
     
-    // 3. Create a new row
+    // 4. Create a new row at the bottom
     let row = table.insertRow(-1); 
     
-    // 4. Insert the data into the cells
-    row.insertCell(0).innerHTML = name;
-    row.insertCell(1).innerHTML = qty;
-    row.insertCell(2).innerHTML = price;
+    // 5. Insert the data into the cells
+    let cell1 = row.insertCell(0);
+    let cell2 = row.insertCell(1);
+    let cell3 = row.insertCell(2);
 
-    // 5. Clear the form for the next item
-    document.querySelector('input[placeholder="product name"]').value = "";
-    document.querySelector('input[type="number"]').value = "";
-    alert(name + " added to inventory!");
-});
+    cell1.innerHTML = nameInput.value;
+    cell2.innerHTML = qtyInput.value;
+    cell3.innerHTML = priceInput.value || "0.00";
+
+    // 6. Success message and Clear the form
+    alert(nameInput.value + " added successfully!");
+    nameInput.value = "";
+    qtyInput.value = "";
+    priceInput.value = "";
+};
  </script>
 </body>
 </html>
