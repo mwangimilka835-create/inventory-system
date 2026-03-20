@@ -146,39 +146,39 @@ default currency<br>
 </div>
 <script>
 document.addEventListener('click', function (event) {
-    // This finds ANY button that says "Save" or "saved"
-    if (event.target && (event.target.textContent.toLowerCase().includes('save'))) {
-        
-        // 1. Get all your input boxes
-        let inputs = document.querySelectorAll('input');
-        let name = inputs[0].value;  // First box
-        let qty = inputs[1].value;   // Second box
-        let price = inputs[2] ? inputs[2].value : "0"; // Third box
+    if (event.target && event.target.textContent === 'Save Product') {
+        let name = document.querySelector('input[placeholder="product name"]').value;
+        let qty = document.querySelector('input[type="number"]').value;
+        let price = document.querySelector('input[placeholder="e.g 120.50"]').value;
 
         if (!name || !qty) {
             alert("Please enter a name and quantity!");
             return;
         }
 
-        // 2. Find the table
         let table = document.querySelector('table');
-        if (!table) {
-            alert("Table not found! Make sure you have a <table> tag.");
-            return;
-        }
-
-        // 3. Add the row
         let row = table.insertRow(-1); 
+
+        // Add the Data Cells
         row.insertCell(0).innerHTML = name;
         row.insertCell(1).innerHTML = qty;
-        row.insertCell(2).innerHTML = price;
+        row.insertCell(2).innerHTML = price || "0";
 
-        // 4. Clear and Alert
-        inputs[0].value = "";
-        inputs[1].value = "";
-        if(inputs[2]) inputs[2].value = "";
-        
+        // Add the Actions Cell with Buttons
+        let actionCell = row.insertCell(3);
+        actionCell.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <button style="background: #eee; border: 1px solid #ccc; border-radius: 4px;">edit</button>
+                <button style="background: #ff4d4d; color: white; border: none; border-radius: 4px;">delete</button>
+            </div>
+        `;
+
         alert(name + " added successfully!");
+        
+        // Clear inputs
+        document.querySelector('input[placeholder="product name"]').value = "";
+        document.querySelector('input[type="number"]').value = "";
+        document.querySelector('input[placeholder="e.g 120.50"]').value = "";
     }
 });
 </script>
