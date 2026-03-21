@@ -196,6 +196,38 @@ document.addEventListener('click', function (event) {
         alert("Success: " + name + " added!");
     }
 });
+ <script>
+    // This is the function that was missing!
+    function saveProduct() {
+        // 1. Get the values from your input boxes
+        const nameInput = document.querySelector('input[placeholder="product name"]');
+        const qtyInput = document.querySelector('input[placeholder="quantity"]');
+        const priceInput = document.querySelector('input[placeholder="price(KES)"]');
+
+        // 2. Check if they are empty
+        if (!nameInput.value || !qtyInput.value || !priceInput.value) {
+            alert("Please fill in all fields!");
+            return;
+        }
+
+        // 3. Find the table body (this ensures it prints correctly!)
+        const tableBody = document.querySelector("#inventory-table tbody");
+        const newRow = tableBody.insertRow();
+
+        // 4. Create the 4 columns and fill them
+        newRow.insertCell(0).innerText = nameInput.value;
+        newRow.insertCell(1).innerText = qtyInput.value;
+        newRow.insertCell(2).innerText = priceInput.value;
+        newRow.insertCell(3).innerHTML = '<button style="background:red; color:white; border:none; padding:5px; border-radius:3px;" onclick="this.closest(\'tr\').remove()">Delete</button>';
+
+        // 5. Clear the boxes for the next item
+        nameInput.value = "";
+        qtyInput.value = "";
+        priceInput.value = "";
+
+        alert("Item added successfully!");
+    }
+</script>
 </script>
 </body>
 </html>
