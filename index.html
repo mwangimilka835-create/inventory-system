@@ -53,28 +53,28 @@
         <h1>🍞 My Bakery Inventory</h1>
         <p>Keep track of your stock easily.</p>
     </div>
-
-    <div class="form-container">
-        <div class="welcome-section" style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #2980b9;">
-    <h2>Welcome back, Milka! 👋</h2>
-    <p>Manage your bakery stock for today.</p>
-</div>
-
-<div style="display: flex; gap: 10px; margin-bottom: 20px;">
-    <div style="flex: 1; background: #27ae60; color: white; padding: 15px; border-radius: 8px; text-align: center;">
-        <small>Total Items</small>
-        <h3 id="total-items-count">0</h3>
-    </div>
-    <div style="flex: 1; background: #e67e22; color: white; padding: 15px; border-radius: 8px; text-align: center;">
-        <small>Stock Value</small>
-        <h3 id="total-value-count">KES 0</h3>
-    </div>
-
-    <button class="print-btn" onclick="window.print()">🖨️ Print Inventory Report</button>
 <div class="form-container">
+    <div class="welcome-section" style="border-left: 5px solid #2980b9; padding-left: 10px;">
+        <h2>Welcome back, Milka! 👋</h2>
+        <p>Manage your bakery stock for today.</p>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin: 20px 0;">
+        <div style="flex: 1; background: #27ae60; color: white; padding: 15px; border-radius: 8px; text-align: center;">
+            <small>Total Items</small>
+            <h3 id="total-items-count" style="margin: 5px 0;">0</h3>
+        </div>
+        <div style="flex: 1; background: #e67e22; color: white; padding: 15px; border-radius: 8px; text-align: center;">
+            <small>Stock Value</small>
+            <h3 id="total-value-count" style="margin: 5px 0;">KES 0</h3>
+        </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
     <h3>Add New Product</h3>
     <input type="text" id="pName" placeholder="Product Name">
-</div>
+    
     <select id="pCategory" style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
         <option value="Bakery">🍞 Bakery</option>
         <option value="Dairy">🥛 Dairy</option>
@@ -86,7 +86,9 @@
     <input type="number" id="pPrice" placeholder="Price (KES)">
 
     <button type="button" class="add-btn" onclick="saveProduct()">Save Product</button>
-</div>     
+    <button type="button" class="print-btn" onclick="window.print()" style="background: #34495e; color: white; margin-top: 10px;">🖨️ Print Report</button>
+</div>
+   
     <table id="inventory-table">
         <thead>
             <tr>
