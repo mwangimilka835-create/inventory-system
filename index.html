@@ -131,7 +131,7 @@ cells[3].innerText) || 0; // Corrected column index for Qty
         row.insertCell(5).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
 
         // Column 6: WhatsApp Order Button (Replace with your actual number)
-        let myNumber = "254700000000"; 
+        let myNumber = "254112873218"; 
         let message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${qty * price}`;
         let encodedMsg = encodeURIComponent(message);
         row.insertCell(6).innerHTML = `<a href="https://wa.me/${myNumber}?text=${encodedMsg}" target="_blank" class="no-print"><button style="background: #25D366; color: white; padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button></a>`;
