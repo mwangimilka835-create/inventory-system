@@ -3,39 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Milka's Smart Inventory</title>
+    <title>Smart Inventory System</title>
     <style>
-    body { font-family: Arial, sans-serif; background-color: #f1c40f; margin: 0; padding: 20px; }
-    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .header { background: #2980b9; color: white; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
-    .stats { display: flex; gap: 10px; margin-bottom: 20px; }
-    .stat-box { flex: 1; padding: 15px; border-radius: 8px; color: white; text-align: center; }
-    input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-    button { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    .add-btn { background: #27ae60; color: white; }
-    .print-btn { background: #34495e; color: white; }
-    .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; width: auto; margin: 0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-    th { background-color: #f2f2f2; }
-
-    /* --- THE PRINT FIX --- */
-    @media print {
-        /* Hide everything except the table and the header */
-        body { background: white !important; padding: 0; }
-        .header h1 { color: black; }
-        .container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; }
-        
-        /* Hide buttons, inputs, and the "Welcome" message */
-        .add-btn, .print-btn, .delete-btn, input, select, h3, .stats, .welcome-section { 
-            display: none !important; 
-        }
-
-        /* Show the table clearly */
-        table { width: 100%; border: 1px solid black; }
-        th, td { border: 1px solid black !important; color: black; }
-    }
-          </style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1c40f; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }
+        .welcome-box { border-left: 6px solid #2980b9; padding-left: 15px; margin-bottom: 25px; color: #34495e; }
+        .stats { display: flex; gap: 15px; margin-bottom: 25px; }
+        .stat-box { flex: 1; padding: 15px; border-radius: 10px; color: white; text-align: center; }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.3s; }
+        .add-btn { background: #27ae60; color: white; }
+        .add-btn:hover { background: #219150; }
+        .print-btn { background: #34495e; color: white; }
+        .export-btn { background: #2980b9; color: white; }
+        .delete-btn { background: #e74c3c; color: white; padding: 6px 12px; width: auto; margin: 0; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; color: #2c3e50; }
+        .no-print { display: table-cell; }
+        @media print { .no-print, .add-btn, .print-btn, .export-btn, input, select, h3, .welcome-box, #searchInput { display: none !important; } body { background: white; } .container { box-shadow: none; width: 100%; max-width: 100%; } table { border: 1px solid #000; } th, td { border: 1px solid #000 !important; } }
+    </style>
 </head>
 <body>
 
@@ -44,9 +32,9 @@
 </div>
 
 <div class="container">
-    <div style="border-left: 5px solid #2980b9; padding-left: 10px; margin-bottom: 20px;">
-    <h2>Welcome, <span id="user-name-display">Guest</span>! 👋</h2>
-    <p>Manage your business stock efficiently.</p>
+    <div class="welcome-box">
+        <h2>Welcome, <span id="user-name-display">Guest</span>! 👋</h2>
+        <p>Keep track of your stock and business value.</p>
     </div>
 
     <div class="stats">
@@ -55,27 +43,29 @@
             <h3 id="total-items-count">0</h3>
         </div>
         <div class="stat-box" style="background: #e67e22;">
-            <small>Stock Value</small>
+            <small>Total Value</small>
             <h3 id="total-value-count">KES 0</h3>
         </div>
     </div>
 
     <h3>Add New Product</h3>
-    <input type="text" id="pName" placeholder="Product Name">
+    <input type="text" id="pName" placeholder="Product Name (e.g. Milk, Keyboard)">
     <select id="pCategory">
-        <option value="Bakery">🍞 Bakery</option>
-        <option value="Dairy">🥛 Dairy</option>
-        <option value="General">📦 General</option>
-        <option value="Drinks">🥤 Drinks</option>
+        <option value="General">📦 General Stock</option>
+        <option value="Bakery">🍞 Bakery Items</option>
+        <option value="Dairy">🥛 Dairy & Poultry</option>
+        <option value="Electronics">🔌 Electronics/ICT</option>
+        <option value="Drinks">🥤 Beverages</option>
     </select>
     <input type="number" id="pQty" placeholder="Quantity">
     <input type="number" id="pPrice" placeholder="Price (KES)">
 
-    <button class="add-btn" onclick="saveProduct()">Save Product</button>
-    <button class="print-btn" onclick="window.print()">Print Inventory Report</button>
-    
-<button type="button" class="export-btn" style="background: #27ae60; color: white; margin-top: 10px; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="exportTableToCSV('Inventory_Report.csv')">📊 Export to Excel (CSV)</button>
-<input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 Search for products..." style="margin-top: 20px; border: 2px solid #2980b9;">
+    <button type="button" class="add-btn" onclick="saveProduct()">✅ Save Product</button>
+    <button type="button" class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+    <button type="button" class="export-btn" onclick="exportTableToCSV('Stock_Report.csv')">📊 Export to Excel</button>
+
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 Search products..." style="border: 2px solid #2980b9;">
+
     <table id="inventory-table">
         <thead>
             <tr>
@@ -83,7 +73,7 @@
                 <th>Category</th>
                 <th>Qty</th>
                 <th>Price</th>
-                <th>Action</th>
+                <th class="no-print">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -91,65 +81,64 @@
     </table>
 </div>
 
+<footer style="text-align: center; margin-top: 30px; color: #7f8c8d; font-size: 13px;">
+    <p>© 2026 Inventory Management System | Designed by Milka Mumbi</p>
+</footer>
+
 <script>
-    // 1. Ask for Name when page opens
+    // 1. POPUP NAME
     window.onload = function() {
-        var name = prompt("Please enter your name:");
-        if (name == null || name == "") { name = "User"; }
-        var display = document.getElementById("user-name-display");
-        if(display) display.innerText = name;
+        let name = prompt("Please enter your name:");
+        if (!name) name = "User";
+        document.getElementById("user-name-display").innerText = name;
     };
 
-    // 2. THE SAVE PRODUCT BUTTON BRAIN
+    // 2. SAVE PRODUCT
     function saveProduct() {
-        // Get values from input boxes
-        var name = document.getElementById("pName").value;
-        var category = document.getElementById("pCategory").value;
-        var qty = document.getElementById("pQty").value;
-        var price = document.getElementById("pPrice").value;
+        let name = document.getElementById("pName").value;
+        let cat = document.getElementById("pCategory").value;
+        let qty = document.getElementById("pQty").value;
+        let price = document.getElementById("pPrice").value;
 
-        // Validation: Don't save if boxes are empty
         if (name === "" || qty === "" || price === "") {
-            alert("Please fill in the Product Name, Quantity, and Price!");
+            alert("Please fill in all fields!");
             return;
         }
 
-        // Find the table and add a new row
-        var table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-        var row = table.insertRow();
+        let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        let row = table.insertRow();
         
-        row.insertCell(0).innerHTML = name;
-        row.insertCell(1).innerHTML = category;
-        row.insertCell(2).innerHTML = qty;
-        row.insertCell(3).innerHTML = price;
-        row.insertCell(4).innerHTML = '<button class="delete-btn" onclick="removeRow(this)">Delete</button>';
+        row.insertCell(0).innerText = name;
+        row.insertCell(1).innerText = cat;
+        row.insertCell(2).innerText = qty;
+        row.insertCell(3).innerText = price;
+        row.insertCell(4).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
 
-        // Reset the boxes for the next item
+        // Clear Inputs
         document.getElementById("pName").value = "";
         document.getElementById("pQty").value = "";
         document.getElementById("pPrice").value = "";
 
-        // Update the dashboard math
         updateDashboard();
     }
 
-    // 3. The Delete Button Function
+    // 3. REMOVE ROW
     function removeRow(btn) {
         btn.parentElement.parentElement.remove();
         updateDashboard();
     }
 
-    // 4. Update Math & Low Stock Alerts
+    // 4. UPDATE DASHBOARD & COLORS
     function updateDashboard() {
-        var tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-        var rows = tbody.getElementsByTagName('tr');
-        var totalValue = 0;
+        let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        let rows = tbody.getElementsByTagName('tr');
+        let totalVal = 0;
 
-        for (var i = 0; i < rows.length; i++) {
-            var q = parseFloat(rows[i].cells[2].innerText) || 0;
-            var p = parseFloat(rows[i].cells[3].innerText) || 0;
-            
-            // Turn row RED if stock is less than 5
+        for (let i = 0; i < rows.length; i++) {
+            let q = parseFloat(rows[i].cells[2].innerText) || 0;
+            let p = parseFloat(rows[i].cells[3].innerText) || 0;
+
+            // Low Stock Warning
             if (q < 5) {
                 rows[i].style.backgroundColor = "#ff7675";
                 rows[i].style.color = "white";
@@ -157,42 +146,40 @@
                 rows[i].style.backgroundColor = "white";
                 rows[i].style.color = "black";
             }
-            totalValue += (q * p);
+            totalVal += (q * p);
         }
 
         document.getElementById("total-items-count").innerText = rows.length;
-        document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
+        document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
 
-    // 5. Search Function
+    // 5. SEARCH
     function searchTable() {
-        var input = document.getElementById("searchInput");
-        var filter = input.value.toUpperCase();
-        var table = document.getElementById("inventory-table");
-        var tr = table.getElementsByTagName("tr");
+        let input = document.getElementById("searchInput").value.toUpperCase();
+        let tr = document.getElementById("inventory-table").getElementsByTagName("tr");
 
-        for (var i = 1; i < tr.length; i++) {
-            var td = tr[i].getElementsByTagName("td")[0];
+        for (let i = 1; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName("td")[0];
             if (td) {
-                var txtValue = td.textContent || td.innerText;
-                tr[i].style.display = (txtValue.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+                let txt = td.textContent || td.innerText;
+                tr[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
             }
         }
     }
 
-    // 6. Excel Export Function
+    // 6. EXCEL EXPORT
     function exportTableToCSV(filename) {
-        var csv = [];
-        var rows = document.querySelectorAll("table tr");
-        for (var i = 0; i < rows.length; i++) {
-            var row = [], cols = rows[i].querySelectorAll("td, th");
-            for (var j = 0; j < cols.length - 1; j++) {
+        let csv = [];
+        let rows = document.querySelectorAll("table tr");
+        for (let i = 0; i < rows.length; i++) {
+            let row = [], cols = rows[i].querySelectorAll("td, th");
+            for (let j = 0; j < cols.length - 1; j++) {
                 row.push('"' + cols[j].innerText + '"');
             }
             csv.push(row.join(","));
         }
-        var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-        var downloadLink = document.createElement("a");
+        let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+        let downloadLink = document.createElement("a");
         downloadLink.download = filename;
         downloadLink.href = window.URL.createObjectURL(csvFile);
         document.body.appendChild(downloadLink);
@@ -203,8 +190,6 @@
 
 </body>
 </html>
-
-
 
 
 
