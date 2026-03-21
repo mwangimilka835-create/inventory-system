@@ -76,34 +76,60 @@
     </table>
 
     <script>
-        function saveProduct() {
-            // Get inputs by ID (much safer!)
-            var name = document.getElementById("pName").value;
-            var qty = document.getElementById("pQty").value;
-            var price = document.getElementById("pPrice").value;
+       function saveProduct() {
+    var name = document.getElementById("pName").value;
+    var qty = document.getElementById("pQty").value;
+    var price = document.getElementById("pPrice").value;
 
-            if (name == "" || qty == "" || price == "") {
-                alert("Please fill all boxes!");
-                return;
-            }
+    if (name == "" || qty == "" || price == "") {
+        alert("Please fill all boxes!");
+        return;
+    }
 
-            // Find the table body
-            var table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-            var row = table.insertRow();
+    var table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+    var row = table.insertRow();
+    row.insertCell(0).innerHTML = name;
+    row.insertCell(1).innerHTML = qty;
+    row.insertCell(2).innerHTML = price;
+    row.insertCell(3).innerHTML = '<button class="delete-btn" onclick="removeRow(this)">Delete</button>';
 
-            // Insert cells
-            row.insertCell(0).innerHTML = name;
-            row.insertCell(1).innerHTML = qty;
-            row.insertCell(2).innerHTML = price;
-            row.insertCell(3).innerHTML = '<button class="delete-btn" onclick="this.parentElement.parentElement.remove()">Delete</button>';
+    // Clear inputs
+    document.getElementById("pName").value = "";
+    document.getElementById("pQty").value = "";
+    document.getElementById("pPrice").value = "";
+    
+    // UPDATE THE DASHBOARD CARDS
+    updateDashboard();
+    alert("Success: " + name + " added!");
+}
 
-            // Clear inputs
-            document.getElementById("pName").value = "";
-            document.getElementById("pQty").value = "";
-            document.getElementById("pPrice").value = "";
+// New function to handle deleting and updating counts
+function removeRow(btn) {
+    btn.parentElement.parentElement.remove();
+    updateDashboard();
+}
+
+// The "Brain" that calculates your totals
+function updateDashboard() {
+    var table = document.getElementById("inventory-table");
+    var tbody = table.getElementsByTagName('tbody')[0];
+    var rows = tbody.getElementsByTagName('tr');
+    
+    var totalItems = rows.length;
+    var totalValue = 0;
+
+    for (var i = 0; i < rows.length; i++) {
+        var q = parseFloat(rows[i].cells[1].innerText) || 0;
+        var p = parseFloat(rows[i].cells[2].innerText) || 0;
+        totalValue += (q * p);
+    }
+
+    // Push the numbers into your green and orange boxes
+    document.getElementById("total-items-count").innerText = totalItems;
+    document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
+        } 
             
-            alert("Success: " + name + " added!");
-        }
+            
     </script>
 
 </body>
