@@ -103,31 +103,48 @@
 
     // 2. SAVE PRODUCT
     function saveProduct() {
-        let name = document.getElementById("pName").value;
-        let cat = document.getElementById("pCategory").value;
-        let qty = document.getElementById("pQty").value;
-        let price = document.getElementById("pPrice").value;
+    let name = document.getElementById("pName").value;
+    let cat = document.getElementById("pCategory").value;
+    let qty = document.getElementById("pQty").value;
+    let price = document.getElementById("pPrice").value;
 
-        if (name === "" || qty === "" || price === "") {
-            alert("Please fill in all fields!");
-            return;
-        }
+    if (name === "" || qty === "" || price === "") {
+        alert("Please fill in all fields!");
+        return;
+    }
 
-        let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-        let row = table.insertRow();
-        
-        row.insertCell(0).innerText = name;
-        row.insertCell(1).innerText = cat;
-        row.insertCell(2).innerText = qty;
-        row.insertCell(3).innerText = price;
-        row.insertCell(4).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
+    let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+    let row = table.insertRow();
+    
+    // 1. Photo Cell
+    row.insertCell(0).innerHTML = '<img src="unnamed.jpg" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">';
 
-        // Clear Inputs
-        document.getElementById("pName").value = "";
-        document.getElementById("pQty").value = "";
-        document.getElementById("pPrice").value = "";
+    // 2. Product Info
+    row.insertCell(1).innerText = name;
+    row.insertCell(2).innerText = qty;
+    row.insertCell(3).innerText = "KES " + price;
 
-        updateDashboard();
+    // 3. Delete Button
+    row.insertCell(4).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
+
+    // 4. WHATSAPP ORDER BUTTON (THE MAGIC!)
+    let myNumber = "254712345678"; // <--- CHANGE THIS TO YOUR NUMBER!
+    let message = `Hello Milka, I would like to order ${qty} units of ${name}. Total: KES ${qty * price}`;
+    let encodedMsg = encodeURIComponent(message);
+    
+    row.insertCell(5).innerHTML = `
+        <a href="https://wa.me/${myNumber}?text=${encodedMsg}" target="_blank" class="no-print">
+            <button style="background: #25D366; color: white; padding: 6px 12px; width: auto; font-size: 14px; border: none; border-radius: 5px;">
+                Order via WhatsApp
+            </button>
+        </a>`;
+
+    // Clear Inputs
+    document.getElementById("pName").value = "";
+    document.getElementById("pQty").value = "";
+    document.getElementById("pPrice").value = "";
+
+    updateDashboard();
     }
 
     // 3. REMOVE ROW
