@@ -92,116 +92,113 @@
 </div>
 
 <script>
-function searchTable() {
-    var input = document.getElementById("searchInput");
-    var filter = input.value.toUpperCase();
-    var table = document.getElementById("inventory-table");
-    var tr = table.getElementsByTagName("tr");
+    // 1. Ask for Name when page opens
+    window.onload = function() {
+        var name = prompt("Please enter your name:");
+        if (name == null || name == "") { name = "User"; }
+        var display = document.getElementById("user-name-display");
+        if(display) display.innerText = name;
+    };
 
-    for (var i = 1; i < tr.length; i++) {
-        var td = tr[i].getElementsByTagName("td")[0]; // Search the Product Name column
-        if (td) {
-            var txtValue = td.textContent || td.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }
-    }
-    }
-    // This runs as soon as the page loads
-window.onload = function() {
-    var name = prompt("Please enter your name to access the Inventory System:");
-    
-    // If they didn't type anything, call them "User"
-    if (name == null || name == "") {
-        name = "User";
-    }
-    
-    // Change the text on the screen to their name
-    document.getElementById("user-name-display").innerText = name;
-};
+    // 2. THE SAVE PRODUCT BUTTON BRAIN
     function saveProduct() {
+        // Get values from input boxes
         var name = document.getElementById("pName").value;
         var category = document.getElementById("pCategory").value;
         var qty = document.getElementById("pQty").value;
         var price = document.getElementById("pPrice").value;
 
+        // Validation: Don't save if boxes are empty
         if (name === "" || qty === "" || price === "") {
-            alert("Please fill all boxes!");
+            alert("Please fill in the Product Name, Quantity, and Price!");
             return;
         }
 
+        // Find the table and add a new row
         var table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
         var row = table.insertRow();
+        
         row.insertCell(0).innerHTML = name;
         row.insertCell(1).innerHTML = category;
         row.insertCell(2).innerHTML = qty;
         row.insertCell(3).innerHTML = price;
         row.insertCell(4).innerHTML = '<button class="delete-btn" onclick="removeRow(this)">Delete</button>';
 
-        // Clear boxes
+        // Reset the boxes for the next item
         document.getElementById("pName").value = "";
         document.getElementById("pQty").value = "";
         document.getElementById("pPrice").value = "";
 
+        // Update the dashboard math
         updateDashboard();
     }
 
+    // 3. The Delete Button Function
     function removeRow(btn) {
         btn.parentElement.parentElement.remove();
         updateDashboard();
     }
 
+    // 4. Update Math & Low Stock Alerts
     function updateDashboard() {
-    var tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-    var rows = tbody.getElementsByTagName('tr');
-    var totalItems = rows.length;
-    var totalValue = 0;
+        var tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        var rows = tbody.getElementsByTagName('tr');
+        var totalValue = 0;
 
-    // --- START OF THE NEW LOOP ---
-    for (var i = 0; i < rows.length; i++) {
-        var q = parseFloat(rows[i].cells[2].innerText) || 0; // Grabs the Quantity
-        var p = parseFloat(rows[i].cells[3].innerText) || 0; // Grabs the Price
-
-        // LOW STOCK WARNING LOGIC:
-        if (q < 5) {
-            rows[i].style.backgroundColor = "#ff7675"; // Turns the row Red if low
-            rows[i].style.color = "white";
-        } else {
-            rows[i].style.backgroundColor = "white"; // Stays white if stock is good
-            rows[i].style.color = "black";
+        for (var i = 0; i < rows.length; i++) {
+            var q = parseFloat(rows[i].cells[2].innerText) || 0;
+            var p = parseFloat(rows[i].cells[3].innerText) || 0;
+            
+            // Turn row RED if stock is less than 5
+            if (q < 5) {
+                rows[i].style.backgroundColor = "#ff7675";
+                rows[i].style.color = "white";
+            } else {
+                rows[i].style.backgroundColor = "white";
+                rows[i].style.color = "black";
+            }
+            totalValue += (q * p);
         }
 
-        totalValue += (q * p); // Calculates the math
+        document.getElementById("total-items-count").innerText = rows.length;
+        document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
     }
-    // --- END OF THE NEW LOOP ---
 
-    document.getElementById("total-items-count").innerText = totalItems;
-    document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
+    // 5. Search Function
+    function searchTable() {
+        var input = document.getElementById("searchInput");
+        var filter = input.value.toUpperCase();
+        var table = document.getElementById("inventory-table");
+        var tr = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < tr.length; i++) {
+            var td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                var txtValue = td.textContent || td.innerText;
+                tr[i].style.display = (txtValue.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+            }
+        }
+    }
+
+    // 6. Excel Export Function
     function exportTableToCSV(filename) {
-    var csv = [];
-    var rows = document.querySelectorAll("table tr");
-    
-    for (var i = 0; i < rows.length; i++) {
-        var row = [], cols = rows[i].querySelectorAll("td, th");
-        for (var j = 0; j < cols.length - 1; j++) {
-            row.push(cols[j].innerText);
+        var csv = [];
+        var rows = document.querySelectorAll("table tr");
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+            for (var j = 0; j < cols.length - 1; j++) {
+                row.push('"' + cols[j].innerText + '"');
+            }
+            csv.push(row.join(","));
         }
-        csv.push(row.join(","));
+        var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+        var downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
     }
-
-    // This creates the download link
-    var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-    var downloadLink = document.createElement("a");
-    downloadLink.download = filename;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-        }
-        
 </script>
 
 </body>
