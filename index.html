@@ -153,19 +153,31 @@ window.onload = function() {
     }
 
     function updateDashboard() {
-        var tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-        var rows = tbody.getElementsByTagName('tr');
-        var totalItems = rows.length;
-        var totalValue = 0;
+    var tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+    var rows = tbody.getElementsByTagName('tr');
+    var totalItems = rows.length;
+    var totalValue = 0;
 
-        for (var i = 0; i < rows.length; i++) {
-            var q = parseFloat(rows[i].cells[2].innerText) || 0;
-            var p = parseFloat(rows[i].cells[3].innerText) || 0;
-            totalValue += (q * p);
+    // --- START OF THE NEW LOOP ---
+    for (var i = 0; i < rows.length; i++) {
+        var q = parseFloat(rows[i].cells[2].innerText) || 0; // Grabs the Quantity
+        var p = parseFloat(rows[i].cells[3].innerText) || 0; // Grabs the Price
+
+        // LOW STOCK WARNING LOGIC:
+        if (q < 5) {
+            rows[i].style.backgroundColor = "#ff7675"; // Turns the row Red if low
+            rows[i].style.color = "white";
+        } else {
+            rows[i].style.backgroundColor = "white"; // Stays white if stock is good
+            rows[i].style.color = "black";
         }
 
-        document.getElementById("total-items-count").innerText = totalItems;
-        document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
+        totalValue += (q * p); // Calculates the math
+    }
+    // --- END OF THE NEW LOOP ---
+
+    document.getElementById("total-items-count").innerText = totalItems;
+    document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
     }
 </script>
 
