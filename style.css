@@ -341,60 +341,39 @@ background-color:var(--color-secondary);
 }
 }
 <style>
-@media print {
-    html, body { background-color: white !important; margin: 0; padding: 0; }
-    #inventory-table { visibility: visible !important; position: absolute; left: 0; top: 0; width: 100%; border: 2px solid black !important; background: white !important; color: black !important; }
-    th, td { border: 1px solid black !important; color: black !important; padding: 10px; }
-    /* This hides EVERYTHING else */
-    body > *:not(#inventory-table) { display: none !important; }
-}
-    /* ... your existing CSS for table, body, etc. ... */
+    /* 1. NORMAL VIEW (FOR YOUR PHONE) */
+    body { background-color: #f1c40f; font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+    .dashboard { background-color: #2980b9; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #34495e; color: white; }
+    button { padding: 10px; cursor: pointer; border-radius: 4px; border: none; }
+    .add-btn { background-color: #27ae60; color: white; width: 100%; }
+    .print-btn { background-color: #34495e; color: white; width: 100%; margin-top: 10px; }
 
-    /* PASTE THE NEW CODE HERE */
+    /* 2. THE PRINT VIEW (THE "MAGIC" PART) */
     @media print {
-        button, .form-container, img, h1 { display: none !important; }
-        table { width: 100%; border: 1px solid black; }
-        th, td { border: 1px solid black; padding: 8px; }
-    }
-/* --- PRINT RULES START --- */
-@media print {
-    /* Hide the navigation, forms, settings, and buttons */
-    .dashboard, .add-new-product, .system-settings, .footer, button, img, h1 {
-        display: none !important;
-    }
+        /* Hide everything except the table */
+        body * { visibility: hidden; background: white !important; }
+        #inventory-table, #inventory-table * { visibility: visible !important; }
+        
+        /* Position table at the very top of the page */
+        #inventory-table {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100% !important;
+            border: 2px solid black !important;
+        }
 
-    /* Make the body white and remove the yellow background */
-    body {
-        background-color: white !important;
-        margin: 0;
-        padding: 0;
+        /* Force black borders and text for the printer */
+        th, td { 
+            border: 1px solid black !important; 
+            color: black !important; 
+            padding: 8px; 
+            background: white !important;
+        }
     }
-
-    /* Center and clean up the table */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th, td {
-        border: 1px solid black !important; /* Thick black lines for paper */
-        padding: 10px;
-        color: black !important;
-        text-align: left;
-}
-/* --- PRINT RULES START --- */
-@media print {
-    body * { visibility: hidden; background: white !important; }
-    #inventory-table, #inventory-table * { visibility: visible; }
-    #inventory-table {
-        position: absolute;
-        left: 0; top: 0;
-        width: 100%;
-        border: 1px solid black !important;
-    }
-    th, td { border: 1px solid black !important; color: black !important; padding: 8px; }
-}
 </style>
 
 
