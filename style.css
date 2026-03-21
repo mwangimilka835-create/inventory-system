@@ -378,33 +378,16 @@ background-color:var(--color-secondary);
 }
 /* --- PRINT RULES START --- */
 @media print {
-    /* Hide the navigation, forms, settings, and buttons */
-    .dashboard, .add-new-product, .system-settings, .footer, button, img, h1 {
-        display: none !important;
-    }
-
-    /* Make the body white and remove the yellow background */
-    body {
-        background-color: white !important;
-        margin: 0;
-        padding: 0;
-    }
-
-    /* Center and clean up the table */
-    table {
+    body * { visibility: hidden; background: white !important; }
+    #inventory-table, #inventory-table * { visibility: visible; }
+    #inventory-table {
+        position: absolute;
+        left: 0; top: 0;
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+        border: 1px solid black !important;
     }
-
-    th, td {
-        border: 1px solid black !important; /* Thick black lines for paper */
-        padding: 10px;
-        color: black !important;
-        text-align: left;
-    }
+    th, td { border: 1px solid black !important; color: black !important; padding: 8px; }
 }
-/* --- PRINT RULES END --- */
 </style>
 
 
