@@ -1,234 +1,98 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
-<title>inventory management system</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakery Inventory System</title>
+    <style>
+        /* 1. LOOKS ON SCREEN */
+        body { background-color: #f1c40f; font-family: sans-serif; padding: 20px; margin: 0; }
+        .dashboard { background-color: #2980b9; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .form-container { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        
+        button { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        .add-btn { background-color: #27ae60; color: white; }
+        .print-btn { background-color: #34495e; color: white; margin-top: 15px; }
+        .delete-btn { background-color: #e74c3c; color: white; padding: 5px; width: auto; }
+
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #34495e; color: white; }
+
+        /* 2. LOOKS ON PRINTED PAPER */
+        @media print {
+            body * { visibility: hidden; background: white !important; }
+            #inventory-table, #inventory-table * { visibility: visible !important; }
+            #inventory-table { position: absolute; left: 0; top: 0; width: 100%; border: 1px solid black !important; }
+            th, td { border: 1px solid black !important; color: black !important; }
+            button, .form-container, .dashboard { display: none !important; }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<header>
-<h1>INVENTORY MANAGEMENT SYSTEM FOR SMALL AND MEDIUM SIZED ENTERPRISES IN KIAMBU COUNTY</h1>
-</header>
- 
-<nav>
-<ul>
-<li><a href="#home">home page</a></li><br>
-<li><a href="#dashboard"class="active">dashboard</a></li><br>
-<li><a href="#inventory">inventory</a></li><br>
-<li><a href="#reports">reports</a></li><br>
-<li><a href="#settings">settings</a></li><br>
-</ul>
-</nav>
 
-<main>
-<section id="home">
-<h2>welcome to the inventory management system</h2>
-<p> A reliable solution for small and medium sized enterprises in Kiambu County to track products,manage stock levels, and optimize sales operations.</p>
-</section>
-<section id="dashboard">
-<h2>dashboard summary</h2>
-<div class="summary-container">
-<div class="summary-box box-total">
-<h3>total products</h3>
-<p class="count">248</p>
-</div>
-</div>
-<div class="summary-box box-lowstock">
-<h3> low stock</h3>
-<p class="count">15</p>
-</div>
-<div class="summary-box box-sales">
-<h3> recent sales(24h)</h3>
-<p class="count">42</p>
-</div>
- <div style="text-align: center; margin: 20px 0;">
-  <h2 style="color: #2c3e50;">Fresh Bakery Inventory</h2>
-  <img src="products.jpg" alt="Bakery Stock" style="width: 100%; max-width: 500px; border-radius: 12px; border: 2px solid #ecf0f1; shadow: 0 4px 8px rgba(0,0,0,0.1);">
-  <p style="color: #7f8c8d; font-style: italic;">Monitoring daily bakes and dairy supplies</p>
- </div>
-<section id="inventory">
-<h2>current inventory</h2>
-<table border="1">
- <table id="inventory-table">
-<thead>
-<tr>
-<th>product name</th>
-<th>quantity</th>
-<th>price(KES)/th>
-<th>actions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fresh Milk</td>
-<td>120</td>
-<td>60.0</td>
-<td>
-<button class="edit-btn">edit</button>
-<button class="delete-btn">delete</button>
-</td>
-</tr>
-<tr>
-<td>Loaf of bread</td>
-<td>85</td>
-<td>65.00</td>
-<td>
-<button class="edit-btn">edit</button>
-<button class="delete-btn">delete</button>
-</td>
-</tr>
-<tr>
-<td>Kienyeji eggs(tray)</td>
-<td>12</td>
-<td>450.00</td>
-<td>
-<button class="edit-btn">edit</button>
-<button class="delete-btn">delete</button>
-</td>
-</tr>
-</table>
-</section>
-<section id="add-product">
-<h2>add new product<h2>
- <form id="addProductForm" onsubmit="event.preventDefault(); alert('Demo Mode: Item added to inventory successfully!'); return false;">
-<div class= "form-group">
-<label for="product_name">product name</label>
-<input type= "text" id="product_name" name="product_name" required>
-</div>
-<div class= "form-group">
-<label for="quantity">quantity</label>
-<input type= "number" id="quantity" name="quantity" required>
-</div>
-<div class= "form-group">
-<label for="price">price(KES)</label>
-<input type= "text" id="price" name="price" placeholder="e.g 120.50" required>
-</div>
-<div class= "form-group">
-<label for="category">category</label>
-<select id="category" name="category">
-<option value="dairy">dairy</option>
-<option value="bakery">bakery</option>
-<option value="produce">fresh produce</option>
-<option value="dry_goods">dry goods</option>
-<option value="other">other</option>
-</select>
-</div>
-<section id="settings">
-<h2> system settings</h2>
-<div class="settings-group">
-<h3< general preferences</h3>
-<label>
-enable low stock levels<br>
-<span class="toggle-switch active"></span>
-</label>
-<label>
-default currency<br>
-<select style="width:100px">
-<option>KES</option>
-<option>USD</option>
-</select
-</label>
-</div>
-<div class="settings-group">
-<h3>user management</h3>
-<p style=font-size:0.9rem; color: #555">manage users and permissions(requires advanced backbend).</p>
-</div>
-</section>
-  <button type="button" class="add-btn" onclick="saveProduct()">Save Product</button>
-<button type="button" onclick="window.print()" style="background-color: #34495e; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%;">🖨️ Print Inventory Report</button>
- </form>
-</section>
-</main>
-<footer>
-<p>©MWANGI MILKA 2026 Nakuru,Kenya</p>
-<p>CONTACT:Phone:0112873218 email:mwangimilka@gmail.com</p>
-</footer>
-</div>
-<script>
- // This makes the 'Delete' buttons on your ORIGINAL rows work!
-document.querySelector('table').addEventListener('click', function(e) {
-    if (e.target && e.target.innerHTML.toLowerCase() === 'delete') {
-        if(confirm("Are you sure you want to remove this item?")) {
-            e.target.closest('tr').remove();
-        }
-    }
-});
-// We look for the button by its exact position to avoid text errors
-document.addEventListener('click', function (event) {
-    if (event.target.tagName === 'BUTTON' && event.target.innerHTML.toLowerCase().includes('save')) {
-        
-        // 1. Get the 3 input boxes by their order on the screen
-        let allInputs = document.getElementsByTagName('input');
-        let name = allInputs[0].value;
-        let qty = allInputs[1].value;
-        let price = allInputs[2].value || "0";
-
-        if (name === "" || qty === "") {
-            alert("Please fill in Name and Quantity");
-            return;
-        }
-
-        // 2. Find the table and add the row
-        let table = document.getElementsByTagName('table')[0];
-        let row = table.insertRow(-1);
-
-        // 3. Add the data cells
-        row.insertCell(0).innerHTML = name;
-        row.insertCell(1).innerHTML = qty;
-        row.insertCell(2).innerHTML = price;
-
-        // 4. Add the buttons cell
-        let actionCell = row.insertCell(3);
-        actionCell.innerHTML = `
-    <div style="display: flex; flex-direction: column; gap: 4px;">
-        <button style="font-size: 10px; background: #eee; border: 1px solid #ccc; border-radius: 3px;">edit</button>
-        <button style="font-size: 10px; background: #ff4d4d; color: white; border: none; border-radius: 3px;" onclick="this.closest('tr').remove()">delete</button>
+    <div class="dashboard">
+        <h1>🍞 My Bakery Inventory</h1>
+        <p>Keep track of your stock easily.</p>
     </div>
-;
 
-        // 5. Clear the form
-        allInputs[0].value = "";
-        allInputs[1].value = "";
-        allInputs[2].value = "";
-        
-        alert("Success: " + name + " added!");
-    }
-    // This is the function that was missing!
-    function saveProduct() {
-        // 1. Get the values from your input boxes
-        const nameInput = document.querySelector('input[placeholder="product name"]');
-        const qtyInput = document.querySelector('input[placeholder="quantity"]');
-        const priceInput = document.querySelector('input[placeholder="price(KES)"]');
+    <div class="form-container">
+        <h3>Add New Product</h3>
+        <input type="text" id="pName" placeholder="product name">
+        <input type="number" id="pQty" placeholder="quantity">
+        <input type="number" id="pPrice" placeholder="price(KES)">
+        <button class="add-btn" onclick="saveProduct()">Save Product</button>
+    </div>
 
-        // 2. Check if they are empty
-        if (!nameInput.value || !qtyInput.value || !priceInput.value) {
-            alert("Please fill in all fields!");
-            return;
+    <button class="print-btn" onclick="window.print()">🖨️ Print Inventory Report</button>
+
+    <table id="inventory-table">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+
+    <script>
+        function saveProduct() {
+            // Get inputs by ID (much safer!)
+            var name = document.getElementById("pName").value;
+            var qty = document.getElementById("pQty").value;
+            var price = document.getElementById("pPrice").value;
+
+            if (name == "" || qty == "" || price == "") {
+                alert("Please fill all boxes!");
+                return;
+            }
+
+            // Find the table body
+            var table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+            var row = table.insertRow();
+
+            // Insert cells
+            row.insertCell(0).innerHTML = name;
+            row.insertCell(1).innerHTML = qty;
+            row.insertCell(2).innerHTML = price;
+            row.insertCell(3).innerHTML = '<button class="delete-btn" onclick="this.parentElement.parentElement.remove()">Delete</button>';
+
+            // Clear inputs
+            document.getElementById("pName").value = "";
+            document.getElementById("pQty").value = "";
+            document.getElementById("pPrice").value = "";
+            
+            alert("Success: " + name + " added!");
         }
+    </script>
 
-        // 3. Find the table body (this ensures it prints correctly!)
-        const tableBody = document.querySelector("#inventory-table tbody");
-        const newRow = tableBody.insertRow();
-
-        // 4. Create the 4 columns and fill them
-        newRow.insertCell(0).innerText = nameInput.value;
-        newRow.insertCell(1).innerText = qtyInput.value;
-        newRow.insertCell(2).innerText = priceInput.value;
-        newRow.insertCell(3).innerHTML = '<button style="background:red; color:white; border:none; padding:5px; border-radius:3px;" onclick="this.closest(\'tr\').remove()">Delete</button>';
-
-        // 5. Clear the boxes for the next item
-        nameInput.value = "";
-        qtyInput.value = "";
-        priceInput.value = "";
-
-        alert("Item added successfully!");
-         }
-</script>
 </body>
 </html>
-
 
 
 
