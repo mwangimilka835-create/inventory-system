@@ -3,143 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakery Inventory System</title>
+    <title>Milka's Bakery Inventory</title>
     <style>
-        /* 1. LOOKS ON SCREEN */
-        body { background-color: #f1c40f; font-family: sans-serif; padding: 20px; margin: 0; }
-        .dashboard { background-color: #2980b9; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .form-container { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        
-        button { 
-    width: 100%; 
-    padding: 15px; /* This makes the button taller and easier to click */
-    border: none; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-weight: bold; 
-    font-size: 16px; 
-    margin-top: 15px; /* This adds space so it doesn't touch the input boxes */
-}
-
-.add-btn { 
-    background-color: #27ae60; 
-    color: white; 
-}
-
-.print-btn { 
-    background-color: #34495e; 
-    color: white; 
-    margin-bottom: 20px; /* Space between the button and the table */
-}
-        
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+        body { font-family: Arial, sans-serif; background-color: #f1c40f; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .header { background: #2980b9; color: white; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        .stats { display: flex; gap: 10px; margin-bottom: 20px; }
+        .stat-box { flex: 1; padding: 15px; border-radius: 8px; color: white; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .add-btn { background: #27ae60; color: white; }
+        .print-btn { background: #34495e; color: white; }
+        .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; width: auto; margin: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #34495e; color: white; }
-
-        /* 2. LOOKS ON PRINTED PAPER */
-        @media print {
-            body * { visibility: hidden; background: white !important; }
-            #inventory-table, #inventory-table * { visibility: visible !important; }
-            #inventory-table { position: absolute; left: 0; top: 0; width: 100%; border: 1px solid black !important; }
-            th, td { border: 1px solid black !important; color: black !important; }
-            button, .form-container, .dashboard { display: none !important; }
-        }
+        th { background-color: #f2f2f2; }
+        @media print { .container, .header, .stats, .add-btn, .print-btn, .delete-btn { display: none; } body { background: white; } table { width: 100%; } }
     </style>
 </head>
 <body>
 
-    <div class="dashboard">
-        <h1>🍞 My Bakery Inventory</h1>
-        <p>Keep track of your stock easily.</p>
-    </div>
-    <div class="form-container">
-    <div class="welcome-section" style="border-left: 5px solid #2980b9; padding-left: 10px;">
+<div class="header">
+    <h1>Bakery Management</h1>
+</div>
+
+<div class="container">
+    <div style="border-left: 5px solid #2980b9; padding-left: 10px; margin-bottom: 20px;">
         <h2>Welcome back, Milka! 👋</h2>
-        <p>Manage your bakery stock for today.</p>
     </div>
 
-    <div style="display: flex; gap: 10px; margin: 20px 0;">
-        <div style="flex: 1; background: #27ae60; color: white; padding: 15px; border-radius: 8px; text-align: center;">
+    <div class="stats">
+        <div class="stat-box" style="background: #27ae60;">
             <small>Total Items</small>
-            <h3 id="total-items-count" style="margin: 5px 0;">0</h3>
+            <h3 id="total-items-count">0</h3>
         </div>
-        <div style="flex: 1; background: #e67e22; color: white; padding: 15px; border-radius: 8px; text-align: center;">
+        <div class="stat-box" style="background: #e67e22;">
             <small>Stock Value</small>
-            <h3 id="total-value-count" style="margin: 5px 0;">KES 0</h3>
+            <h3 id="total-value-count">KES 0</h3>
         </div>
     </div>
-
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
     <h3>Add New Product</h3>
     <input type="text" id="pName" placeholder="Product Name">
-    
-    <select id="pCategory" style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+    <select id="pCategory">
         <option value="Bakery">🍞 Bakery</option>
         <option value="Dairy">🥛 Dairy</option>
         <option value="General">📦 General</option>
         <option value="Drinks">🥤 Drinks</option>
     </select>
-
     <input type="number" id="pQty" placeholder="Quantity">
     <input type="number" id="pPrice" placeholder="Price (KES)">
 
-    <button type="button" class="add-btn" onclick="saveProduct()">Save Product</button>
-    <button type="button" class="print-btn" onclick="window.print()" style="background: #34495e; color: white; margin-top: 10px;">🖨️ Print Report</button>
-    </div>
-     </tbody>
+    <button class="add-btn" onclick="saveProduct()">Save Product</button>
+    <button class="print-btn" onclick="window.print()">Print Inventory Report</button>
+
+    <table id="inventory-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
     </table>
+</div>
 
-    <script>
-       function saveProduct() {
-    var name = document.getElementById("pName").value;
-    var qty = document.getElementById("pQty").value;
-    var price = document.getElementById("pPrice").value;
+<script>
+    function saveProduct() {
+        var name = document.getElementById("pName").value;
+        var category = document.getElementById("pCategory").value;
+        var qty = document.getElementById("pQty").value;
+        var price = document.getElementById("pPrice").value;
 
-    if (name == "" || qty == "" || price == "") {
-        alert("Please fill all boxes!");
-        return;
+        if (name === "" || qty === "" || price === "") {
+            alert("Please fill all boxes!");
+            return;
+        }
+
+        var table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        var row = table.insertRow();
+        row.insertCell(0).innerHTML = name;
+        row.insertCell(1).innerHTML = category;
+        row.insertCell(2).innerHTML = qty;
+        row.insertCell(3).innerHTML = price;
+        row.insertCell(4).innerHTML = '<button class="delete-btn" onclick="removeRow(this)">Delete</button>';
+
+        // Clear boxes
+        document.getElementById("pName").value = "";
+        document.getElementById("pQty").value = "";
+        document.getElementById("pPrice").value = "";
+
+        updateDashboard();
     }
 
-    var table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-    var row = table.insertRow();
-    row.insertCell(0).innerHTML = name;
-    row.insertCell(1).innerHTML = qty;
-    row.insertCell(2).innerHTML = price;
-    row.insertCell(3).innerHTML = '<button class="delete-btn" onclick="removeRow(this)">Delete</button>';
-
-    // Clear inputs
-    document.getElementById("pName").value = "";
-    document.getElementById("pQty").value = "";
-    document.getElementById("pPrice").value = "";
-    
-    // UPDATE THE DASHBOARD CARDS
-    updateDashboard();
-    alert("Success: " + name + " added!");
-
-// The "Brain" that calculates your totals
-function updateDashboard() {
-    var table = document.getElementById("inventory-table");
-    var tbody = table.getElementsByTagName('tbody')[0];
-    var rows = tbody.getElementsByTagName('tr');
-    
-    var totalItems = rows.length;
-    var totalValue = 0;
-
-    for (var i = 0; i < rows.length; i++) {
-        var q = parseFloat(rows[i].cells[1].innerText) || 0;
-        var p = parseFloat(rows[i].cells[2].innerText) || 0;
-        totalValue += (q * p);
+    function removeRow(btn) {
+        btn.parentElement.parentElement.remove();
+        updateDashboard();
     }
 
-    // Push the numbers into your green and orange boxes
-    document.getElementById("total-items-count").innerText = totalItems;
-    document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
-        } 
-            
-            
-    </script>
+    function updateDashboard() {
+        var tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        var rows = tbody.getElementsByTagName('tr');
+        var totalItems = rows.length;
+        var totalValue = 0;
+
+        for (var i = 0; i < rows.length; i++) {
+            var q = parseFloat(rows[i].cells[2].innerText) || 0;
+            var p = parseFloat(rows[i].cells[3].innerText) || 0;
+            totalValue += (q * p);
+        }
+
+        document.getElementById("total-items-count").innerText = totalItems;
+        document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
+    }
+</script>
 
 </body>
 </html>
