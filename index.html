@@ -90,6 +90,18 @@
 </div>
 
 <script>
+    // This runs as soon as the page loads
+window.onload = function() {
+    var name = prompt("Please enter your name to access the Inventory System:");
+    
+    // If they didn't type anything, call them "User"
+    if (name == null || name == "") {
+        name = "User";
+    }
+    
+    // Change the text on the screen to their name
+    document.getElementById("user-name-display").innerText = name;
+};
     function saveProduct() {
         var name = document.getElementById("pName").value;
         var category = document.getElementById("pCategory").value;
