@@ -181,6 +181,29 @@ window.onload = function() {
 
     document.getElementById("total-items-count").innerText = totalItems;
     document.getElementById("total-value-count").innerText = "KES " + totalValue.toLocaleString();
+    function exportTableToCSV(filename) {
+    var csv = [];
+    var rows = document.querySelectorAll("table tr");
+    
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        // We loop through columns but skip the last one (the Delete button)
+        for (var j = 0; j < cols.length - 1; j++) {
+            row.push('"' + cols[j].innerText + '"');
+        }
+        
+        csv.push(row.join(","));
+    }
+
+    // Download the CSV file
+    var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+    var downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
     }
 </script>
 
