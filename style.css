@@ -341,6 +341,13 @@ background-color:var(--color-secondary);
 }
 }
 <style>
+@media print {
+    html, body { background-color: white !important; margin: 0; padding: 0; }
+    #inventory-table { visibility: visible !important; position: absolute; left: 0; top: 0; width: 100%; border: 2px solid black !important; background: white !important; color: black !important; }
+    th, td { border: 1px solid black !important; color: black !important; padding: 10px; }
+    /* This hides EVERYTHING else */
+    body > *:not(#inventory-table) { display: none !important; }
+}
     /* ... your existing CSS for table, body, etc. ... */
 
     /* PASTE THE NEW CODE HERE */
