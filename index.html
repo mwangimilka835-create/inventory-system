@@ -69,35 +69,37 @@
         <small>Stock Value</small>
         <h3 id="total-value-count">KES 0</h3>
     </div>
-</div>
-        <h3>Add New Product</h3>
-         <input type="text" id="pName" placeholder="Product Name">
-
-    </div>
 
     <button class="print-btn" onclick="window.print()">🖨️ Print Inventory Report</button>
+<div class="form-container">
+    <h3>Add New Product</h3>
+    <input type="text" id="pName" placeholder="Product Name">
+</div>
+    <select id="pCategory" style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+        <option value="Bakery">🍞 Bakery</option>
+        <option value="Dairy">🥛 Dairy</option>
+        <option value="General">📦 General</option>
+        <option value="Drinks">🥤 Drinks</option>
+    </select>
 
+    <input type="number" id="pQty" placeholder="Quantity">
+    <input type="number" id="pPrice" placeholder="Price (KES)">
+
+    <button type="button" class="add-btn" onclick="saveProduct()">Save Product</button>
+</div>     
     <table id="inventory-table">
         <thead>
             <tr>
-                
-            <th>Product Name</th>
-                <input type="text" id="pName" placeholder="Product Name">
-<select id="pCategory" style="width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px;">
-    <option value="Bakery">🍞 Bakery</option>
-    <option value="Dairy">🥛 Dairy</option>
-    <option value="General">📦 General</option>
-    <option value="Drinks">🥤 Drinks</option>
-</select>
- <input type="number" id="pQty" placeholder="Quantity">
-<input type="number" id="pPrice" placeholder="Price (KES)">
-<button class="add-btn" onclick="saveProduct()">Save Product</button>
-        </div>
-                <th>product name</th>
-                 <th>category</th>
-                <th>Action</th>
-            </tr>
-        </thead>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Action</th>
+    </tr>
+              </thead>  
+            
+        
+        
         <tbody>
             </tbody>
     </table>
