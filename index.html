@@ -73,6 +73,9 @@
 
     <button class="add-btn" onclick="saveProduct()">Save Product</button>
     <button class="print-btn" onclick="window.print()">Print Inventory Report</button>
+    <button type="button" class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+
+<button type="button" class="export-btn" style="background: #27ae60; color: white; margin-top: 10px;" onclick="exportTableToCSV('Inventory_Report.csv')">📊 Export to Excel (CSV)</button>
 <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 Search for products..." style="margin-top: 20px; border: 2px solid #2980b9;">
     <table id="inventory-table">
         <thead>
