@@ -151,29 +151,29 @@ cells[3].innerText) || 0; // Corrected column index for Qty
     }
 
     // 4. UPDATE DASHBOARD (Calculates Total Value & Red Alert)
-    function updateDashboard() {
-        let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-        let rows = tbody.getElementsByTagName('tr');
-        let totalVal = 0;
+function updateDashboard() {
+    let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+    let rows = tbody.getElementsByTagName('tr');
+    let totalVal = 0;
 
-        for (let i = 0; i < rows.length; i++) {
-            // Index 3 is Qty, Index 4 is Price
-            let q = parseFloat(rows[i].cells[3].innerText) || 0; 
-            let p = parseFloat(rows[i].cells[4].innerText) || 0;
+    for (let i = 0; i < rows.length; i++) {
+        // We look at Index 3 for Qty and Index 4 for Price
+        let q = parseFloat(rows[i].cells[3].innerText) || 0; 
+        let p = parseFloat(rows[i].cells[4].innerText) || 0;
 
-            // Low Stock Warning (Turns Red if less than 5)
-            if (q < 5) {
-                rows[i].style.backgroundColor = "#ff7675";
-                rows[i].style.color = "white";
-            } else {
-                rows[i].style.backgroundColor = "white";
-                rows[i].style.color = "black";
-            }
-            totalVal += (q * p);
+        // Low Stock Warning
+        if (q < 5) {
+            rows[i].style.backgroundColor = "#ff7675";
+            rows[i].style.color = "white";
+        } else {
+            rows[i].style.backgroundColor = "white";
+            rows[i].style.color = "black";
         }
+        totalVal += (q * p);
+    }
 
-        document.getElementById("total-items-count").innerText = rows.length;
-        document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
+    document.getElementById("total-items-count").innerText = rows.length;
+    document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
 
     // 5. SEARCH TABLE
