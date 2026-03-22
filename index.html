@@ -154,7 +154,27 @@ table {
         padding: 5px 8px;
         font-size: 11px;
     }
-                   }
+/* Mobile Optimization: Hiding less critical columns */
+@media screen and (max-width: 600px) {
+    /* Hide the Photo column (Column 1) and Category (Column 3) */
+    #inventory-table th:nth-child(1), 
+    #inventory-table td:nth-child(1),
+    #inventory-table th:nth-child(3), 
+    #inventory-table td:nth-child(3) {
+        display: none;
+    }
+
+    /* Make the remaining text a bit larger for easy reading */
+    #inventory-table td {
+        font-size: 14px;
+        padding: 12px 5px;
+    }
+
+    /* Ensure the table doesn't feel squashed */
+    #inventory-table {
+        min-width: auto; /* Allow it to fit the screen width */
+    }
+            }                   }
     </style>
 </head>
 <body>
