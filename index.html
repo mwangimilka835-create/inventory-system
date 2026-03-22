@@ -211,31 +211,32 @@ function showToast(msg) {
 }
 
 // 3. THE RENDER FUNCTION (The fix for your headers)
+
 function renderTable() {
-    let products = JSON.parse(localStorage.getItem("myInventory")) || [];
-    let tbody = document.getElementById("inventory-body");
+    const products = JSON.parse(localStorage.getItem("myInventory")) || [];
+    const tbody = document.getElementById("inventory-body");
     
-    if (!tbody) return; // Stop if the table body isn't found
+    if (!tbody) return; // Safety check
     
-    tbody.innerHTML = ""; // Clear ONLY the body rows
+    tbody.innerHTML = ""; // Clear existing rows
 
     products.forEach((p, index) => {
-        let row = tbody.insertRow();
-        let whatsappLink = `https://wa.me/254112873218?text=I+want+to+order+${p.name}`;
-
+        const row = tbody.insertRow();
+        const whatsappMsg = encodeURIComponent(`I want to order ${p.qty} ${p.name}`);
+        
         row.innerHTML = `
-            <td><img src="unnamed_1.jpg" style="width:40px; border-radius:5px;"></td>
+            <td><img src="unnamed_1.jpg" style="width:40px; border-radius:4px;"></td>
             <td>${p.name}</td>
             <td>${p.cat}</td>
             <td>${p.date}</td>
             <td>${p.qty}</td>
             <td>${p.price}</td>
-            <td class="no-print"><button onclick="removeRow(${index})" style="background:#e74c3c; color:white; border:none; padding:5px; border-radius:5px;">Delete</button></td>
-            <td class="no-print"><a href="${whatsappLink}" target="_blank"><button style="background:#25D366; color:white; border:none; padding:5px; border-radius:5px;">Order</button></a></td>
+            <td class="no-print"><button onclick="removeRow(${index})" style="background:#e74c3c; color:white; border:none; padding:5px; border-radius:4px;">Delete</button></td>
+            <td class="no-print"><a href="https://wa.me/254112873218?text=${whatsappMsg}" target="_blank"><button style="background:#25D366; color:white; border:none; padding:5px; border-radius:4px;">Order</button></a></td>
         `;
     });
     updateDashboard();
-}
+    }
 
 // 4. THE SAVE FUNCTION
 function saveProduct() {
