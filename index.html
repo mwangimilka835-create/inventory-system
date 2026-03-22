@@ -430,7 +430,25 @@ table {
             }
         }
     }
+ function filterByCategory() {
+    let filter = document.getElementById("categoryFilter").value;
+    let table = document.getElementById("inventory-table");
+    let tr = table.getElementsByTagName("tr");
 
+    for (let i = 1; i < tr.length; i++) {
+        let td = tr[i].getElementsByTagName("td")[2]; // Column 2 is Category
+        if (td) {
+            let categoryText = td.textContent || td.innerText;
+            
+            // If "All" is selected, show everything. Otherwise, match the text.
+            if (filter === "All" || categoryText.includes(filter) || filter.includes(categoryText)) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+    }
     // 6. EXCEL EXPORT (Updated to include the Date)
     function exportTableToCSV(filename) {
         let csv = [];
