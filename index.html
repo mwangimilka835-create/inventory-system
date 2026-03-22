@@ -164,8 +164,7 @@
         
         <button onclick="window.print()" style="background:#34495e; color:white; width:48%;">🖨️ Print</button>
         <button onclick="exportTableToCSV('Inventory.csv')" style="background:#2980b9; color:white; width:48%;">📊 Export</button>
-    </div>
-<div class="table-container">
+  <div class="table-container">
     <table id="inventory-table" style="min-width: 600px; width: 100%; margin-top: 0;"
         <thead>
             <tr>
@@ -185,107 +184,96 @@
     </div> <!-- End of the scrollable container -->
 </div>
 
+</div>
 
 <div id="toast">Message here</div>
-
 <script>
-     // 1. LOAD DATA WHEN APP OPENS
+    // 1. RUNS WHEN PAGE LOADS
 window.onload = function() {
-    let name = prompt("Please enter your name:");
-    if (!name || name.trim() === "") name = "Guest";
+    let name = prompt("Enter your name:");
+    if (!name) name = "Guest";
     document.getElementById("user-name-display").innerText = name;
     
-    renderTable(); // This pulls your saved data from the phone's memory!
+    // Load Dark Mode Preference
+    if(localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+
+    renderTable(); // Show saved data
 };
 
-// 2. TOAST NOTIFICATION
-function showToast(msg, type = 'success') {
-    const t = document.getElementById("toast");
+// 2. THE TOAST MESSAGE (The pop-up)
+function showToast(msg) {
+    let t = document.getElementById("toast");
     t.innerText = msg;
-    t.style.backgroundColor = type === 'error' ? '#e74c3c' : '#27ae60';
     t.className = "show";
     setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
 }
 
-// 3. THE "RENDER" ENGINE (Reads from LocalStorage)
+// 3. THE RENDER FUNCTION (The fix for your headers)
 function renderTable() {
-    // 1. Get the list of products from memory
     let products = JSON.parse(localStorage.getItem("myInventory")) || [];
-    
-    // 2. Select ONLY the body (this prevents the headers from being deleted)
     let tbody = document.getElementById("inventory-body");
     
-    // 3. Clear only the rows, not the headers
-    tbody.innerHTML = ""; 
+    if (!tbody) return; // Stop if the table body isn't found
+    
+    tbody.innerHTML = ""; // Clear ONLY the body rows
 
     products.forEach((p, index) => {
         let row = tbody.insertRow();
-        let myNumber = "254112873218"; 
-        let message = `Hello, I want to order ${p.qty} units of ${p.name}.`;
-        let whatsappLink = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
+        let whatsappLink = `https://wa.me/254112873218?text=I+want+to+order+${p.name}`;
 
         row.innerHTML = `
-            <td><img src="unnamed_1.jpg" style="width:50px; border-radius:5px;"></td>
+            <td><img src="unnamed_1.jpg" style="width:40px; border-radius:5px;"></td>
             <td>${p.name}</td>
             <td>${p.cat}</td>
             <td>${p.date}</td>
             <td>${p.qty}</td>
             <td>${p.price}</td>
-            <td class="no-print"><button class="delete-btn" onclick="removeRow(${index})" style="background:#e74c3c; color:white; border:none; padding:5px; border-radius:5px;">Delete</button></td>
+            <td class="no-print"><button onclick="removeRow(${index})" style="background:#e74c3c; color:white; border:none; padding:5px; border-radius:5px;">Delete</button></td>
             <td class="no-print"><a href="${whatsappLink}" target="_blank"><button style="background:#25D366; color:white; border:none; padding:5px; border-radius:5px;">Order</button></a></td>
         `;
     });
-    
-    updateDashboard(); // Recalculate your Total Items and Value
-    }
+    updateDashboard();
+}
 
-// 4. SAVE PRODUCT TO MEMORY
+// 4. THE SAVE FUNCTION
 function saveProduct() {
-    // 1. Get values from inputs
-    const name = document.getElementById("pName").value;
-    const cat = document.getElementById("pCategory").value;
-    const qty = document.getElementById("pQty").value;
-    const price = document.getElementById("pPrice").value;
-    const date = new Date().toLocaleDateString('en-GB');
+    let name = document.getElementById("pName").value;
+    let cat = document.getElementById("pCategory").value;
+    let qty = document.getElementById("pQty").value;
+    let price = document.getElementById("pPrice").value;
+    let date = new Date().toLocaleDateString('en-GB');
 
-    // 2. Validation: Don't save if fields are empty
     if (!name || !qty || !price) {
-        showToast("Please fill all fields! ⚠️", "error");
+        alert("Please fill all fields!");
         return;
     }
 
-    // 3. Get existing products from memory (LocalStorage)
     let products = JSON.parse(localStorage.getItem("myInventory")) || [];
-    
-    // 4. Add the new product to the list
     products.push({ name, cat, qty, price, date });
-    
-    // 5. Save the updated list back to memory
     localStorage.setItem("myInventory", JSON.stringify(products));
 
-    // 6. Clear the input fields for the next entry
+    // Clear Inputs
     document.getElementById("pName").value = "";
     document.getElementById("pQty").value = "";
     document.getElementById("pPrice").value = "";
-    
-    // 7. Refresh the table and show the success message
-    renderTable(); 
-    showToast("Product Saved Successfully! ✅");
-    }
 
+    renderTable();
+    showToast("Product Saved! ✅");
+}
 
-// 5. REMOVE ROW FROM MEMORY
+// 5. REMOVE ROW
 function removeRow(index) {
     let products = JSON.parse(localStorage.getItem("myInventory")) || [];
     products.splice(index, 1);
     localStorage.setItem("myInventory", JSON.stringify(products));
     renderTable();
-    showToast("Item Removed", "error");
 }
 
 // 6. DASHBOARD TOTALS
 function updateDashboard() {
-    const rows = document.querySelectorAll("#inventory-table tbody tr");
+    let rows = document.querySelectorAll("#inventory-body tr");
     let totalVal = 0;
     rows.forEach(row => {
         let q = parseFloat(row.cells[4].innerText) || 0;
@@ -294,56 +282,6 @@ function updateDashboard() {
     });
     document.getElementById("total-items-count").innerText = rows.length;
     document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
-    }
-   // 1. RE-ADD DARK MODE
-function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-    const btn = document.getElementById("darkModeToggle");
-    if (document.body.classList.contains("dark-mode")) {
-        btn.innerText = "☀️";
-        localStorage.setItem("theme", "dark");
-    } else {
-        btn.innerText = "🌙";
-        localStorage.setItem("theme", "light");
-    }
-}
-
-// 2. RE-ADD EXCEL EXPORT
-function exportTableToCSV(filename) {
-    let csv = [];
-    let rows = document.querySelectorAll("table tr");
-    
-    for (let i = 0; i < rows.length; i++) {
-        let row = [], cols = rows[i].querySelectorAll("td, th");
-        // We pick Name, Cat, Date, Qty, Price (Columns 1 to 5)
-        for (let j = 1; j <= 5; j++) {
-            let data = cols[j] ? cols[j].innerText.replace(/,/g, "") : "";
-            row.push('"' + data + '"');
-        }
-        csv.push(row.join(","));
-    }
-
-    let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-    let downloadLink = document.createElement("a");
-    downloadLink.download = filename;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    showToast("Inventory Exported! 📊");
-}
-
-// 3. ADD SEARCH BACK
-function searchTable() {
-    let input = document.getElementById("searchInput").value.toUpperCase();
-    let tr = document.getElementById("inventory-table").getElementsByTagName("tr");
-    for (let i = 1; i < tr.length; i++) {
-        let td = tr[i].getElementsByTagName("td")[1]; // Search by Product Name
-        if (td) {
-            let txt = td.textContent || td.innerText;
-            tr[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
-        }
-    }
     }
 </script>
 
