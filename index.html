@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Inventory System</title>
     <style>
+        #inventory-table thead th {
+    position: sticky;
+    top: 0;
+    background: #2c3e50;
+    color: #f1c40f;
+    padding: 15px 10px;
+    z-index: 10;
+    text-align: left;
+    border-bottom: 2px solid #f1c40f;
+        }
         #inventory-table th {
     background-color: #2c3e50;
     color: #f1c40f; /* Your signature gold color */
@@ -198,8 +208,13 @@ function showToast(msg, type = 'success') {
 
 // 3. THE "RENDER" ENGINE (Reads from LocalStorage)
 function renderTable() {
+    // 1. Get the list of products from memory
     let products = JSON.parse(localStorage.getItem("myInventory")) || [];
-    let tbody = document.querySelector("#inventory-table tbody");
+    
+    // 2. Select ONLY the body (this prevents the headers from being deleted)
+    let tbody = document.getElementById("inventory-body");
+    
+    // 3. Clear only the rows, not the headers
     tbody.innerHTML = ""; 
 
     products.forEach((p, index) => {
@@ -215,12 +230,13 @@ function renderTable() {
             <td>${p.date}</td>
             <td>${p.qty}</td>
             <td>${p.price}</td>
-            <td class="no-print"><button class="delete-btn" onclick="removeRow(${index})">Delete</button></td>
+            <td class="no-print"><button class="delete-btn" onclick="removeRow(${index})" style="background:#e74c3c; color:white; border:none; padding:5px; border-radius:5px;">Delete</button></td>
             <td class="no-print"><a href="${whatsappLink}" target="_blank"><button style="background:#25D366; color:white; border:none; padding:5px; border-radius:5px;">Order</button></a></td>
         `;
     });
-    updateDashboard();
-}
+    
+    updateDashboard(); // Recalculate your Total Items and Value
+    }
 
 // 4. SAVE PRODUCT TO MEMORY
 function saveProduct() {
