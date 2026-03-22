@@ -157,6 +157,7 @@
 </div>
 
 <div id="toast">Message here</div>
+ class="delete-btn" onclick="this.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button>
 <script>
     window.onload = function() {
         let name = prompt("Enter your name:") || "User";
@@ -192,17 +193,15 @@
             return;
         }
 
-        // WhatsApp Logic
         const myNumber = "254700000000"; 
-        const totalRowValue = (parseFloat(qty) * parseFloat(price)).toLocaleString();
-        const message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalRowValue}`;
+        const totalValue = (parseFloat(qty) * parseFloat(price)).toLocaleString();
+        const message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalValue}`;
         const whatsappLink = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
 
         const table = document.getElementById("inventory-table").querySelector("tbody");
         const row = table.insertRow();
         
-        // --- MATCHING THE 8 COLUMNS ---
-        // 1: Photo | 2: Product | 3: Category | 4: Date | 5: Qty | 6: Price | 7: Action | 8: Order
+        // BUILD 8 COLUMNS: 1:Photo, 2:Name, 3:Cat, 4:Date, 5:Qty, 6:Price, 7:Action, 8:Order
         row.innerHTML = `
             <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
             <td>${name}</td>
@@ -220,7 +219,6 @@
             </td>
         `;
 
-        // Reset inputs
         document.getElementById("pName").value = "";
         document.getElementById("pQty").value = "";
         document.getElementById("pPrice").value = "";
@@ -231,26 +229,51 @@
 
     function updateDashboard() {
         const rows = document.querySelectorAll("#inventory-table tbody tr");
-        const itemsCard = document.getElementById("total-items-count");
-        const valueCard = document.getElementById("total-value-count");
-        
         let totalVal = 0;
         let totalItems = 0;
 
         rows.forEach(row => {
-            // Clean KES/commas to fix NaN
             const q = parseFloat(row.cells[4].innerText.replace(/[^0-9.]/g, "")) || 0;
             const p = parseFloat(row.cells[5].innerText.replace(/[^0-9.]/g, "")) || 0;
-            
             totalVal += (q * p);
             totalItems++;
-
             if(q < 5) row.classList.add("low-stock-alert");
             else row.classList.remove("low-stock-alert");
         });
 
+        const itemsCard = document.getElementById("total-items-count");
+        const valueCard = document.getElementById("total-value-count");
         if (itemsCard) itemsCard.innerText = totalItems;
         if (valueCard) valueCard.innerText = "KES " + totalVal.toLocaleString();
+    }
+
+    // FIXED EXPORT FUNCTION
+    function exportTableToCSV(filename) {
+        let csv = [];
+        const rows = document.querySelectorAll("table tr");
+        
+        rows.forEach(row => {
+            const cols = row.querySelectorAll("td, th");
+            let rowData = [];
+            
+            // We export the first 6 columns (Photo is skipped, Name to Price are kept)
+            for (let i = 1; i <= 5; i++) {
+                let data = cols[i] ? cols[i].innerText.replace(/,/g, "") : "";
+                rowData.push('"' + data + '"');
+            }
+            csv.push(rowData.join(","));
+        });
+
+        const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename || "inventory_report.csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Excel Exported! 📊");
     }
 </script>
 
