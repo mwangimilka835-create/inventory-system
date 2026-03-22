@@ -161,7 +161,9 @@
 <script>
     window.onload = function() {
         let name = prompt("Enter your name:") || "User";
-        document.getElementById("total-items-count").parentElement.parentElement.previousElementSibling.innerHTML = `<h2>Welcome, ${name}! 👋</h2>`;
+        // Find the welcome text and update it
+        const welcomeBox = document.querySelector('.stats').previousElementSibling;
+        if (welcomeBox) welcomeBox.innerHTML = `<h2>Welcome, ${name}! 👋</h2>`;
         updateDashboard();
     };
 
@@ -179,66 +181,71 @@
     }
 
     function saveProduct() {
-    const name = document.getElementById("pName").value;
-    const cat = document.getElementById("pCategory").value;
-    const qty = document.getElementById("pQty").value;
-    const price = document.getElementById("pPrice").value;
-    const date = new Date().toLocaleDateString();
+        const name = document.getElementById("pName").value;
+        const cat = document.getElementById("pCategory").value;
+        const qty = document.getElementById("pQty").value;
+        const price = document.getElementById("pPrice").value;
+        const date = new Date().toLocaleDateString();
 
-    if(!name || !qty || !price) {
-        showToast("Fill all fields!", "error");
-        return;
-    }
+        if(!name || !qty || !price) {
+            showToast("Fill all fields!", "error");
+            return;
+        }
 
-    // --- WHATSAPP LOGIC ---
-    let myNumber = "254700000000"; // REPLACE WITH YOUR PHONE NUMBER
-    let totalCost = qty * price;
-    let message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalCost}`;
-    let encodedMsg = encodeURIComponent(message);
-    let whatsappLink = `https://wa.me/${myNumber}?text=${encodedMsg}`;
-    // ----------------------
+        // --- WHATSAPP LOGIC ---
+        const myNumber = "254700000000"; // REPLACE WITH YOUR NUMBER
+        const totalRowValue = (parseFloat(qty) * parseFloat(price)).toLocaleString();
+        const message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalRowValue}`;
+        const whatsappLink = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
 
-    const table = document.getElementById("inventory-table").querySelector("tbody");
-    const row = table.insertRow();
-    
-    // We build the row including the WhatsApp button in the last column
-    row.innerHTML = `
-        <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
-        <td>${name}</td>
-        <td>${cat}</td>
-        <td>${date}</td>
-        <td>${qty}</td>
-        <td>${price}</td>
-        <td class="no-print">
-            <div style="display: flex; gap: 5px;">
-                <a href="${whatsappLink}" target="_blank">
-                    <button style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button>
-                </a>
-                <button class="delete-btn" onclick="this.parentElement.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button>
-            </div>
-        </td>
-    `;
+        const table = document.getElementById("inventory-table").querySelector("tbody");
+        const row = table.insertRow();
+        
+        row.innerHTML = `
+            <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
+            <td>${name}</td>
+            <td>${cat}</td>
+            <td>${date}</td>
+            <td>${qty}</td>
+            <td>${price}</td>
+            <td class="no-print">
+                <div style="display: flex; gap: 5px;">
+                    <a href="${whatsappLink}" target="_blank">
+                        <button style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button>
+                    </a>
+                    <button class="delete-btn" onclick="this.parentElement.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button>
+                </div>
+            </td>
+        `;
 
-    // Clear Inputs
-    document.getElementById("pName").value = "";
-    document.getElementById("pQty").value = "";
-    document.getElementById("pPrice").value = "";
-    
-    updateDashboard();
-    showToast("Product Saved! ✅");
+        document.getElementById("pName").value = "";
+        document.getElementById("pQty").value = "";
+        document.getElementById("pPrice").value = "";
+        
+        updateDashboard();
+        showToast("Product Saved!");
     }
 
     function updateDashboard() {
-        const rows = document.getElementById("inventory-table").querySelectorAll("tbody tr");
+        const rows = document.querySelectorAll("#inventory-table tbody tr");
         let totalVal = 0;
+        let totalItems = 0;
+
         rows.forEach(row => {
-            const q = parseFloat(row.cells[4].innerText);
-            const p = parseFloat(row.cells[5].innerText);
+            // We use cells[4] for Qty and cells[5] for Price
+            // We use parseFloat and replace to remove "KES" or commas if they exist
+            const q = parseFloat(row.cells[4].innerText.replace(/[^0-9.]/g, "")) || 0;
+            const p = parseFloat(row.cells[5].innerText.replace(/[^0-9.]/g, "")) || 0;
+            
             totalVal += (q * p);
+            totalItems++;
+
+            // Low Stock Alert
             if(q < 5) row.classList.add("low-stock-alert");
             else row.classList.remove("low-stock-alert");
         });
-        document.getElementById("total-items-count").innerText = rows.length;
+
+        document.getElementById("total-items-count").innerText = totalItems;
         document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
 
@@ -254,7 +261,8 @@
         const val = document.getElementById("categoryFilter").value;
         const rows = document.querySelectorAll("#inventory-table tbody tr");
         rows.forEach(row => {
-            row.style.display = (val === "All" || row.cells[2].innerText.includes(val)) ? "" : "none";
+            const catText = row.cells[2].innerText;
+            row.style.display = (val === "All" || catText.includes(val)) ? "" : "none";
         });
         showToast("Filter Applied");
     }
@@ -265,7 +273,11 @@
         rows.forEach(row => {
             const cols = row.querySelectorAll("td, th");
             let rowData = [];
-            for(let i=1; i<=5; i++) rowData.push('"' + (cols[i] ? cols[i].innerText : "") + '"');
+            // Export Name, Category, Date, Qty, Price
+            for(let i=1; i<=5; i++) {
+                let data = cols[i] ? cols[i].innerText : "";
+                rowData.push('"' + data + '"');
+            }
             csv.push(rowData.join(","));
         });
         const blob = new Blob([csv.join("\n")], {type: "text/csv"});
