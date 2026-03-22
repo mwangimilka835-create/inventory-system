@@ -240,29 +240,38 @@ function renderTable() {
 
 // 4. SAVE PRODUCT TO MEMORY
 function saveProduct() {
+    // 1. Get values from inputs
     const name = document.getElementById("pName").value;
     const cat = document.getElementById("pCategory").value;
     const qty = document.getElementById("pQty").value;
     const price = document.getElementById("pPrice").value;
     const date = new Date().toLocaleDateString('en-GB');
 
+    // 2. Validation: Don't save if fields are empty
     if (!name || !qty || !price) {
-        showToast("Fill all fields!", "error");
+        showToast("Please fill all fields! ⚠️", "error");
         return;
     }
 
+    // 3. Get existing products from memory (LocalStorage)
     let products = JSON.parse(localStorage.getItem("myInventory")) || [];
+    
+    // 4. Add the new product to the list
     products.push({ name, cat, qty, price, date });
+    
+    // 5. Save the updated list back to memory
     localStorage.setItem("myInventory", JSON.stringify(products));
 
-    // Clear inputs and refresh
+    // 6. Clear the input fields for the next entry
     document.getElementById("pName").value = "";
     document.getElementById("pQty").value = "";
     document.getElementById("pPrice").value = "";
     
-    renderTable();
-    showToast("Product Saved! ✅");
-}
+    // 7. Refresh the table and show the success message
+    renderTable(); 
+    showToast("Product Saved Successfully! ✅");
+    }
+
 
 // 5. REMOVE ROW FROM MEMORY
 function removeRow(index) {
