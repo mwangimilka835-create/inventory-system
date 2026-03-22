@@ -161,11 +161,20 @@
 
 <script>
     window.onload = function() {
-        let name = prompt("Enter your name:") || "User";
-        const welcomeDisplay = document.querySelector('.welcome-box h2');
-        if (welcomeDisplay) welcomeDisplay.innerHTML = `Welcome, ${name}! 👋`;
-        updateDashboard();
-    };
+    // 1. Ask for the name
+    let name = prompt("Enter your name:");
+    
+    // 2. If the user clicks 'Cancel' or leaves it blank, use "Guest"
+    if (!name || name.trim() === "") {
+        name = "Guest";
+    }
+
+    // 3. Put the name into the Greeting
+    document.getElementById("user-name-display").innerText = name;
+    
+    // 4. (Optional) Run your dashboard update
+    updateDashboard(); 
+};
 
     function showToast(msg, type='success') {
         const t = document.getElementById("toast");
