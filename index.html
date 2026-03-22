@@ -36,6 +36,32 @@
         th { background-color: #f8f9fa; color: #2c3e50; }
         .no-print { display: table-cell; }
         @media print { .no-print, .add-btn, .print-btn, .export-btn, input, select, h3, .welcome-box, #searchInput { display: none !important; } body { background: white; } .container { box-shadow: none; width: 100%; max-width: 100%; } table { border: 1px solid #000; } th, td { border: 1px solid #000 !important; } }
+/* This allows horizontal scrolling on mobile */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Makes scrolling smooth on iPhones */
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+        /* This keeps the table cells from getting too squished */
+table {
+    min-width: 600px; /* Forces a minimum width so columns stay readable */
+    width: 100%;
+}
+
+/* Make buttons smaller on mobile so they fit better */
+@media (max-width: 600px) {
+    th, td {
+        padding: 8px 4px;
+        font-size: 13px;
+    }
+    .delete-btn, .whatsapp-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+                   }
     </style>
 </head>
 <body>
