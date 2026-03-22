@@ -6,7 +6,59 @@
     <title>Smart Inventory System</title>
     <style>
     /* ... all your other CSS codes are up here ... */
+    /* Navigation Bar Styling */
+.navbar {
+    background-color: #2d3436; /* Professional Dark Grey */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    position: sticky; /* Stays at the top while scrolling */
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
 
+.nav-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #f1c40f; /* Matches your yellow/gold theme */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #f1c40f;
+}
+
+.nav-links a.active {
+    border-bottom: 2px solid #f1c40f;
+}
+
+/* Fix for mobile phones */
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+    .nav-links {
+        gap: 15px;
+        font-size: 14px;
+    }
+}
     /* Makes the WhatsApp button feel "alive" */
     td a button:hover {
         filter: brightness(1.1); /* Makes the green look slightly glowy */
