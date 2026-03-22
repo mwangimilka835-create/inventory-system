@@ -225,9 +225,9 @@ function updateDashboard() {
 
     for (let i = 0; i < rows.length; i++) {
         // We look at Index 3 for Qty and Index 4 for Price
-        let q = parseFloat(rows[i].cells[3].innerText) || 0; 
-        let p = parseFloat(rows[i].cells[4].innerText) || 0;
-
+        // Inside updateDashboard(), change these two lines:
+let q = parseFloat(rows[i].cells[4].innerText) || 0; // Qty is now Column 4
+let p = parseFloat(rows[i].cells[5].innerText) || 0; // Price is now Column 5
         // Low Stock Warning
         if (q < 5) {
             rows[i].style.backgroundColor = "#ff7675";
