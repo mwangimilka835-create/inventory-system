@@ -179,35 +179,53 @@
     }
 
     function saveProduct() {
-        const name = document.getElementById("pName").value;
-        const cat = document.getElementById("pCategory").value;
-        const qty = document.getElementById("pQty").value;
-        const price = document.getElementById("pPrice").value;
-        const date = new Date().toLocaleDateString();
+    const name = document.getElementById("pName").value;
+    const cat = document.getElementById("pCategory").value;
+    const qty = document.getElementById("pQty").value;
+    const price = document.getElementById("pPrice").value;
+    const date = new Date().toLocaleDateString();
 
-        if(!name || !qty || !price) {
-            showToast("Fill all fields!", "error");
-            return;
-        }
+    if(!name || !qty || !price) {
+        showToast("Fill all fields!", "error");
+        return;
+    }
 
-        const table = document.getElementById("inventory-table").querySelector("tbody");
-        const row = table.insertRow();
-        row.innerHTML = `
-            <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
-            <td>${name}</td>
-            <td>${cat}</td>
-            <td>${date}</td>
-            <td>${qty}</td>
-            <td>${price}</td>
-            <td class="no-print"><button class="delete-btn" onclick="this.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button></td>
-        `;
+    // --- WHATSAPP LOGIC ---
+    let myNumber = "254700000000"; // REPLACE WITH YOUR PHONE NUMBER
+    let totalCost = qty * price;
+    let message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalCost}`;
+    let encodedMsg = encodeURIComponent(message);
+    let whatsappLink = `https://wa.me/${myNumber}?text=${encodedMsg}`;
+    // ----------------------
 
-        document.getElementById("pName").value = "";
-        document.getElementById("pQty").value = "";
-        document.getElementById("pPrice").value = "";
-        
-        updateDashboard();
-        showToast("Product Saved!");
+    const table = document.getElementById("inventory-table").querySelector("tbody");
+    const row = table.insertRow();
+    
+    // We build the row including the WhatsApp button in the last column
+    row.innerHTML = `
+        <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
+        <td>${name}</td>
+        <td>${cat}</td>
+        <td>${date}</td>
+        <td>${qty}</td>
+        <td>${price}</td>
+        <td class="no-print">
+            <div style="display: flex; gap: 5px;">
+                <a href="${whatsappLink}" target="_blank">
+                    <button style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button>
+                </a>
+                <button class="delete-btn" onclick="this.parentElement.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button>
+            </div>
+        </td>
+    `;
+
+    // Clear Inputs
+    document.getElementById("pName").value = "";
+    document.getElementById("pQty").value = "";
+    document.getElementById("pPrice").value = "";
+    
+    updateDashboard();
+    showToast("Product Saved! ✅");
     }
 
     function updateDashboard() {
