@@ -6,6 +6,17 @@
     <title>Smart Inventory System</title>
     <style>
         /* Styling the placeholder text */
+        /* Special style for low stock items */
+.low-stock-alert {
+    background-color: #ff7675 !important; /* Soft Red */
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Optional: Add a small badge icon before the quantity */
+.low-stock-alert td:nth-child(5)::before {
+    content: "⚠️ "; 
+}
 ::placeholder {
     color: #a4b0be; /* A nice light grey */
     font-size: 0.9rem;
