@@ -216,6 +216,62 @@
         document.getElementById("pQty").value = "";
         document.getElementById("pPrice").value = "";
         
+<script>
+    window.onload = function() {
+        let name = prompt("Enter your name:") || "User";
+        const welcomeDisplay = document.querySelector('.welcome-box h2');
+        if (welcomeDisplay) welcomeDisplay.innerHTML = `Welcome, ${name}! 👋`;
+        updateDashboard();
+    };
+
+    function showToast(msg, type='success') {
+        const t = document.getElementById("toast");
+        t.innerText = msg;
+        t.style.backgroundColor = type === 'success' ? '#27ae60' : '#e74c3c';
+        t.className = "show";
+        setTimeout(() => { t.className = ""; }, 3000);
+    }
+
+    function saveProduct() {
+        const name = document.getElementById("pName").value;
+        const cat = document.getElementById("pCategory").value;
+        const qty = document.getElementById("pQty").value;
+        const price = document.getElementById("pPrice").value;
+        const date = new Date().toLocaleDateString();
+
+        if(!name || !qty || !price) {
+            showToast("Fill all fields!", "error");
+            return;
+        }
+
+        // WhatsApp Logic - specifically for the 'Order' column
+        const myNumber = "254700000000"; 
+        const totalRowValue = (parseFloat(qty) * parseFloat(price)).toLocaleString();
+        const message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalRowValue}`;
+        const whatsappLink = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
+
+        const table = document.getElementById("inventory-table").querySelector("tbody");
+        const row = table.insertRow();
+        
+        row.innerHTML = `
+            <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
+            <td>${name}</td>
+            <td>${cat}</td>
+            <td>${date}</td>
+            <td>${qty}</td>
+            <td>${price}</td>
+            <td class="no-print"><button class="delete-btn" onclick="this.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button></td>
+            <td class="no-print">
+                <a href="${whatsappLink}" target="_blank">
+                    <button style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button>
+                </a>
+            </td>
+        `;
+
+        document.getElementById("pName").value = "";
+        document.getElementById("pQty").value = "";
+        document.getElementById("pPrice").value = "";
+        
         updateDashboard();
         showToast("Product Saved! ✅");
     }
@@ -226,7 +282,7 @@
         let totalItems = 0;
 
         rows.forEach(row => {
-            // Updated column indexes: Qty is 4, Price is 5
+            // Strips away any 'KES' text to prevent NaN errors
             const q = parseFloat(row.cells[4].innerText.replace(/[^0-9.]/g, "")) || 0;
             const p = parseFloat(row.cells[5].innerText.replace(/[^0-9.]/g, "")) || 0;
             
@@ -240,42 +296,7 @@
         document.getElementById("total-items-count").innerText = totalItems;
         document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
-
-    function searchTable() {
-        const val = document.getElementById("searchInput").value.toUpperCase();
-        const rows = document.querySelectorAll("#inventory-table tbody tr");
-        rows.forEach(row => {
-            row.style.display = row.cells[1].innerText.toUpperCase().includes(val) ? "" : "none";
-        });
-    }
-
-    function filterByCategory() {
-        const val = document.getElementById("categoryFilter").value;
-        const rows = document.querySelectorAll("#inventory-table tbody tr");
-        rows.forEach(row => {
-            const catText = row.cells[2].innerText;
-            row.style.display = (val === "All" || catText.includes(val)) ? "" : "none";
-        });
-        showToast("Filter Applied");
-    }
-
-    function exportTableToCSV(filename) {
-        let csv = [];
-        const rows = document.querySelectorAll("table tr");
-        rows.forEach(row => {
-            const cols = row.querySelectorAll("td, th");
-            let rowData = [];
-            for(let i=1; i<=5; i++) rowData.push('"' + (cols[i] ? cols[i].innerText : "") + '"');
-            csv.push(rowData.join(","));
-        });
-        const blob = new Blob([csv.join("\n")], {type: "text/csv"});
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = filename;
-        link.click();
-        showToast("Exported! 📊");
-    }
- </script>
+</script>
 </body>
         </html>
 
