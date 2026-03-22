@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Inventory System</title>
     <style>
+    /* ... all your other CSS codes are up here ... */
+
+    /* Makes the WhatsApp button feel "alive" */
+    td a button:hover {
+        filter: brightness(1.1); /* Makes the green look slightly glowy */
+        transform: scale(1.05);  /* Makes it grow just a tiny bit */
+        transition: all 0.3s ease; /* Add this to make the growth smooth! */
+    }
         /* This targets your Save/Add Product button */
 .input-section button {
     transition: all 0.3s ease; /* Makes the color change smoothly, not a "flash" */
