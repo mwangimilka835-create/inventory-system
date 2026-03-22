@@ -352,47 +352,27 @@ table {
         let name = prompt("Please enter your name:");
         if (!name) name = "User";
         document.getElementById("user-name-display").innerText = name;
-        updateDashboard(); // Run once on load
+        updateDashboard(); 
     };
+
     function toggleDarkMode() {
-    // 1. Flip the 'dark-mode' class on the whole body
-    document.body.classList.toggle("dark-mode");
-    
-    // 2. Change the icon based on the mode
-    const btn = document.getElementById("darkModeToggle");
-    if (document.body.classList.contains("dark-mode")) {
-        btn.innerText = "☀️";
-    } else {
-        btn.innerText = "🌙";
+        document.body.classList.toggle("dark-mode");
+        const btn = document.getElementById("darkModeToggle");
+        btn.innerText = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
     }
-    }
+
+    // TOAST FUNCTION
     function showToast(message, type = 'success') {
-    const toast = document.getElementById("toast");
-    
-    // Set the message
-    toast.innerHTML = message;
-    
-    // Change color based on type (optional: e.g., red for errors)
-    toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+        const toast = document.getElementById("toast");
+        toast.innerHTML = message;
+        toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+        toast.className = "show";
+        setTimeout(function() { 
+            toast.className = toast.className.replace("show", ""); 
+        }, 3000);
+    }
 
-    // Add the "show" class to the div
-    toast.className = "show";
-
-    // After 3 seconds, remove the show class
-    setTimeout(function() { 
-        toast.className = toast.className.replace("show", ""); 
-    }, 3000);
-}
-
-// --- HOW TO USE IT ---
-
-// In your Save Product function:
-// showToast("Product saved successfully!");
-
-// In your Export function:
-// showToast("Inventory exported to Excel!");
-
-    // 2. SAVE PRODUCT (Fixed for Date Column)
+    // 2. SAVE PRODUCT
     function saveProduct() {
         let name = document.getElementById("pName").value;
         let cat = document.getElementById("pCategory").value;
@@ -401,33 +381,23 @@ table {
         let today = new Date().toLocaleDateString('en-GB'); 
 
         if (name === "" || qty === "" || price === "") {
-            alert("Please fill in all fields!");
+            showToast("Please fill all fields!", "error");
             return;
-            showToast("Product saved successfully!");
         }
 
         let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
         let row = table.insertRow();
         
-        // Column 0: Photo
-        row.insertCell(0).innerHTML = '<img src="unnamed_1.jpg" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">';
-        // Column 1: Name
+        row.insertCell(0).innerHTML = '<img src="unnamed_1.jpg" style="width:40px; height:40px; object-fit:cover; border-radius:5px;">';
         row.insertCell(1).innerText = name;
-        // Column 2: Category
         row.insertCell(2).innerText = cat;
-        // Column 3: Date (The New One!)
         row.insertCell(3).innerText = today;
-        // Column 4: Qty
         row.insertCell(4).innerText = qty;
-        // Column 5: Price
         row.insertCell(5).innerText = price;
-        
-        // Column 6: Delete
         row.insertCell(6).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
 
-        // Column 7: WhatsApp (Updated for your number)
-        let myNumber = "254700000000"; // REPLACE THIS WITH YOUR NUMBER
-        let message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${qty * price}`;
+        let myNumber = "254700000000"; 
+        let message = `Hello, I want to order ${qty} units of ${name}.`;
         let encodedMsg = encodeURIComponent(message);
         row.insertCell(7).innerHTML = `<a href="https://wa.me/${myNumber}?text=${encodedMsg}" target="_blank" class="no-print"><button style="background: #25D366; color: white; padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button></a>`;
 
@@ -437,43 +407,39 @@ table {
         document.getElementById("pPrice").value = "";
 
         updateDashboard();
+        showToast("Product saved successfully!"); // Toast moved here!
     }
 
-    // 3. REMOVE ROW
     function removeRow(btn) {
         btn.parentElement.parentElement.remove();
         updateDashboard();
+        showToast("Item removed", "error");
     }
 
     function updateDashboard() {
-    let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-    let rows = tbody.getElementsByTagName('tr');
-    let totalVal = 0;
+        let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        let rows = tbody.getElementsByTagName('tr');
+        let totalVal = 0;
+        let itemCount = 0;
 
-    for (let i = 0; i < rows.length; i++) {
-        // We look at Column 4 (Quantity)
-        let qCell = rows[i].cells[4];
-        let pCell = rows[i].cells[5];
-        
-        let q = parseFloat(qCell.innerText) || 0; 
-        let p = parseFloat(pCell.innerText) || 0;
+        for (let i = 0; i < rows.length; i++) {
+            // Check if it's a real data row (not the toast div)
+            if(rows[i].cells.length < 5) continue; 
+            
+            let q = parseFloat(rows[i].cells[4].innerText) || 0; 
+            let p = parseFloat(rows[i].cells[5].innerText) || 0;
 
-        // CHECK: Is quantity less than 5?
-        if (q < 5) {
-            rows[i].classList.add("low-stock-alert");
-        } else {
-            rows[i].classList.remove("low-stock-alert");
+            if (q < 5) { rows[i].classList.add("low-stock-alert"); } 
+            else { rows[i].classList.remove("low-stock-alert"); }
+
+            totalVal += (q * p);
+            itemCount++;
         }
 
-        totalVal += (q * p);
+        document.getElementById("total-items-count").innerText = itemCount;
+        document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
 
-    // Update the summary boxes at the top
-    document.getElementById("total-items-count").innerText = rows.length;
-    document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
-    }
-
-    // 5. SEARCH
     function searchTable() {
         let input = document.getElementById("searchInput").value.toUpperCase();
         let tr = document.getElementById("inventory-table").getElementsByTagName("tr");
@@ -485,38 +451,17 @@ table {
             }
         }
     }
- function filterByCategory() {
-    let filter = document.getElementById("categoryFilter").value;
-    let table = document.getElementById("inventory-table");
-    let tr = table.getElementsByTagName("tr");
 
-    for (let i = 1; i < tr.length; i++) {
-        let td = tr[i].getElementsByTagName("td")[2]; // Column 2 is Category
-        if (td) {
-            let categoryText = td.textContent || td.innerText;
-            
-            // If "All" is selected, show everything. Otherwise, match the text.
-            if (filter === "All" || categoryText.includes(filter) || filter.includes(categoryText)) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }
-    }
-    }
-    // 6. EXCEL EXPORT (Updated to include the Date)
     function exportTableToCSV(filename) {
         let csv = [];
         let rows = document.querySelectorAll("table tr");
         for (let i = 0; i < rows.length; i++) {
             let row = [], cols = rows[i].querySelectorAll("td, th");
-            // Pick columns 1, 2, 3, 4, 5 (Name, Cat, Date, Qty, Price)
             for (let j = 1; j <= 5; j++) {
                 let data = cols[j] ? cols[j].innerText.replace(/,/g, "") : "";
                 row.push('"' + data + '"');
             }
             csv.push(row.join(","));
-            showToast("Inventory exported to Excel!");
         }
         let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
         let downloadLink = document.createElement("a");
@@ -525,8 +470,200 @@ table {
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
+        
+        showToast("Inventory exported to Excel!"); // Moved outside the loop
+
+
+<script>
+    // 1. INITIALIZATION & USER NAME
+    window.onload = function() {
+        let name = prompt("Please enter your name:");
+        if (!name) name = "User";
+        document.getElementById("user-name-display").innerText = name;
+        updateDashboard(); 
+    };
+
+    // 2. DARK MODE TOGGLE
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        const btn = document.getElementById("darkModeToggle");
+        const isDark = document.body.classList.contains("dark-mode");
+        
+        btn.innerText = isDark ? "☀️" : "🌙";
+        showToast(isDark ? "Dark Mode Enabled 🌙" : "Light Mode Enabled ☀️");
+    }
+
+    // 3. TOAST NOTIFICATION SYSTEM
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById("toast");
+        if (!toast) return; // Safety check
+
+        toast.innerHTML = message;
+        toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+        
+        // Reset animation by removing and re-adding the class
+        toast.className = "";
+        void toast.offsetWidth; // Trigger reflow
+        toast.className = "show";
+
+        setTimeout(function() { 
+            toast.className = toast.className.replace("show", ""); 
+        }, 3000);
+    }
+
+    // 4. SAVE PRODUCT
+    function saveProduct() {
+        let name = document.getElementById("pName").value;
+        let cat = document.getElementById("pCategory").value;
+        let qty = document.getElementById("pQty").value;
+        let price = document.getElementById("pPrice").value;
+        let today = new Date().toLocaleDateString('en-GB'); 
+
+        // Validation
+        if (name === "" || qty === "" || price === "") {
+            showToast("Please fill in all fields!", "error");
+            return;
+        }
+
+        let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        let row = table.insertRow();
+        
+        // Column 0: Photo
+        row.insertCell(0).innerHTML = '<img src="unnamed_1.jpg" style="width:40px; height:40px; object-fit:cover; border-radius:5px;">';
+        // Column 1: Name
+        row.insertCell(1).innerText = name;
+        // Column 2: Category
+        row.insertCell(2).innerText = cat;
+        // Column 3: Date
+        row.insertCell(3).innerText = today;
+        // Column 4: Qty
+        row.insertCell(4).innerText = qty;
+        // Column 5: Price
+        row.insertCell(5).innerText = price;
+        // Column 6: Delete
+        row.insertCell(6).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
+
+        // Column 7: WhatsApp Integration
+        let myNumber = "254700000000"; 
+        let message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${qty * price}`;
+        let encodedMsg = encodeURIComponent(message);
+        row.insertCell(7).innerHTML = `<a href="https://wa.me/${myNumber}?text=${encodedMsg}" target="_blank" class="no-print"><button style="background: #25D366; color: white; padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button></a>`;
+
+        // Clear Inputs
+        document.getElementById("pName").value = "";
+        document.getElementById("pQty").value = "";
+        document.getElementById("pPrice").value = "";
+
+        updateDashboard();
+        showToast("Product saved successfully! ✅");
+    }
+
+    // 5. REMOVE ROW
+    function removeRow(btn) {
+        if(confirm("Are you sure you want to delete this item?")) {
+            btn.parentElement.parentElement.remove();
+            updateDashboard();
+            showToast("Item removed from inventory", "error");
+        }
+    }
+
+    // 6. UPDATE DASHBOARD (Totals & Low Stock Alerts)
+    function updateDashboard() {
+        let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        let rows = tbody.getElementsByTagName('tr');
+        let totalVal = 0;
+        let itemCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            // Ensure we aren't counting the toast div or empty rows
+            if(rows[i].cells.length < 5) continue; 
+
+            let q = parseFloat(rows[i].cells[4].innerText) || 0; 
+            let p = parseFloat(rows[i].cells[5].innerText) || 0;
+
+            // Low Stock Logic (Alert if under 5)
+            if (q < 5) {
+                rows[i].classList.add("low-stock-alert");
+            } else {
+                rows[i].classList.remove("low-stock-alert");
+            }
+
+            totalVal += (q * p);
+            itemCount++;
+        }
+
+        document.getElementById("total-items-count").innerText = itemCount;
+        document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
+    }
+
+    // 7. SEARCH FILTER
+    function searchTable() {
+        let input = document.getElementById("searchInput").value.toUpperCase();
+        let tr = document.getElementById("inventory-table").getElementsByTagName("tr");
+        
+        for (let i = 1; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName("td")[1]; // Search by Product Name (Col 1)
+            if (td) {
+                let txt = td.textContent || td.innerText;
+                tr[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+            }
+        }
+    }
+
+    // 8. CATEGORY FILTER (The Missing Function)
+    function filterByCategory() {
+        let filter = document.getElementById("categoryFilter").value;
+        let table = document.getElementById("inventory-table");
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName("td")[2]; // Column 2 is Category
+            if (td) {
+                let categoryText = td.textContent || td.innerText;
+                
+                // Match "All" or match the specific category name
+                if (filter === "All" || categoryText.includes(filter)) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+        showToast(filter === "All" ? "Showing all items" : `Filtered by: ${filter}`);
+    }
+
+    // 9. EXCEL EXPORT
+    function exportTableToCSV(filename) {
+        let csv = [];
+        let rows = document.querySelectorAll("table tr");
+        
+        if (rows.length <= 1) {
+            showToast("No data to export!", "error");
+            return;
+        }
+
+        for (let i = 0; i < rows.length; i++) {
+            let row = [], cols = rows[i].querySelectorAll("td, th");
+            // Pick columns: Name, Cat, Date, Qty, Price (1 through 5)
+            for (let j = 1; j <= 5; j++) {
+                let data = cols[j] ? cols[j].innerText.replace(/,/g, "") : "";
+                row.push('"' + data + '"');
+            }
+            csv.push(row.join(","));
+        }
+
+        let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+        let downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        showToast("Inventory exported to Excel! 📊");
     }
 </script>
+
 
 </body>
 </html>
