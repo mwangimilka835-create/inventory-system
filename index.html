@@ -161,9 +161,7 @@
     window.onload = function() {
         let name = prompt("Enter your name:") || "User";
         const welcomeDisplay = document.querySelector('.welcome-box h2');
-        if (welcomeDisplay) {
-            welcomeDisplay.innerHTML = `Welcome, ${name}! 👋`;
-        }
+        if (welcomeDisplay) welcomeDisplay.innerHTML = `Welcome, ${name}! 👋`;
         updateDashboard();
     };
 
@@ -195,7 +193,7 @@
         }
 
         // WhatsApp Logic
-        const myNumber = "254700000000"; // Ensure your number is correct
+        const myNumber = "254700000000"; 
         const totalRowValue = (parseFloat(qty) * parseFloat(price)).toLocaleString();
         const message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalRowValue}`;
         const whatsappLink = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
@@ -203,8 +201,8 @@
         const table = document.getElementById("inventory-table").querySelector("tbody");
         const row = table.insertRow();
         
-        // This builds exactly 8 <td> cells to match your 8 <th> headers:
-        // Photo, Product, Category, Date, Qty, Price, Action, Order
+        // --- MATCHING THE 8 COLUMNS ---
+        // 1: Photo | 2: Product | 3: Category | 4: Date | 5: Qty | 6: Price | 7: Action | 8: Order
         row.innerHTML = `
             <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
             <td>${name}</td>
@@ -222,6 +220,7 @@
             </td>
         `;
 
+        // Reset inputs
         document.getElementById("pName").value = "";
         document.getElementById("pQty").value = "";
         document.getElementById("pPrice").value = "";
@@ -239,7 +238,7 @@
         let totalItems = 0;
 
         rows.forEach(row => {
-            // Strips away any 'KES' text to prevent NaN errors
+            // Clean KES/commas to fix NaN
             const q = parseFloat(row.cells[4].innerText.replace(/[^0-9.]/g, "")) || 0;
             const p = parseFloat(row.cells[5].innerText.replace(/[^0-9.]/g, "")) || 0;
             
@@ -252,41 +251,6 @@
 
         if (itemsCard) itemsCard.innerText = totalItems;
         if (valueCard) valueCard.innerText = "KES " + totalVal.toLocaleString();
-    }
-
-    function searchTable() {
-        const val = document.getElementById("searchInput").value.toUpperCase();
-        const rows = document.querySelectorAll("#inventory-table tbody tr");
-        rows.forEach(row => {
-            row.style.display = row.cells[1].innerText.toUpperCase().includes(val) ? "" : "none";
-        });
-    }
-
-    function filterByCategory() {
-        const val = document.getElementById("categoryFilter").value;
-        const rows = document.querySelectorAll("#inventory-table tbody tr");
-        rows.forEach(row => {
-            const catText = row.cells[2].innerText;
-            row.style.display = (val === "All" || catText.includes(val)) ? "" : "none";
-        });
-        showToast("Filter Applied");
-    }
-
-    function exportTableToCSV(filename) {
-        let csv = [];
-        const rows = document.querySelectorAll("table tr");
-        rows.forEach(row => {
-            const cols = row.querySelectorAll("td, th");
-            let rowData = [];
-            for(let i=1; i<=5; i++) rowData.push('"' + (cols[i] ? cols[i].innerText : "") + '"');
-            csv.push(rowData.join(","));
-        });
-        const blob = new Blob([csv.join("\n")], {type: "text/csv"});
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = filename;
-        link.click();
-        showToast("Exported! 📊");
     }
 </script>
 
