@@ -314,6 +314,18 @@ table {
         document.getElementById("user-name-display").innerText = name;
         updateDashboard(); // Run once on load
     };
+    function toggleDarkMode() {
+    // 1. Flip the 'dark-mode' class on the whole body
+    document.body.classList.toggle("dark-mode");
+    
+    // 2. Change the icon based on the mode
+    const btn = document.getElementById("darkModeToggle");
+    if (document.body.classList.contains("dark-mode")) {
+        btn.innerText = "☀️";
+    } else {
+        btn.innerText = "🌙";
+    }
+    }
 
     // 2. SAVE PRODUCT (Fixed for Date Column)
     function saveProduct() {
