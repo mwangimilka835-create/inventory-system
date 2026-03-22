@@ -516,6 +516,7 @@ table {
                 row.push('"' + data + '"');
             }
             csv.push(row.join(","));
+            showToast("Inventory exported to Excel!");
         }
         let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
         let downloadLink = document.createElement("a");
