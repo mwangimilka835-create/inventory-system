@@ -169,46 +169,53 @@ cells[3].innerText) || 0; // Corrected column index for Qty
         let name = prompt("Please enter your name:");
         if (!name) name = "User";
         document.getElementById("user-name-display").innerText = name;
+        updateDashboard(); // Run once on load
     };
 
-    // 2. SAVE PRODUCT
+    // 2. SAVE PRODUCT (Fixed for Date Column)
     function saveProduct() {
-    let name = document.getElementById("pName").value;
-    let cat = document.getElementById("pCategory").value;
-    let qty = document.getElementById("pQty").value;
-    let price = document.getElementById("pPrice").value;
-    
-    // Automatically get today's date (e.g., 22/03/2026)
-    let today = new Date().toLocaleDateString('en-GB'); 
+        let name = document.getElementById("pName").value;
+        let cat = document.getElementById("pCategory").value;
+        let qty = document.getElementById("pQty").value;
+        let price = document.getElementById("pPrice").value;
+        let today = new Date().toLocaleDateString('en-GB'); 
 
-    if (name === "" || qty === "" || price === "") {
-        alert("Please fill in all fields!");
-        return;
-    }
+        if (name === "" || qty === "" || price === "") {
+            alert("Please fill in all fields!");
+            return;
+        }
 
-    let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-    let row = table.insertRow();
-    
-    row.insertCell(0).innerHTML = '<img src="unnamed.jpg" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">';
-    row.insertCell(1).innerText = name;
-    row.insertCell(2).innerText = cat;
-    row.insertCell(3).innerText = today; // INSERS THE DATE
-    row.insertCell(4).innerText = qty;
-    row.insertCell(5).innerText = price;
-    
-    row.insertCell(6).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
+        let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        let row = table.insertRow();
+        
+        // Column 0: Photo
+        row.insertCell(0).innerHTML = '<img src="unnamed.jpg" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">';
+        // Column 1: Name
+        row.insertCell(1).innerText = name;
+        // Column 2: Category
+        row.insertCell(2).innerText = cat;
+        // Column 3: Date (The New One!)
+        row.insertCell(3).innerText = today;
+        // Column 4: Qty
+        row.insertCell(4).innerText = qty;
+        // Column 5: Price
+        row.insertCell(5).innerText = price;
+        
+        // Column 6: Delete
+        row.insertCell(6).innerHTML = '<button class="delete-btn no-print" onclick="removeRow(this)">Delete</button>';
 
-    let myNumber = "254112873218"; 
-    let message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${qty * price}`;
-    let encodedMsg = encodeURIComponent(message);
-    row.insertCell(7).innerHTML = `<a href="https://wa.me/${myNumber}?text=${encodedMsg}" target="_blank" class="no-print"><button style="background: #25D366; color: white; padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button></a>`;
+        // Column 7: WhatsApp (Updated for your number)
+        let myNumber = "254700000000"; // REPLACE THIS WITH YOUR NUMBER
+        let message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${qty * price}`;
+        let encodedMsg = encodeURIComponent(message);
+        row.insertCell(7).innerHTML = `<a href="https://wa.me/${myNumber}?text=${encodedMsg}" target="_blank" class="no-print"><button style="background: #25D366; color: white; padding: 6px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button></a>`;
 
-    document.getElementById("pName").value = "";
-    document.getElementById("pQty").value = "";
-    document.getElementById("pPrice").value = "";
+        // Clear Inputs
+        document.getElementById("pName").value = "";
+        document.getElementById("pQty").value = "";
+        document.getElementById("pPrice").value = "";
 
-    updateDashboard();
-    }
+        updateDashboard();
     }
 
     // 3. REMOVE ROW
@@ -217,39 +224,38 @@ cells[3].innerText) || 0; // Corrected column index for Qty
         updateDashboard();
     }
 
-    // 4. UPDATE DASHBOARD (Calculates Total Value & Red Alert)
-function updateDashboard() {
-    let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
-    let rows = tbody.getElementsByTagName('tr');
-    let totalVal = 0;
+    // 4. UPDATE DASHBOARD (Fixed Math for Date Column)
+    function updateDashboard() {
+        let tbody = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
+        let rows = tbody.getElementsByTagName('tr');
+        let totalVal = 0;
 
-    for (let i = 0; i < rows.length; i++) {
-        // We look at Index 3 for Qty and Index 4 for Price
-        // Inside updateDashboard(), change these two lines:
-let q = parseFloat(rows[i].cells[4].innerText) || 0; // Qty is now Column 4
-let p = parseFloat(rows[i].cells[5].innerText) || 0; // Price is now Column 5
-        // Low Stock Warning
-        if (q < 5) {
-            rows[i].style.backgroundColor = "#ff7675";
-            rows[i].style.color = "white";
-        } else {
-            rows[i].style.backgroundColor = "white";
-            rows[i].style.color = "black";
+        for (let i = 0; i < rows.length; i++) {
+            // Because we added Date, Qty is now cell [4] and Price is cell [5]
+            let q = parseFloat(rows[i].cells[4].innerText) || 0; 
+            let p = parseFloat(rows[i].cells[5].innerText) || 0;
+
+            // Low Stock Warning
+            if (q < 5) {
+                rows[i].style.backgroundColor = "#ff7675";
+                rows[i].style.color = "white";
+            } else {
+                rows[i].style.backgroundColor = "white";
+                rows[i].style.color = "black";
+            }
+            totalVal += (q * p);
         }
-        totalVal += (q * p);
+
+        document.getElementById("total-items-count").innerText = rows.length;
+        document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
 
-    document.getElementById("total-items-count").innerText = rows.length;
-    document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
-    }
-
-    // 5. SEARCH TABLE
+    // 5. SEARCH
     function searchTable() {
         let input = document.getElementById("searchInput").value.toUpperCase();
         let tr = document.getElementById("inventory-table").getElementsByTagName("tr");
-
         for (let i = 1; i < tr.length; i++) {
-            let td = tr[i].getElementsByTagName("td")[1]; // Searches by Product Name
+            let td = tr[i].getElementsByTagName("td")[1]; 
             if (td) {
                 let txt = td.textContent || td.innerText;
                 tr[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
@@ -257,22 +263,19 @@ let p = parseFloat(rows[i].cells[5].innerText) || 0; // Price is now Column 5
         }
     }
 
-    // 6. EXCEL EXPORT (Skips images/buttons for a clean report)
+    // 6. EXCEL EXPORT (Updated to include the Date)
     function exportTableToCSV(filename) {
         let csv = [];
         let rows = document.querySelectorAll("table tr");
-        
         for (let i = 0; i < rows.length; i++) {
             let row = [], cols = rows[i].querySelectorAll("td, th");
-            
-            // Loop from Column 1 to 4 (Product, Category, Qty, Price)
-            for (let j = 1; j <= 4; j++) {
+            // Pick columns 1, 2, 3, 4, 5 (Name, Cat, Date, Qty, Price)
+            for (let j = 1; j <= 5; j++) {
                 let data = cols[j] ? cols[j].innerText.replace(/,/g, "") : "";
                 row.push('"' + data + '"');
             }
             csv.push(row.join(","));
         }
-
         let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
         let downloadLink = document.createElement("a");
         downloadLink.download = filename;
@@ -280,11 +283,6 @@ let p = parseFloat(rows[i].cells[5].innerText) || 0; // Price is now Column 5
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-    }
-    // 7. PRINT REPORT
-    function printReport() {
-        // This opens the browser's print dialog
-        window.print();
     }
 </script>
 
