@@ -8,6 +8,15 @@
         #inventory-table td {
     vertical-align: middle;
         }
+        #inventory-table thead th {
+    position: sticky;
+    top: 60px; /* Adjust based on your navbar height */
+    background: #f8f9fa;
+    z-index: 10;
+        }
+        #inventory-table tbody tr:nth-child(even) {
+    background-color: rgba(0,0,0,0.02);
+        }
         /* TOAST STYLING */
         #toast {
             visibility: hidden;
