@@ -366,6 +366,31 @@ table {
         btn.innerText = "🌙";
     }
     }
+    function showToast(message, type = 'success') {
+    const toast = document.getElementById("toast");
+    
+    // Set the message
+    toast.innerHTML = message;
+    
+    // Change color based on type (optional: e.g., red for errors)
+    toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+
+    // Add the "show" class to the div
+    toast.className = "show";
+
+    // After 3 seconds, remove the show class
+    setTimeout(function() { 
+        toast.className = toast.className.replace("show", ""); 
+    }, 3000);
+}
+
+// --- HOW TO USE IT ---
+
+// In your Save Product function:
+// showToast("Product saved successfully!");
+
+// In your Export function:
+// showToast("Inventory exported to Excel!");
 
     // 2. SAVE PRODUCT (Fixed for Date Column)
     function saveProduct() {
