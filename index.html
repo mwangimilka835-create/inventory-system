@@ -163,130 +163,96 @@
 <div id="toast">Message here</div>
 
 <script>
-    window.onload = function() {
-    // 1. Ask for the name
-    let name = prompt("Enter your name:");
-    
-    // 2. If the user clicks 'Cancel' or leaves it blank, use "Guest"
-    if (!name || name.trim() === "") {
-        name = "Guest";
-    }
-
-    // 3. Put the name into the Greeting
+     // 1. LOAD DATA WHEN APP OPENS
+window.onload = function() {
+    let name = prompt("Please enter your name:");
+    if (!name || name.trim() === "") name = "Guest";
     document.getElementById("user-name-display").innerText = name;
     
-    // 4. (Optional) Run your dashboard update
-    updateDashboard(); 
+    renderTable(); // This pulls your saved data from the phone's memory!
 };
 
-    function showToast(msg, type='success') {
-        const t = document.getElementById("toast");
-        if (!t) return;
-        t.innerText = msg;
-        t.style.backgroundColor = type === 'success' ? '#27ae60' : '#e74c3c';
-        t.className = "show";
-        setTimeout(() => { t.className = ""; }, 3000);
-    }
+// 2. TOAST NOTIFICATION
+function showToast(msg, type = 'success') {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.style.backgroundColor = type === 'error' ? '#e74c3c' : '#27ae60';
+    t.className = "show";
+    setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+}
 
-    function toggleDarkMode() {
-        document.body.classList.toggle("dark-mode");
-        const isDark = document.body.classList.contains("dark-mode");
-        showToast(isDark ? "Dark Mode Enabled 🌙" : "Light Mode Enabled ☀️");
-    }
+// 3. THE "RENDER" ENGINE (Reads from LocalStorage)
+function renderTable() {
+    let products = JSON.parse(localStorage.getItem("myInventory")) || [];
+    let tbody = document.querySelector("#inventory-table tbody");
+    tbody.innerHTML = ""; 
 
-    function saveProduct() {
-        const name = document.getElementById("pName").value;
-        const cat = document.getElementById("pCategory").value;
-        const qty = document.getElementById("pQty").value;
-        const price = document.getElementById("pPrice").value;
-        const date = new Date().toLocaleDateString();
+    products.forEach((p, index) => {
+        let row = tbody.insertRow();
+        let myNumber = "254112873218"; 
+        let message = `Hello, I want to order ${p.qty} units of ${p.name}.`;
+        let whatsappLink = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
 
-        if(!name || !qty || !price) {
-            showToast("Fill all fields!", "error");
-            return;
-        }
-
-        const myNumber = "254112873218"; 
-        const totalValue = (parseFloat(qty) * parseFloat(price)).toLocaleString();
-        const message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalValue}`;
-        const whatsappLink = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
-
-        const table = document.getElementById("inventory-table").querySelector("tbody");
-        const row = table.insertRow();
-        
-        // BUILD 8 COLUMNS: 1:Photo, 2:Name, 3:Cat, 4:Date, 5:Qty, 6:Price, 7:Action, 8:Order
         row.innerHTML = `
-            <td><img src="unnamed_1.jpg" style="width:40px;height:40px;border-radius:5px;"></td>
-            <td>${name}</td>
-            <td>${cat}</td>
-            <td>${date}</td>
-            <td>${qty}</td>
-            <td>${price}</td>
-            <td class="no-print">
-                <button class="delete-btn" onclick="this.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button>
-            </td>
-            <td class="no-print">
-                <a href="${whatsappLink}" target="_blank">
-                    <button style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button>
-                </a>
-            </td>
+            <td><img src="unnamed_1.jpg" style="width:50px; border-radius:5px;"></td>
+            <td>${p.name}</td>
+            <td>${p.cat}</td>
+            <td>${p.date}</td>
+            <td>${p.qty}</td>
+            <td>${p.price}</td>
+            <td class="no-print"><button class="delete-btn" onclick="removeRow(${index})">Delete</button></td>
+            <td class="no-print"><a href="${whatsappLink}" target="_blank"><button style="background:#25D366; color:white; border:none; padding:5px; border-radius:5px;">Order</button></a></td>
         `;
+    });
+    updateDashboard();
+}
 
-        document.getElementById("pName").value = "";
-        document.getElementById("pQty").value = "";
-        document.getElementById("pPrice").value = "";
-        
-        updateDashboard();
-        showToast("Product Saved! ✅");
+// 4. SAVE PRODUCT TO MEMORY
+function saveProduct() {
+    const name = document.getElementById("pName").value;
+    const cat = document.getElementById("pCategory").value;
+    const qty = document.getElementById("pQty").value;
+    const price = document.getElementById("pPrice").value;
+    const date = new Date().toLocaleDateString('en-GB');
+
+    if (!name || !qty || !price) {
+        showToast("Fill all fields!", "error");
+        return;
     }
 
-    function updateDashboard() {
-        const rows = document.querySelectorAll("#inventory-table tbody tr");
-        let totalVal = 0;
-        let totalItems = 0;
+    let products = JSON.parse(localStorage.getItem("myInventory")) || [];
+    products.push({ name, cat, qty, price, date });
+    localStorage.setItem("myInventory", JSON.stringify(products));
 
-        rows.forEach(row => {
-            const q = parseFloat(row.cells[4].innerText.replace(/[^0-9.]/g, "")) || 0;
-            const p = parseFloat(row.cells[5].innerText.replace(/[^0-9.]/g, "")) || 0;
-            totalVal += (q * p);
-            totalItems++;
-            if(q < 5) row.classList.add("low-stock-alert");
-            else row.classList.remove("low-stock-alert");
-        });
+    // Clear inputs and refresh
+    document.getElementById("pName").value = "";
+    document.getElementById("pQty").value = "";
+    document.getElementById("pPrice").value = "";
+    
+    renderTable();
+    showToast("Product Saved! ✅");
+}
 
-        const itemsCard = document.getElementById("total-items-count");
-        const valueCard = document.getElementById("total-value-count");
-        if (itemsCard) itemsCard.innerText = totalItems;
-        if (valueCard) valueCard.innerText = "KES " + totalVal.toLocaleString();
-    }
+// 5. REMOVE ROW FROM MEMORY
+function removeRow(index) {
+    let products = JSON.parse(localStorage.getItem("myInventory")) || [];
+    products.splice(index, 1);
+    localStorage.setItem("myInventory", JSON.stringify(products));
+    renderTable();
+    showToast("Item Removed", "error");
+}
 
-    // FIXED EXPORT FUNCTION
-    function exportTableToCSV(filename) {
-        let csv = [];
-        const rows = document.querySelectorAll("table tr");
-        
-        rows.forEach(row => {
-            const cols = row.querySelectorAll("td, th");
-            let rowData = [];
-            
-            // We export the first 6 columns (Photo is skipped, Name to Price are kept)
-            for (let i = 1; i <= 5; i++) {
-                let data = cols[i] ? cols[i].innerText.replace(/,/g, "") : "";
-                rowData.push('"' + data + '"');
-            }
-            csv.push(rowData.join(","));
-        });
-
-        const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", filename || "inventory_report.csv");
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast("Excel Exported! 📊");
+// 6. DASHBOARD TOTALS
+function updateDashboard() {
+    const rows = document.querySelectorAll("#inventory-table tbody tr");
+    let totalVal = 0;
+    rows.forEach(row => {
+        let q = parseFloat(row.cells[4].innerText) || 0;
+        let p = parseFloat(row.cells[5].innerText) || 0;
+        totalVal += (q * p);
+    });
+    document.getElementById("total-items-count").innerText = rows.length;
+    document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
 </script>
 
