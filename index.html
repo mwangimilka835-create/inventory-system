@@ -281,8 +281,19 @@ table {
     <button type="button" class="add-btn" onclick="saveProduct()">✅ Save Product</button>
     <button type="button" class="print-btn" onclick="window.print()">🖨️ Print Report</button>
     <button type="button" class="export-btn" onclick="exportTableToCSV('Stock_Report.csv')">📊 Export to Excel</button>
+<div class="search-container no-print" style="display: flex; gap: 10px; margin-bottom: 10px;">
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 Search products..." style="flex: 2; border: 2px solid #2980b9; margin: 0;">
+    
+    <select id="categoryFilter" onchange="filterByCategory()" style="flex: 1; margin: 0; border: 2px solid #2980b9;">
+        <option value="All">All Categories</option>
+        <option value="General">📦 General Stock</option>
+        <option value="Bakery">🍞 Bakery Items</option>
+        <option value="Dairy">🥛 Dairy & Poultry</option>
+        <option value="Electronics">🔌 Electronics/ICT</option>
+        <option value="Drinks">🥤 Beverages</option>
+    </select>
+</div>
 
-    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 Search products..." style="border: 2px solid #2980b9;">
 <div class="table-container">
     <table id="inventory-table">
   <thead>
