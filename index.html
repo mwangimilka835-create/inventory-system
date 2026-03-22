@@ -6,6 +6,39 @@
     <title>Smart Inventory System</title>
     <style>
         /* Styling the placeholder text */
+        /* Dark Mode Base Colors */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+}
+
+/* Table changes in Dark Mode */
+body.dark-mode table {
+    background-color: #2d2d2d;
+    color: white;
+    border-color: #444;
+}
+
+body.dark-mode th {
+    background-color: #333;
+    color: #f1c40f; /* Keep your gold theme for headers */
+}
+
+body.dark-mode td {
+    border-bottom: 1px solid #444;
+}
+
+/* Input boxes in Dark Mode */
+body.dark-mode input, body.dark-mode select {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+}
+
+/* Ensure Low Stock Red still stands out */
+body.dark-mode .low-stock-alert {
+    background-color: #c0392b !important; /* Darker red for dark mode */
+}
         /* Special style for low stock items */
 .low-stock-alert {
     background-color: #ff7675 !important; /* Soft Red */
