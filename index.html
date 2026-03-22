@@ -158,12 +158,12 @@
 
 <div id="toast">Message here</div>
 
-<script>
+ style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button>
+ <script>
     window.onload = function() {
         let name = prompt("Enter your name:") || "User";
-        // Find the welcome text and update it
-        const welcomeBox = document.querySelector('.stats').previousElementSibling;
-        if (welcomeBox) welcomeBox.innerHTML = `<h2>Welcome, ${name}! 👋</h2>`;
+        const welcomeBox = document.querySelector('.welcome-box h2');
+        if (welcomeBox) welcomeBox.innerHTML = `Welcome, ${name}! 👋`;
         updateDashboard();
     };
 
@@ -173,11 +173,6 @@
         t.style.backgroundColor = type === 'success' ? '#27ae60' : '#e74c3c';
         t.className = "show";
         setTimeout(() => { t.className = ""; }, 3000);
-    }
-
-    function toggleDarkMode() {
-        document.body.classList.toggle("dark-mode");
-        showToast("Theme Toggled!");
     }
 
     function saveProduct() {
@@ -192,7 +187,7 @@
             return;
         }
 
-        // --- WHATSAPP LOGIC ---
+        // WhatsApp Logic
         const myNumber = "254700000000"; // REPLACE WITH YOUR NUMBER
         const totalRowValue = (parseFloat(qty) * parseFloat(price)).toLocaleString();
         const message = `Hello, I want to order ${qty} units of ${name}. Total: KES ${totalRowValue}`;
@@ -208,22 +203,21 @@
             <td>${date}</td>
             <td>${qty}</td>
             <td>${price}</td>
+            <td class="no-print"><button class="delete-btn" onclick="this.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button></td>
             <td class="no-print">
-                <div style="display: flex; gap: 5px;">
-                    <a href="${whatsappLink}" target="_blank">
-                        <button style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">WhatsApp</button>
-                    </a>
-                    <button class="delete-btn" onclick="this.parentElement.parentElement.parentElement.remove(); updateDashboard(); showToast('Deleted','error');">Delete</button>
-                </div>
+                <a href="${whatsappLink}" target="_blank">
+                    <button style="background: #25D366; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; width: auto;">WhatsApp</button>
+                </a>
             </td>
         `;
 
+        // Clear Inputs
         document.getElementById("pName").value = "";
         document.getElementById("pQty").value = "";
         document.getElementById("pPrice").value = "";
         
         updateDashboard();
-        showToast("Product Saved!");
+        showToast("Product Saved! ✅");
     }
 
     function updateDashboard() {
@@ -232,15 +226,13 @@
         let totalItems = 0;
 
         rows.forEach(row => {
-            // We use cells[4] for Qty and cells[5] for Price
-            // We use parseFloat and replace to remove "KES" or commas if they exist
+            // Updated column indexes: Qty is 4, Price is 5
             const q = parseFloat(row.cells[4].innerText.replace(/[^0-9.]/g, "")) || 0;
             const p = parseFloat(row.cells[5].innerText.replace(/[^0-9.]/g, "")) || 0;
             
             totalVal += (q * p);
             totalItems++;
 
-            // Low Stock Alert
             if(q < 5) row.classList.add("low-stock-alert");
             else row.classList.remove("low-stock-alert");
         });
@@ -273,11 +265,7 @@
         rows.forEach(row => {
             const cols = row.querySelectorAll("td, th");
             let rowData = [];
-            // Export Name, Category, Date, Qty, Price
-            for(let i=1; i<=5; i++) {
-                let data = cols[i] ? cols[i].innerText : "";
-                rowData.push('"' + data + '"');
-            }
+            for(let i=1; i<=5; i++) rowData.push('"' + (cols[i] ? cols[i].innerText : "") + '"');
             csv.push(rowData.join(","));
         });
         const blob = new Blob([csv.join("\n")], {type: "text/csv"});
@@ -285,9 +273,9 @@
         link.href = URL.createObjectURL(blob);
         link.download = filename;
         link.click();
-        showToast("Exported!");
+        showToast("Exported! 📊");
     }
-</script>
+ </script>
 </body>
         </html>
 
