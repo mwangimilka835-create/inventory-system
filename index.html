@@ -254,6 +254,56 @@ function updateDashboard() {
     document.getElementById("total-items-count").innerText = rows.length;
     document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
     }
+   // 1. RE-ADD DARK MODE
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const btn = document.getElementById("darkModeToggle");
+    if (document.body.classList.contains("dark-mode")) {
+        btn.innerText = "☀️";
+        localStorage.setItem("theme", "dark");
+    } else {
+        btn.innerText = "🌙";
+        localStorage.setItem("theme", "light");
+    }
+}
+
+// 2. RE-ADD EXCEL EXPORT
+function exportTableToCSV(filename) {
+    let csv = [];
+    let rows = document.querySelectorAll("table tr");
+    
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll("td, th");
+        // We pick Name, Cat, Date, Qty, Price (Columns 1 to 5)
+        for (let j = 1; j <= 5; j++) {
+            let data = cols[j] ? cols[j].innerText.replace(/,/g, "") : "";
+            row.push('"' + data + '"');
+        }
+        csv.push(row.join(","));
+    }
+
+    let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+    let downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    showToast("Inventory Exported! 📊");
+}
+
+// 3. ADD SEARCH BACK
+function searchTable() {
+    let input = document.getElementById("searchInput").value.toUpperCase();
+    let tr = document.getElementById("inventory-table").getElementsByTagName("tr");
+    for (let i = 1; i < tr.length; i++) {
+        let td = tr[i].getElementsByTagName("td")[1]; // Search by Product Name
+        if (td) {
+            let txt = td.textContent || td.innerText;
+            tr[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+        }
+    }
+    }
 </script>
 
 </body>
