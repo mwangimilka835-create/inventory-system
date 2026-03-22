@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Inventory System</title>
     <style>
+        /* This targets your Save/Add Product button */
+.input-section button {
+    transition: all 0.3s ease; /* Makes the color change smoothly, not a "flash" */
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* This happens when you hover your mouse (or hold your finger) on the button */
+.input-section button:hover {
+    background-color: #2ecc71 !important; /* Changes to a nice Success Green */
+    transform: translateY(-2px); /* Makes the button "lift" up slightly */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Adds a little shadow underneath */
+}
+
+/* This happens exactly when you click it */
+.input-section button:active {
+    transform: translateY(0); /* The button "pushes" back down when clicked */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
         @media print {
     .no-print, .delete-btn, button, .search-container, .input-section {
         display: none !important;
