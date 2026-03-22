@@ -403,6 +403,7 @@ table {
         if (name === "" || qty === "" || price === "") {
             alert("Please fill in all fields!");
             return;
+            showToast("Product saved successfully!");
         }
 
         let table = document.getElementById("inventory-table").getElementsByTagName('tbody')[0];
