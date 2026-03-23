@@ -6,140 +6,57 @@
     <title>IMS | Professional Portfolio Project</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-            --accent: #f59e0b;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
+            --primary: #2563eb; --secondary: #64748b; --accent: #f59e0b;
+            --success: #22c55e; --danger: #ef4444; --bg: #f8fafc;
+            --card: #ffffff; --text: #1e293b;
         }
 
         .dark-mode {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f1f5f9;
-            --primary: #3b82f6;
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --primary: #3b82f6;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            transition: 0.3s;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; transition: 0.3s; }
 
         /* NAVIGATION */
-        nav {
-            background: #1e293b;
-            padding: 1rem;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        nav a {
-            color: #cbd5e1;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-        }
-
+        nav { background: #1e293b; padding: 1rem; display: flex; justify-content: center; gap: 10px; position: sticky; top: 0; z-index: 100; }
+        nav a { color: #cbd5e1; text-decoration: none; font-weight: 600; font-size: 12px; cursor: pointer; padding: 8px 10px; border-radius: 6px; }
         nav a.active { background: var(--primary); color: white; }
 
         .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
-        }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
 
         /* DASHBOARD */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--card); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card h3 { margin: 0; font-size: 0.7rem; color: var(--secondary); text-transform: uppercase; }
+        .stat-card p { margin: 10px 0 0; font-size: 1.2rem; font-weight: 700; color: var(--primary); }
 
-        .stat-card {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
-        }
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 3rem; background: var(--card); border-radius: 12px; border: 2px dashed #cbd5e1; margin-top: 20px; }
+        .empty-state h3 { color: var(--secondary); }
 
-        .stat-card h3 { margin: 0; font-size: 0.8rem; color: var(--secondary); text-transform: uppercase; }
-        .stat-card p { margin: 10px 0 0; font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        /* SEARCH & FILTER */
+        .filter-container { display: grid; grid-template-columns: 1fr 150px; gap: 10px; margin-bottom: 1rem; }
+        .search-input, .filter-select { padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: var(--card); color: var(--text); }
 
-        /* TABLE STYLING */
-        .table-container {
-            background: var(--card);
-            border-radius: 12px;
-            overflow-x: auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        /* TABLE */
+        .table-container { background: var(--card); border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
         thead th { background: #1e293b; color: var(--accent); padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
         tbody td { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
 
-        .low-stock { background: rgba(239, 68, 68, 0.05); }
+        /* BUTTONS */
+        .btn-action { padding: 6px 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; border: none; text-decoration: none; color: white; display: inline-block; }
+        .btn-order { background: #25D366; }
+        .btn-edit { background: var(--primary); }
+        .btn-del { background: var(--danger); }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        /* ACTION BUTTONS */
-        .btn-order {
-            background: #25D366;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
-        }
-
-        .btn-del {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        /* FORM */
         .form-card { background: var(--card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0 20px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0 15px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
 
-        #toast {
-            visibility: hidden;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            z-index: 1000;
-        }
+        #toast { visibility: hidden; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 8px; z-index: 1000; }
         #toast.show { visibility: visible; animation: fadein 0.5s; }
-
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 20px; opacity: 1;} }
         @media print { .no-print { display: none !important; } }
     </style>
@@ -154,7 +71,7 @@
 
 <div class="container">
     <header>
-        <h1 style="font-size: 1.5rem; margin:0;">Inventory System</h1>
+        <h1 style="font-size: 1.3rem; margin:0;">Inventory System Pro</h1>
         <button onclick="toggleDarkMode()" id="theme-btn" style="background:none; border:none; font-size:20px; cursor:pointer;">🌙</button>
     </header>
 
@@ -164,14 +81,17 @@
             <div class="stat-card"><h3>Inventory Value</h3><p id="stat-value">KES 0</p></div>
             <div class="stat-card"><h3>Low Stock</h3><p id="stat-low" style="color:var(--danger)">0</p></div>
         </div>
-        <div style="text-align:center; padding: 2rem; color: gray; background: var(--card); border-radius: 12px;">
-            <p>Portfolio Showcase: A fully functional CRUD Inventory System.</p>
+        <div id="dashboard-empty-msg" class="empty-state" style="display:none;">
+            <h3>Your inventory is currently empty.</h3>
+            <p>Start by adding new products to track your stock.</p>
+            <button onclick="showSection('add')" class="btn-save" style="width:auto; padding: 10px 20px;">Add First Item</button>
         </div>
     </div>
 
     <div id="add-section" style="display:none;">
         <div class="form-card">
-            <h2>Add New Stock Item</h2>
+            <h2 id="form-title">Add New Stock Item</h2>
+            <input type="hidden" id="edit-index" value="-1">
             <input type="text" id="pName" placeholder="Product Name">
             <select id="pCategory">
                 <option value="Electronics">Electronics</option>
@@ -180,28 +100,44 @@
             </select>
             <input type="number" id="pQty" placeholder="Quantity">
             <input type="number" id="pPrice" placeholder="Unit Price (KES)">
-            <button class="btn-save" onclick="saveProduct()">✅ Save to System</button>
+            <button class="btn-save" id="save-btn" onclick="saveProduct()">✅ Save Item</button>
+            <button class="btn-del" id="cancel-btn" onclick="showSection('inventory')" style="width:100%; margin-top:10px; display:none;">Cancel Edit</button>
         </div>
     </div>
 
     <div id="inventory-section" style="display:none;">
-        <div class="no-print" style="margin-bottom: 1rem; display: flex; gap: 10px;">
-            <button onclick="window.print()" style="padding: 10px; border-radius: 6px; background: #64748b; color: white; border:none;">🖨️ PDF Report</button>
-            <button onclick="exportCSV()" style="padding: 10px; border-radius: 6px; background: #2563eb; color: white; border:none;">📊 Export Data</button>
+        <div class="filter-container no-print">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search product..." onkeyup="renderTable()">
+            <select id="filterCategory" class="filter-select" onchange="renderTable()">
+                <option value="All">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Supplies">Supplies</option>
+            </select>
         </div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th class="no-print">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-body"></tbody>
-            </table>
+
+        <div id="inventory-list-container">
+            <div class="no-print" style="margin-bottom: 1rem; display: flex; gap: 10px;">
+                <button onclick="window.print()" class="btn-action" style="background:#64748b;">🖨️ PDF Report</button>
+                <button onclick="exportCSV()" class="btn-action" style="background:#2563eb;">📊 CSV Export</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th class="no-print">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="inventory-empty-msg" class="empty-state" style="display:none;">
+            <h3>No items found.</h3>
+            <p>Try adjusting your search or add a new product.</p>
         </div>
     </div>
 </div>
@@ -209,72 +145,126 @@
 <div id="toast">Saved! ✅</div>
 
 <script>
-    // STARTUP
     window.onload = () => {
         if(localStorage.getItem("ims-theme") === "dark") toggleDarkMode();
         showSection('dashboard');
     };
 
-    // NAVIGATION
     function showSection(id) {
+        // Reset Form if leaving Add section
+        if(id !== 'add') resetForm();
+
         document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
         document.getElementById('dashboard-section').style.display = 'none';
         document.getElementById('add-section').style.display = 'none';
         document.getElementById('inventory-section').style.display = 'none';
         document.getElementById(id + '-section').style.display = 'block';
+        
         updateStats();
         renderTable();
     }
 
-    // CRUD: SAVE
     function saveProduct() {
         const name = document.getElementById("pName").value;
         const cat = document.getElementById("pCategory").value;
         const qty = parseInt(document.getElementById("pQty").value);
         const price = parseFloat(document.getElementById("pPrice").value);
+        const editIndex = parseInt(document.getElementById("edit-index").value);
+
         if (!name || isNaN(qty) || isNaN(price)) return alert("Please fill all fields!");
 
         let db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        db.push({ name, cat, qty, price, date: new Date().toLocaleDateString() });
-        localStorage.setItem("ims_db", JSON.stringify(db));
 
-        document.getElementById("pName").value = "";
-        document.getElementById("pQty").value = "";
-        document.getElementById("pPrice").value = "";
-        
-        showToast("Success! Item added.");
+        if(editIndex === -1) {
+            // New Item
+            db.push({ name, cat, qty, price, date: new Date().toLocaleDateString() });
+            showToast("Success! Item added.");
+        } else {
+            // Update Existing
+            db[editIndex] = { ...db[editIndex], name, cat, qty, price };
+            showToast("Item updated! 🔄");
+        }
+
+        localStorage.setItem("ims_db", JSON.stringify(db));
+        resetForm();
         showSection('inventory');
     }
 
-    // CRUD: READ (RENDER)
     function renderTable() {
         const db = JSON.parse(localStorage.getItem("ims_db")) || [];
         const tbody = document.getElementById("inventory-body");
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        const filterCat = document.getElementById("filterCategory").value;
+        const listContainer = document.getElementById("inventory-list-container");
+        const emptyMsg = document.getElementById("inventory-empty-msg");
+        const dashEmptyMsg = document.getElementById("dashboard-empty-msg");
+
+        // Handle Dashboard Empty State
+        dashEmptyMsg.style.display = db.length === 0 ? 'block' : 'none';
+
         tbody.innerHTML = "";
+        let visibleCount = 0;
 
         db.forEach((item, index) => {
-            const isLow = item.qty < 5;
-            const row = tbody.insertRow();
-            if(isLow) row.className = "low-stock";
+            if ((item.name.toLowerCase().includes(searchTerm)) && (filterCat === "All" || item.cat === filterCat)) {
+                visibleCount++;
+                const isLow = item.qty < 5;
+                const row = tbody.insertRow();
+                const whatsappMsg = window.encodeURIComponent(`Order Request: ${item.name} (Qty: ${item.qty})`);
 
-            // WHATSAPP LINK
-            const whatsappMsg = window.encodeURIComponent(`Order Request: ${item.name} (Current Qty: ${item.qty})`);
-
-            row.innerHTML = `
-                <td>${item.date}</td>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.qty} ${isLow ? '⚠️' : ''}</td>
-                <td>KES ${item.price.toLocaleString()}</td>
-                <td class="no-print" style="display:flex; gap:10px;">
-                    <a href="https://wa.me/254112873218?text=${whatsappMsg}" target="_blank" class="btn-order">Order</a>
-                    <button onclick="deleteItem(${index})" class="btn-del">Del</button>
-                </td>
-            `;
+                row.innerHTML = `
+                    <td><strong>${item.name}</strong><br><small style="color:gray">${item.cat}</small></td>
+                    <td style="color:${isLow ? 'var(--danger)' : 'inherit'}">${item.qty} ${isLow ? '⚠️' : ''}</td>
+                    <td>KES ${item.price.toLocaleString()}</td>
+                    <td class="no-print">
+                        <div style="display:flex; gap:5px;">
+                            <a href="https://wa.me/254112873218?text=${whatsappMsg}" target="_blank" class="btn-action btn-order">Order</a>
+                            <button onclick="editItem(${index})" class="btn-action btn-edit">Edit</button>
+                            <button onclick="deleteItem(${index})" class="btn-action btn-del">Del</button>
+                        </div>
+                    </td>
+                `;
+            }
         });
+
+        // Toggle Empty State for Inventory
+        if(visibleCount === 0) {
+            listContainer.style.display = 'none';
+            emptyMsg.style.display = 'block';
+        } else {
+            listContainer.style.display = 'block';
+            emptyMsg.style.display = 'none';
+        }
     }
 
-    // UPDATE DASHBOARD
+    function editItem(index) {
+        const db = JSON.parse(localStorage.getItem("ims_db")) || [];
+        const item = db[index];
+
+        document.getElementById("pName").value = item.name;
+        document.getElementById("pCategory").value = item.cat;
+        document.getElementById("pQty").value = item.qty;
+        document.getElementById("pPrice").value = item.price;
+        document.getElementById("edit-index").value = index;
+
+        document.getElementById("form-title").innerText = "Edit Stock Item";
+        document.getElementById("save-btn").innerText = "🔄 Update Item";
+        document.getElementById("cancel-btn").style.display = "block";
+
+        showSection('add');
+    }
+
+    function resetForm() {
+        document.getElementById("pName").value = "";
+        document.getElementById("pQty").value = "";
+        document.getElementById("pPrice").value = "";
+        document.getElementById("edit-index").value = "-1";
+        document.getElementById("form-title").innerText = "Add New Stock Item";
+        document.getElementById("save-btn").innerText = "✅ Save Item";
+        document.getElementById("cancel-btn").style.display = "none";
+    }
+
     function updateStats() {
         const db = JSON.parse(localStorage.getItem("ims_db")) || [];
         let totalVal = 0; let low = 0;
@@ -285,7 +275,7 @@
     }
 
     function deleteItem(index) {
-        if(confirm("Remove this product?")) {
+        if(confirm("Permanently remove this item?")) {
             let db = JSON.parse(localStorage.getItem("ims_db")) || [];
             db.splice(index, 1);
             localStorage.setItem("ims_db", JSON.stringify(db));
@@ -307,8 +297,8 @@
 
     function exportCSV() {
         const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        let csv = "Date,Product,Qty,Price\n";
-        db.forEach(i => csv += `${i.date},${i.name},${i.qty},${i.price}\n`);
+        let csv = "Product,Qty,Price\n";
+        db.forEach(i => csv += `${i.name},${i.qty},${i.price}\n`);
         const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
         a.href = window.URL.createObjectURL(blob);
@@ -317,6 +307,6 @@
     }
 </script>
 </body>
-                </html>
+    </html>
 
 
