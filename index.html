@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMS | Professional Portfolio Project</title>
+    <title>StockPro | Inventory Management System</title>
     <style>
         :root {
             --primary: #2563eb; --secondary: #64748b; --accent: #f59e0b;
@@ -15,118 +15,142 @@
             --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --primary: #3b82f6;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; transition: 0.3s; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; transition: 0.3s; overflow-x: hidden; }
 
-        /* NAVIGATION */
-        nav { background: #1e293b; padding: 1rem; display: flex; justify-content: center; gap: 10px; position: sticky; top: 0; z-index: 100; }
-        nav a { color: #cbd5e1; text-decoration: none; font-weight: 600; font-size: 12px; cursor: pointer; padding: 8px 10px; border-radius: 6px; }
-        nav a.active { background: var(--primary); color: white; }
+        /* TAB NAVIGATION */
+        nav { background: #1e293b; padding: 0.8rem; display: flex; justify-content: center; gap: 8px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        nav a { color: #cbd5e1; text-decoration: none; font-weight: 600; font-size: 12px; cursor: pointer; padding: 10px 14px; border-radius: 8px; transition: 0.2s; }
+        nav a.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
 
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .container { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 
-        /* DASHBOARD */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: var(--card); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
-        .stat-card h3 { margin: 0; font-size: 0.7rem; color: var(--secondary); text-transform: uppercase; }
-        .stat-card p { margin: 10px 0 0; font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        /* DASHBOARD CARDS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--card); padding: 1.2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); text-align: center; }
+        .stat-card h3 { margin: 0; font-size: 0.7rem; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card p { margin: 8px 0 0; font-size: 1.2rem; font-weight: 800; color: var(--primary); }
 
-        /* EMPTY STATE */
-        .empty-state { text-align: center; padding: 3rem; background: var(--card); border-radius: 12px; border: 2px dashed #cbd5e1; margin-top: 20px; }
-        .empty-state h3 { color: var(--secondary); }
+        /* EMPTY STATES */
+        .empty-state { text-align: center; padding: 4rem 2rem; background: var(--card); border-radius: 20px; border: 2px dashed #cbd5e1; margin-top: 1rem; }
+        .empty-state h3 { margin-bottom: 0.5rem; color: var(--text); }
+        .empty-state p { color: var(--secondary); margin-bottom: 1.5rem; }
 
-        /* SEARCH & FILTER */
-        .filter-container { display: grid; grid-template-columns: 1fr 150px; gap: 10px; margin-bottom: 1rem; }
-        .search-input, .filter-select { padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: var(--card); color: var(--text); }
+        /* SEARCH & FILTERS */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .search-input { flex: 1; min-width: 200px; padding: 12px 16px; border-radius: 10px; border: 1px solid #e2e8f0; background: var(--card); color: var(--text); }
+        .cat-select { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: var(--card); color: var(--text); }
 
-        /* TABLE */
-        .table-container { background: var(--card); border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        thead th { background: #1e293b; color: var(--accent); padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
-        tbody td { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
+        /* TABLE UI */
+        .table-wrap { background: var(--card); border-radius: 16px; overflow-x: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 650px; }
+        thead th { background: #f1f5f9; color: var(--secondary); padding: 16px; text-align: left; font-size: 11px; text-transform: uppercase; }
+        .dark-mode thead th { background: #334155; color: #cbd5e1; }
+        tbody td { padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 14px; }
 
         /* BUTTONS */
-        .btn-action { padding: 6px 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; border: none; text-decoration: none; color: white; display: inline-block; }
-        .btn-order { background: #25D366; }
-        .btn-edit { background: var(--primary); }
-        .btn-del { background: var(--danger); }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn { padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; border: none; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-order { background: #25D366; color: white; }
+        .btn-edit { background: #f1f5f9; color: var(--primary); margin: 0 4px; }
+        .btn-del { background: #fee2e2; color: var(--danger); }
+        .btn-save { background: var(--primary); color: white; width: 100%; padding: 14px; font-size: 14px; margin-top: 1rem; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
 
-        .form-card { background: var(--card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0 15px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        /* FORM */
+        .form-container { background: var(--card); padding: 2rem; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        label { font-size: 12px; font-weight: 600; color: var(--secondary); display: block; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 1.2rem; border-radius: 10px; border: 1px solid #e2e8f0; box-sizing: border-box; background: var(--bg); color: var(--text); }
 
-        #toast { visibility: hidden; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 8px; z-index: 1000; }
-        #toast.show { visibility: visible; animation: fadein 0.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 20px; opacity: 1;} }
-        @media print { .no-print { display: none !important; } }
+        #toast { visibility: hidden; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 600; z-index: 2000; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+        #toast.show { visibility: visible; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translate(-50%, 50px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        
+        @media print { .no-print { display: none !important; } .container { width: 100%; max-width: 100%; } }
     </style>
 </head>
 <body>
 
 <nav class="no-print">
-    <a id="nav-dashboard" onclick="showSection('dashboard')" class="active">📊 DASHBOARD</a>
-    <a id="nav-inventory" onclick="showSection('inventory')">📦 INVENTORY</a>
-    <a id="nav-add" onclick="showSection('add')">➕ ADD ITEM</a>
+    <a id="nav-dashboard" onclick="showSection('dashboard')" class="active">DASHBOARD</a>
+    <a id="nav-inventory" onclick="showSection('inventory')">INVENTORY</a>
+    <a id="nav-add" onclick="showSection('add')">ADD ITEM</a>
 </nav>
 
 <div class="container">
     <header>
-        <h1 style="font-size: 1.3rem; margin:0;">Inventory System Pro</h1>
-        <button onclick="toggleDarkMode()" id="theme-btn" style="background:none; border:none; font-size:20px; cursor:pointer;">🌙</button>
+        <h2 style="letter-spacing: -0.5px;">StockPro <span style="color:var(--primary)">.</span></h2>
+        <button onclick="toggleDarkMode()" id="theme-btn" style="background:none; border:none; font-size:22px; cursor:pointer;">🌙</button>
     </header>
 
     <div id="dashboard-section">
         <div class="stats-grid">
-            <div class="stat-card"><h3>Total Items</h3><p id="stat-count">0</p></div>
-            <div class="stat-card"><h3>Inventory Value</h3><p id="stat-value">KES 0</p></div>
+            <div class="stat-card"><h3>Items</h3><p id="stat-count">0</p></div>
+            <div class="stat-card"><h3>Value</h3><p id="stat-value">KES 0</p></div>
             <div class="stat-card"><h3>Low Stock</h3><p id="stat-low" style="color:var(--danger)">0</p></div>
         </div>
-        <div id="dashboard-empty-msg" class="empty-state" style="display:none;">
-            <h3>Your inventory is currently empty.</h3>
-            <p>Start by adding new products to track your stock.</p>
-            <button onclick="showSection('add')" class="btn-save" style="width:auto; padding: 10px 20px;">Add First Item</button>
+        
+        <div id="dash-empty" class="empty-state">
+            <h3>Inventory is Empty</h3>
+            <p>You haven't added any products yet. Start building your database.</p>
+            <button onclick="showSection('add')" class="btn btn-save" style="width:auto; padding: 12px 24px;">Add Your First Product</button>
         </div>
     </div>
 
     <div id="add-section" style="display:none;">
-        <div class="form-card">
-            <h2 id="form-title">Add New Stock Item</h2>
-            <input type="hidden" id="edit-index" value="-1">
-            <input type="text" id="pName" placeholder="Product Name">
-            <select id="pCategory">
+        <div class="form-container">
+            <h2 id="form-title" style="margin-top:0;">New Product</h2>
+            <input type="hidden" id="edit-idx" value="-1">
+            
+            <label>Product Name</label>
+            <input type="text" id="pName" placeholder="e.g. Premium Mabati">
+            
+            <label>Category</label>
+            <select id="pCat">
+                <option value="General">General</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Hardware">Hardware</option>
-                <option value="Supplies">General Supplies</option>
+                <option value="Construction">Construction</option>
             </select>
-            <input type="number" id="pQty" placeholder="Quantity">
-            <input type="number" id="pPrice" placeholder="Unit Price (KES)">
-            <button class="btn-save" id="save-btn" onclick="saveProduct()">✅ Save Item</button>
-            <button class="btn-del" id="cancel-btn" onclick="showSection('inventory')" style="width:100%; margin-top:10px; display:none;">Cancel Edit</button>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div>
+                    <label>Quantity</label>
+                    <input type="number" id="pQty" placeholder="0">
+                </div>
+                <div>
+                    <label>Unit Price (KES)</label>
+                    <input type="number" id="pPrice" placeholder="0.00">
+                </div>
+            </div>
+            
+            <button class="btn btn-save" id="btn-save-text" onclick="handleSave()">Save Product</button>
+            <button id="btn-cancel" class="btn" style="width:100%; margin-top:10px; background:transparent; color:var(--secondary); display:none;" onclick="showSection('inventory')">Cancel Edit</button>
         </div>
     </div>
 
     <div id="inventory-section" style="display:none;">
-        <div class="filter-container no-print">
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search product..." onkeyup="renderTable()">
-            <select id="filterCategory" class="filter-select" onchange="renderTable()">
+        <div class="filter-bar no-print">
+            <input type="text" id="qSearch" class="search-input" placeholder="Search products..." onkeyup="renderTable()">
+            <select id="qCat" class="cat-select" onchange="renderTable()">
                 <option value="All">All Categories</option>
+                <option value="General">General</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Hardware">Hardware</option>
-                <option value="Supplies">Supplies</option>
+                <option value="Construction">Construction</option>
             </select>
         </div>
 
-        <div id="inventory-list-container">
-            <div class="no-print" style="margin-bottom: 1rem; display: flex; gap: 10px;">
-                <button onclick="window.print()" class="btn-action" style="background:#64748b;">🖨️ PDF Report</button>
-                <button onclick="exportCSV()" class="btn-action" style="background:#2563eb;">📊 CSV Export</button>
+        <div id="table-view">
+            <div class="no-print" style="margin-bottom: 1rem; display: flex; gap: 8px;">
+                <button onclick="window.print()" class="btn" style="background:#e2e8f0; color:#475569;">Print Report</button>
+                <button onclick="exportCSV()" class="btn" style="background:#dcfce7; color:#166534;">Export CSV</button>
             </div>
-            <div class="table-container">
+            <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th>Qty</th>
+                            <th>Product Detail</th>
+                            <th>Stock</th>
                             <th>Price</th>
                             <th class="no-print">Actions</th>
                         </tr>
@@ -135,27 +159,30 @@
                 </table>
             </div>
         </div>
-        <div id="inventory-empty-msg" class="empty-state" style="display:none;">
-            <h3>No items found.</h3>
-            <p>Try adjusting your search or add a new product.</p>
+
+        <div id="inventory-empty" class="empty-state" style="display:none;">
+            <h3>No Products Found</h3>
+            <p>We couldn't find any items matching your current filters.</p>
         </div>
     </div>
 </div>
 
-<div id="toast">Saved! ✅</div>
+<div id="toast">Message Saved</div>
 
 <script>
+    let inventory = JSON.parse(localStorage.getItem("pro_inventory")) || [];
+
     window.onload = () => {
-        if(localStorage.getItem("ims-theme") === "dark") toggleDarkMode();
+        if(localStorage.getItem("dark-mode") === "true") toggleDarkMode(true);
         showSection('dashboard');
     };
 
     function showSection(id) {
-        // Reset Form if leaving Add section
         if(id !== 'add') resetForm();
-
+        
         document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
+        
         document.getElementById('dashboard-section').style.display = 'none';
         document.getElementById('add-section').style.display = 'none';
         document.getElementById('inventory-section').style.display = 'none';
@@ -165,148 +192,136 @@
         renderTable();
     }
 
-    function saveProduct() {
+    function handleSave() {
         const name = document.getElementById("pName").value;
-        const cat = document.getElementById("pCategory").value;
+        const cat = document.getElementById("pCat").value;
         const qty = parseInt(document.getElementById("pQty").value);
         const price = parseFloat(document.getElementById("pPrice").value);
-        const editIndex = parseInt(document.getElementById("edit-index").value);
+        const idx = parseInt(document.getElementById("edit-idx").value);
 
-        if (!name || isNaN(qty) || isNaN(price)) return alert("Please fill all fields!");
+        if(!name || isNaN(qty) || isNaN(price)) return alert("Fill all fields correctly!");
 
-        let db = JSON.parse(localStorage.getItem("ims_db")) || [];
+        const itemData = { name, cat, qty, price, date: new Date().toLocaleDateString() };
 
-        if(editIndex === -1) {
-            // New Item
-            db.push({ name, cat, qty, price, date: new Date().toLocaleDateString() });
-            showToast("Success! Item added.");
+        if(idx === -1) {
+            inventory.push(itemData);
+            notify("Item Added Successfully!");
         } else {
-            // Update Existing
-            db[editIndex] = { ...db[editIndex], name, cat, qty, price };
-            showToast("Item updated! 🔄");
+            inventory[idx] = itemData;
+            notify("Item Updated!");
         }
 
-        localStorage.setItem("ims_db", JSON.stringify(db));
-        resetForm();
+        localStorage.setItem("pro_inventory", JSON.stringify(inventory));
         showSection('inventory');
     }
 
     function renderTable() {
-        const db = JSON.parse(localStorage.getItem("ims_db")) || [];
         const tbody = document.getElementById("inventory-body");
-        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-        const filterCat = document.getElementById("filterCategory").value;
-        const listContainer = document.getElementById("inventory-list-container");
-        const emptyMsg = document.getElementById("inventory-empty-msg");
-        const dashEmptyMsg = document.getElementById("dashboard-empty-msg");
-
-        // Handle Dashboard Empty State
-        dashEmptyMsg.style.display = db.length === 0 ? 'block' : 'none';
+        const search = document.getElementById("qSearch").value.toLowerCase();
+        const filter = document.getElementById("qCat").value;
+        const tableView = document.getElementById("table-view");
+        const emptyView = document.getElementById("inventory-empty");
 
         tbody.innerHTML = "";
-        let visibleCount = 0;
+        let count = 0;
 
-        db.forEach((item, index) => {
-            if ((item.name.toLowerCase().includes(searchTerm)) && (filterCat === "All" || item.cat === filterCat)) {
-                visibleCount++;
-                const isLow = item.qty < 5;
+        inventory.forEach((item, index) => {
+            if((item.name.toLowerCase().includes(search)) && (filter === "All" || item.cat === filter)) {
+                count++;
+                const low = item.qty < 5;
                 const row = tbody.insertRow();
-                const whatsappMsg = window.encodeURIComponent(`Order Request: ${item.name} (Qty: ${item.qty})`);
+                const msg = encodeURIComponent(`Order Inquiry: ${item.name}`);
 
                 row.innerHTML = `
-                    <td><strong>${item.name}</strong><br><small style="color:gray">${item.cat}</small></td>
-                    <td style="color:${isLow ? 'var(--danger)' : 'inherit'}">${item.qty} ${isLow ? '⚠️' : ''}</td>
-                    <td>KES ${item.price.toLocaleString()}</td>
+                    <td><strong>${item.name}</strong><br><small style="color:var(--secondary)">${item.cat}</small></td>
+                    <td><span style="color:${low ? 'var(--danger)' : 'inherit'}; font-weight:bold">${item.qty}</span> ${low ? '⚠️' : ''}</td>
+                    <td>${item.price.toLocaleString()}</td>
                     <td class="no-print">
-                        <div style="display:flex; gap:5px;">
-                            <a href="https://wa.me/254112873218?text=${whatsappMsg}" target="_blank" class="btn-action btn-order">Order</a>
-                            <button onclick="editItem(${index})" class="btn-action btn-edit">Edit</button>
-                            <button onclick="deleteItem(${index})" class="btn-action btn-del">Del</button>
+                        <div style="display:flex;">
+                            <a href="https://wa.me/254112873218?text=${msg}" target="_blank" class="btn btn-order">Order</a>
+                            <button onclick="beginEdit(${index})" class="btn btn-edit">Edit</button>
+                            <button onclick="deleteItem(${index})" class="btn btn-del">Del</button>
                         </div>
                     </td>
                 `;
             }
         });
 
-        // Toggle Empty State for Inventory
-        if(visibleCount === 0) {
-            listContainer.style.display = 'none';
-            emptyMsg.style.display = 'block';
-        } else {
-            listContainer.style.display = 'block';
-            emptyMsg.style.display = 'none';
-        }
+        tableView.style.display = count > 0 ? "block" : "none";
+        emptyView.style.display = count === 0 && inventory.length > 0 ? "block" : "none";
+        document.getElementById("dash-empty").style.display = inventory.length === 0 ? "block" : "none";
     }
 
-    function editItem(index) {
-        const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        const item = db[index];
-
+    function beginEdit(idx) {
+        const item = inventory[idx];
         document.getElementById("pName").value = item.name;
-        document.getElementById("pCategory").value = item.cat;
+        document.getElementById("pCat").value = item.cat;
         document.getElementById("pQty").value = item.qty;
         document.getElementById("pPrice").value = item.price;
-        document.getElementById("edit-index").value = index;
-
-        document.getElementById("form-title").innerText = "Edit Stock Item";
-        document.getElementById("save-btn").innerText = "🔄 Update Item";
-        document.getElementById("cancel-btn").style.display = "block";
-
+        document.getElementById("edit-idx").value = idx;
+        
+        document.getElementById("form-title").innerText = "Edit Product";
+        document.getElementById("btn-save-text").innerText = "Update Product Info";
+        document.getElementById("btn-cancel").style.display = "block";
         showSection('add');
     }
 
-    function resetForm() {
-        document.getElementById("pName").value = "";
-        document.getElementById("pQty").value = "";
-        document.getElementById("pPrice").value = "";
-        document.getElementById("edit-index").value = "-1";
-        document.getElementById("form-title").innerText = "Add New Stock Item";
-        document.getElementById("save-btn").innerText = "✅ Save Item";
-        document.getElementById("cancel-btn").style.display = "none";
-    }
-
-    function updateStats() {
-        const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        let totalVal = 0; let low = 0;
-        db.forEach(i => { totalVal += (i.qty * i.price); if(i.qty < 5) low++; });
-        document.getElementById("stat-count").innerText = db.length;
-        document.getElementById("stat-value").innerText = "KES " + totalVal.toLocaleString();
-        document.getElementById("stat-low").innerText = low;
-    }
-
-    function deleteItem(index) {
-        if(confirm("Permanently remove this item?")) {
-            let db = JSON.parse(localStorage.getItem("ims_db")) || [];
-            db.splice(index, 1);
-            localStorage.setItem("ims_db", JSON.stringify(db));
-            renderTable(); updateStats();
+    function deleteItem(idx) {
+        if(confirm("Permanently delete this item?")) {
+            inventory.splice(idx, 1);
+            localStorage.setItem("pro_inventory", JSON.stringify(inventory));
+            renderTable();
+            updateStats();
+            notify("Item Removed");
         }
     }
 
-    function toggleDarkMode() {
-        const isDark = document.body.classList.toggle("dark-mode");
-        document.getElementById("theme-btn").innerText = isDark ? "☀️" : "🌙";
-        localStorage.setItem("ims-theme", isDark ? "dark" : "light");
+    function updateStats() {
+        let val = 0; let low = 0;
+        inventory.forEach(i => { val += (i.qty * i.price); if(i.qty < 5) low++; });
+        document.getElementById("stat-count").innerText = inventory.length;
+        document.getElementById("stat-value").innerText = "KES " + val.toLocaleString();
+        document.getElementById("stat-low").innerText = low;
     }
 
-    function showToast(msg) {
+    function resetForm() {
+        document.getElementById("edit-idx").value = "-1";
+        document.getElementById("pName").value = "";
+        document.getElementById("pQty").value = "";
+        document.getElementById("pPrice").value = "";
+        document.getElementById("form-title").innerText = "New Product";
+        document.getElementById("btn-save-text").innerText = "Save Product";
+        document.getElementById("btn-cancel").style.display = "none";
+    }
+
+    function toggleDarkMode(init = false) {
+        let isDark;
+        if(init) { isDark = true; document.body.classList.add("dark-mode"); }
+        else { isDark = document.body.classList.toggle("dark-mode"); }
+        
+        document.getElementById("theme-btn").innerText = isDark ? "☀️" : "🌙";
+        localStorage.setItem("dark-mode", isDark);
+    }
+
+    function notify(m) {
         const t = document.getElementById("toast");
-        t.innerText = msg; t.className = "show";
+        t.innerText = m; t.className = "show";
         setTimeout(() => t.className = "", 3000);
     }
 
     function exportCSV() {
-        const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        let csv = "Product,Qty,Price\n";
-        db.forEach(i => csv += `${i.name},${i.qty},${i.price}\n`);
-        const blob = new Blob([csv], { type: 'text/csv' });
+        let csv = "Product,Category,Qty,Price\n";
+        inventory.forEach(i => csv += `${i.name},${i.cat},${i.qty},${i.price}\n`);
+        const blob = new Blob([csv], {type: 'text/csv'});
         const a = document.createElement('a');
-        a.href = window.URL.createObjectURL(blob);
-        a.download = 'inventory_export.csv';
+        a.href = URL.createObjectURL(blob);
+        a.download = 'stock_report.csv';
         a.click();
     }
 </script>
 </body>
     </html>
+                    
+
 
 
