@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMS | Professional Inventory System</title>
     <style>
+        /* Styling for the Action Buttons */
+.btn-order {
+    background-color: #25D366; /* WhatsApp Green */
+    color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.btn-delete {
+    background-color: #ff4757; /* Professional Red */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-order:hover, .btn-delete:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
         :root {
             --primary: #2563eb;
             --secondary: #64748b;
@@ -283,28 +309,32 @@
     }
 
     function renderTable() {
-        const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        const tbody = document.getElementById("inventory-body");
-        tbody.innerHTML = "";
+    const db = JSON.parse(localStorage.getItem("ims_db")) || [];
+    const tbody = document.getElementById("inventory-body");
+    tbody.innerHTML = "";
 
-        db.forEach((item, index) => {
-            const isLow = item.qty < 5;
-            const row = tbody.insertRow();
-            if(isLow) row.className = "low-stock";
+    db.forEach((item, index) => {
+        const isLow = item.qty < 5;
+        const row = tbody.insertRow();
+        if(isLow) row.className = "low-stock";
 
-            row.innerHTML = `
-                <td>${item.date}</td>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.cat}</td>
-                <td>${item.qty} ${isLow ? '⚠️' : ''}</td>
-                <td>KES ${item.price.toLocaleString()}</td>
-                <td class="no-print">
-                    <button onclick="deleteItem(${index})" style="background:none; color:red; cursor:pointer;">Delete</button>
-                </td>
-            `;
-        });
+        // This creates a pre-written message for WhatsApp
+        const whatsappMsg = `Hello, I would like to order more stock for: ${item.name} (Current Qty: ${item.qty})`;
+        const encodedMsg = encodeURIComponent(whatsappMsg);
+
+        row.innerHTML = `
+            <td>${item.date}</td>
+            <td><strong>${item.name}</strong></td>
+            <td>${item.cat}</td>
+            <td>${item.qty} ${isLow ? '⚠️' : ''}</td>
+            <td>KES ${item.price.toLocaleString()}</td>
+            <td class="no-print" style="display: flex; gap: 8px;">
+                <a href="https://wa.me/254112873218?text=${encodedMsg}" target="_blank" class="btn-order">Order</a>
+                <button onclick="deleteItem(${index})" class="btn-delete">Delete</button>
+            </td>
+        `;
+    });
     }
-
     function updateStats() {
         const db = JSON.parse(localStorage.getItem("ims_db")) || [];
         let totalVal = 0;
