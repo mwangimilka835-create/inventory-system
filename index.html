@@ -14,10 +14,11 @@
         }
 
         .dark-mode {
-            --bg-color: #1a1a1a;
-            --text-color: #f4f4f4;
-            --card-bg: #2c2c2c;
-            --primary-color: #f1c40f;
+    --bg-color: #1a1a1a;
+    --text-color: #f4f4f4;
+    --card-bg: #2c2c2c;
+    --primary-color: #34495e; /* This keeps the cards dark so text is readable */
+    --accent-color: #f1c40f;
         }
 
         body {
@@ -160,7 +161,11 @@
         <input type="number" id="pQty" placeholder="Quantity">
         <input type="number" id="pPrice" placeholder="Price per Unit">
         <button class="btn-save" onclick="saveProduct()">✅ Save Product</button>
-        <button class="btn-export" onclick="exportTableToCSV()">📊 Export to Excel</button>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="btn-export" onclick="window.print()" style="background: #7f8c8d; color: white;">🖨️ Print</button>
+            <button class="btn-export" onclick="exportTableToCSV()">📊 Export to Excel</button>
+        </div>
     </div>
 
     <div style="overflow-x: auto;">
