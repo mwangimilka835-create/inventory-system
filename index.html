@@ -1,36 +1,10 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMS | Professional Inventory System</title>
+    <title>IMS | Professional Portfolio Project</title>
     <style>
-        /* Styling for the Action Buttons */
-.btn-order {
-    background-color: #25D366; /* WhatsApp Green */
-    color: white;
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: bold;
-    display: inline-block;
-}
-
-.btn-delete {
-    background-color: #ff4757; /* Professional Red */
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-}
-
-.btn-order:hover, .btn-delete:hover {
-    opacity: 0.8;
-    transform: scale(1.05);
-}
         :root {
             --primary: #2563eb;
             --secondary: #64748b;
@@ -50,7 +24,7 @@
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
@@ -63,7 +37,7 @@
             padding: 1rem;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -73,33 +47,30 @@
             color: #cbd5e1;
             text-decoration: none;
             font-weight: 600;
+            font-size: 13px;
             cursor: pointer;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: 6px;
-            transition: 0.2s;
         }
 
         nav a.active { background: var(--primary); color: white; }
-        nav a:hover:not(.active) { color: white; background: rgba(255,255,255,0.1); }
 
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
         }
 
-        /* DASHBOARD CARDS */
+        /* DASHBOARD */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
+            gap: 1rem;
             margin-bottom: 2rem;
         }
 
@@ -107,70 +78,53 @@
             background: var(--card);
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             text-align: center;
-            border: 1px solid rgba(0,0,0,0.05);
         }
 
-        .stat-card h3 { margin: 0; font-size: 0.875rem; color: var(--secondary); text-transform: uppercase; }
-        .stat-card p { margin: 10px 0 0; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .stat-card h3 { margin: 0; font-size: 0.8rem; color: var(--secondary); text-transform: uppercase; }
+        .stat-card p { margin: 10px 0 0; font-size: 1.4rem; font-weight: 700; color: var(--primary); }
 
-        /* SEARCH BAR */
-        .search-box {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: var(--card);
-            color: var(--text);
-        }
-
-        /* FORM */
-        .form-group {
-            background: var(--card);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0 20px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        button {
-            cursor: pointer;
-            border: none;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-
-        .btn-main { background: var(--primary); color: white; padding: 12px 24px; border-radius: 8px; width: 100%; }
-        .btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        /* TABLE */
+        /* TABLE STYLING */
         .table-container {
             background: var(--card);
             border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        thead th { background: #1e293b; color: #f59e0b; padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
-        tbody td { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        thead th { background: #1e293b; color: var(--accent); padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
+        tbody td { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
 
-        .low-stock { color: var(--danger); font-weight: bold; background: rgba(239, 68, 68, 0.1); }
+        .low-stock { background: rgba(239, 68, 68, 0.05); }
 
-        /* UTILS */
-        .no-print { display: block; }
-        @media print { .no-print { display: none !important; } }
+        /* ACTION BUTTONS */
+        .btn-order {
+            background: #25D366;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .btn-del {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* FORM */
+        .form-card { background: var(--card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0 20px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
 
         #toast {
             visibility: hidden;
@@ -187,6 +141,7 @@
         #toast.show { visibility: visible; animation: fadein 0.5s; }
 
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 20px; opacity: 1;} }
+        @media print { .no-print { display: none !important; } }
     </style>
 </head>
 <body>
@@ -199,58 +154,51 @@
 
 <div class="container">
     <header>
-        <h1>Inventory System</h1>
-        <button onclick="toggleDarkMode()" id="theme-btn" style="background:none; border:none; font-size:24px; cursor:pointer;">🌙</button>
+        <h1 style="font-size: 1.5rem; margin:0;">Inventory System</h1>
+        <button onclick="toggleDarkMode()" id="theme-btn" style="background:none; border:none; font-size:20px; cursor:pointer;">🌙</button>
     </header>
 
     <div id="dashboard-section">
         <div class="stats-grid">
-            <div class="stat-card"><h3>Total Products</h3><p id="stat-count">0</p></div>
-            <div class="stat-card"><h3>Total Value</h3><p id="stat-value">KES 0</p></div>
-            <div class="stat-card"><h3>Low Stock Items</h3><p id="stat-low" style="color:var(--danger)">0</p></div>
+            <div class="stat-card"><h3>Total Items</h3><p id="stat-count">0</p></div>
+            <div class="stat-card"><h3>Inventory Value</h3><p id="stat-value">KES 0</p></div>
+            <div class="stat-card"><h3>Low Stock</h3><p id="stat-low" style="color:var(--danger)">0</p></div>
         </div>
-        <div style="text-align:center; padding: 2rem; background: var(--card); border-radius: 12px;">
-            <p>Welcome to your portfolio-grade inventory management system.</p>
+        <div style="text-align:center; padding: 2rem; color: gray; background: var(--card); border-radius: 12px;">
+            <p>Portfolio Showcase: A fully functional CRUD Inventory System.</p>
         </div>
     </div>
 
     <div id="add-section" style="display:none;">
-        <div class="form-group">
-            <h2>Add New Product</h2>
-            <label>Product Name</label>
-            <input type="text" id="pName" placeholder="e.g. Wireless Mouse">
-            <label>Category</label>
+        <div class="form-card">
+            <h2>Add New Stock Item</h2>
+            <input type="text" id="pName" placeholder="Product Name">
             <select id="pCategory">
                 <option value="Electronics">Electronics</option>
-                <option value="Office">Office Supplies</option>
-                <option value="Furniture">Furniture</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Supplies">General Supplies</option>
             </select>
-            <label>Quantity</label>
-            <input type="number" id="pQty" placeholder="0">
-            <label>Unit Price (KES)</label>
-            <input type="number" id="pPrice" placeholder="0.00">
-            <button class="btn-main" onclick="saveProduct()">Save Product to Database</button>
+            <input type="number" id="pQty" placeholder="Quantity">
+            <input type="number" id="pPrice" placeholder="Unit Price (KES)">
+            <button class="btn-save" onclick="saveProduct()">✅ Save to System</button>
         </div>
     </div>
 
     <div id="inventory-section" style="display:none;">
-        <input type="text" class="search-box no-print" id="searchInput" onkeyup="filterTable()" placeholder="🔍 Search by product name...">
-        
         <div class="no-print" style="margin-bottom: 1rem; display: flex; gap: 10px;">
-            <button onclick="window.print()" style="padding: 10px; border-radius: 6px; background: #64748b; color: white;">🖨️ Print PDF</button>
-            <button onclick="exportCSV()" style="padding: 10px; border-radius: 6px; background: #2563eb; color: white;">📊 Export CSV</button>
+            <button onclick="window.print()" style="padding: 10px; border-radius: 6px; background: #64748b; color: white; border:none;">🖨️ PDF Report</button>
+            <button onclick="exportCSV()" style="padding: 10px; border-radius: 6px; background: #2563eb; color: white; border:none;">📊 Export Data</button>
         </div>
-
         <div class="table-container">
-            <table id="inventoryTable">
+            <table>
                 <thead>
-    <tr>
-        <th>Added Date</th>
-        <th>Product</th>
-        <th>Category</th>
-        <th>Qty</th>
-        <th>Price</th>
-        <th class="no-print">Actions</th> </tr>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th class="no-print">Actions</th>
+                    </tr>
                 </thead>
                 <tbody id="inventory-body"></tbody>
             </table>
@@ -258,122 +206,90 @@
     </div>
 </div>
 
-<div id="toast">Notification</div>
+<div id="toast">Saved! ✅</div>
 
 <script>
-    // CORE LOGIC
+    // STARTUP
     window.onload = () => {
         if(localStorage.getItem("ims-theme") === "dark") toggleDarkMode();
         showSection('dashboard');
     };
 
+    // NAVIGATION
     function showSection(id) {
-        // Handle nav active states
         document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
-
-        // Handle section visibility
         document.getElementById('dashboard-section').style.display = 'none';
         document.getElementById('add-section').style.display = 'none';
         document.getElementById('inventory-section').style.display = 'none';
         document.getElementById(id + '-section').style.display = 'block';
-
         updateStats();
         renderTable();
     }
 
+    // CRUD: SAVE
     function saveProduct() {
         const name = document.getElementById("pName").value;
         const cat = document.getElementById("pCategory").value;
         const qty = parseInt(document.getElementById("pQty").value);
         const price = parseFloat(document.getElementById("pPrice").value);
-        const date = new Date().toLocaleDateString();
-
-        if (!name || isNaN(qty) || isNaN(price)) {
-            alert("Please fill all fields correctly.");
-            return;
-        }
+        if (!name || isNaN(qty) || isNaN(price)) return alert("Please fill all fields!");
 
         let db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        db.push({ name, cat, qty, price, date });
+        db.push({ name, cat, qty, price, date: new Date().toLocaleDateString() });
         localStorage.setItem("ims_db", JSON.stringify(db));
 
-        // Reset inputs
         document.getElementById("pName").value = "";
         document.getElementById("pQty").value = "";
         document.getElementById("pPrice").value = "";
-
-        showToast("Product saved successfully!");
+        
+        showToast("Success! Item added.");
         showSection('inventory');
     }
-function renderTable() {
-    const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-    const tbody = document.getElementById("inventory-body");
-    tbody.innerHTML = "";
 
-    db.forEach((item, index) => {
-        const isLow = item.qty < 5;
-        const row = tbody.insertRow();
-        if(isLow) row.className = "low-stock";
+    // CRUD: READ (RENDER)
+    function renderTable() {
+        const db = JSON.parse(localStorage.getItem("ims_db")) || [];
+        const tbody = document.getElementById("inventory-body");
+        tbody.innerHTML = "";
 
-        // This creates the WhatsApp message automatically
-        const whatsappMsg = window.encodeURIComponent(`Hello, I would like to order: ${item.name} (Qty: ${item.qty})`);
+        db.forEach((item, index) => {
+            const isLow = item.qty < 5;
+            const row = tbody.insertRow();
+            if(isLow) row.className = "low-stock";
 
-        row.innerHTML = `
-            <td>${item.date}</td>
-            <td><strong>${item.name}</strong></td>
-            <td>${item.cat}</td>
-            <td>${item.qty} ${isLow ? '⚠️' : ''}</td>
-            <td>KES ${item.price.toLocaleString()}</td>
-            <td class="no-print" style="display: flex; gap: 8px;">
-                <a href="https://wa.me/254112873218?text=${whatsappMsg}" 
-                   target="_blank" 
-                   style="background:#25D366; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; font-size:12px; font-weight:bold;">
-                   Order
-                </a>
-                <button onclick="deleteItem(${index})" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">
-                   Del
-                </button>
-            </td>
-        `;
-    });
+            // WHATSAPP LINK
+            const whatsappMsg = window.encodeURIComponent(`Order Request: ${item.name} (Current Qty: ${item.qty})`);
+
+            row.innerHTML = `
+                <td>${item.date}</td>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.qty} ${isLow ? '⚠️' : ''}</td>
+                <td>KES ${item.price.toLocaleString()}</td>
+                <td class="no-print" style="display:flex; gap:10px;">
+                    <a href="https://wa.me/254112873218?text=${whatsappMsg}" target="_blank" class="btn-order">Order</a>
+                    <button onclick="deleteItem(${index})" class="btn-del">Del</button>
+                </td>
+            `;
+        });
     }
-    
+
+    // UPDATE DASHBOARD
     function updateStats() {
         const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        let totalVal = 0;
-        let lowStockCount = 0;
-
-        db.forEach(item => {
-            totalVal += (item.qty * item.price);
-            if(item.qty < 5) lowStockCount++;
-        });
-
+        let totalVal = 0; let low = 0;
+        db.forEach(i => { totalVal += (i.qty * i.price); if(i.qty < 5) low++; });
         document.getElementById("stat-count").innerText = db.length;
         document.getElementById("stat-value").innerText = "KES " + totalVal.toLocaleString();
-        document.getElementById("stat-low").innerText = lowStockCount;
+        document.getElementById("stat-low").innerText = low;
     }
 
     function deleteItem(index) {
-        if(confirm("Permanently delete this item?")) {
+        if(confirm("Remove this product?")) {
             let db = JSON.parse(localStorage.getItem("ims_db")) || [];
             db.splice(index, 1);
             localStorage.setItem("ims_db", JSON.stringify(db));
-            renderTable();
-            updateStats();
-        }
-    }
-
-    function filterTable() {
-        let input = document.getElementById("searchInput").value.toUpperCase();
-        let tr = document.getElementById("inventoryTable").getElementsByTagName("tr");
-
-        for (let i = 1; i < tr.length; i++) {
-            let td = tr[i].getElementsByTagName("td")[1]; // Product name column
-            if (td) {
-                let textValue = td.textContent || td.innerText;
-                tr[i].style.display = textValue.toUpperCase().indexOf(input) > -1 ? "" : "none";
-            }
+            renderTable(); updateStats();
         }
     }
 
@@ -385,26 +301,22 @@ function renderTable() {
 
     function showToast(msg) {
         const t = document.getElementById("toast");
-        t.innerText = msg;
-        t.className = "show";
+        t.innerText = msg; t.className = "show";
         setTimeout(() => t.className = "", 3000);
     }
 
     function exportCSV() {
         const db = JSON.parse(localStorage.getItem("ims_db")) || [];
-        let csv = "Date,Product,Category,Qty,Price\n";
-        db.forEach(i => csv += `${i.date},${i.name},${i.cat},${i.qty},${i.price}\n`);
+        let csv = "Date,Product,Qty,Price\n";
+        db.forEach(i => csv += `${i.date},${i.name},${i.qty},${i.price}\n`);
         const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = 'inventory_report.csv';
+        a.href = window.URL.createObjectURL(blob);
+        a.download = 'inventory_export.csv';
         a.click();
     }
 </script>
-
 </body>
-            </html>
-
+                </html>
 
 
