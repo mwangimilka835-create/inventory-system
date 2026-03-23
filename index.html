@@ -163,7 +163,9 @@
         </div>
         
         <button onclick="window.print()" style="background:#34495e; color:white; width:48%;">🖨️ Print</button>
-        <button onclick="exportTableToCSV('Inventory.csv')" style="background:#2980b9; color:white; width:48%;">📊 Export</button>
+        <button onclick="exportTableToCSV()" style="background: #3498db; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+    📊 Export to Excel
+        </button>
   <div class="table-container">
     <table id="inventory-table" style="min-width: 600px; width: 100%; margin-top: 0;"
         <thead>
@@ -178,7 +180,7 @@
                 <th class="no-print">Order</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="inventory-body">
             </tbody>
     </table>
     </div> <!-- End of the scrollable container -->
@@ -190,39 +192,43 @@
 <script>
     // 1. RUNS WHEN PAGE LOADS
 window.onload = function() {
-    let name = prompt("Enter your name:");
-    if (!name) name = "Guest";
+// 1. INITIALIZE ON LOAD
+window.onload = function() {
+    let name = prompt("Welcome! Please enter your name:");
+    if (!name || name.trim() === "") name = "Inventory Manager";
     document.getElementById("user-name-display").innerText = name;
     
-    // Load Dark Mode Preference
+    // Auto-apply Dark Mode if saved
     if(localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
     }
-
-    renderTable(); // Show saved data
+    renderTable(); 
 };
 
-// 2. THE TOAST MESSAGE (The pop-up)
+// 2. SHOW NOTIFICATIONS (Toast)
 function showToast(msg) {
-    let t = document.getElementById("toast");
+    const t = document.getElementById("toast");
+    if(!t) return;
     t.innerText = msg;
     t.className = "show";
     setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
 }
 
-// 3. THE RENDER FUNCTION (The fix for your headers)
-
+// 3. RENDER THE TABLE (The Core Engine)
 function renderTable() {
     const products = JSON.parse(localStorage.getItem("myInventory")) || [];
-    const tbody = document.getElementById("inventory-body");
+    const tbody = document.getElementById("inventory-body"); // Make sure your HTML has id="inventory-body"
     
-    if (!tbody) return; // Safety check
+    if (!tbody) {
+        console.error("Error: Could not find table body!");
+        return;
+    }
     
     tbody.innerHTML = ""; // Clear existing rows
 
     products.forEach((p, index) => {
         const row = tbody.insertRow();
-        const whatsappMsg = encodeURIComponent(`I want to order ${p.qty} ${p.name}`);
+        const whatsappMsg = encodeURIComponent(`Order for ${p.name}: Qty ${p.qty}`);
         
         row.innerHTML = `
             <td><img src="unnamed_1.jpg" style="width:40px; border-radius:4px;"></td>
@@ -231,23 +237,23 @@ function renderTable() {
             <td>${p.date}</td>
             <td>${p.qty}</td>
             <td>${p.price}</td>
-            <td class="no-print"><button onclick="removeRow(${index})" style="background:#e74c3c; color:white; border:none; padding:5px; border-radius:4px;">Delete</button></td>
-            <td class="no-print"><a href="https://wa.me/254112873218?text=${whatsappMsg}" target="_blank"><button style="background:#25D366; color:white; border:none; padding:5px; border-radius:4px;">Order</button></a></td>
+            <td class="no-print"><button onclick="removeRow(${index})" style="background:#e74c3c; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">Delete</button></td>
+            <td class="no-print"><a href="https://wa.me/254112873218?text=${whatsappMsg}" target="_blank"><button style="background:#25D366; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">Order</button></a></td>
         `;
     });
     updateDashboard();
-    }
+}
 
-// 4. THE SAVE FUNCTION
+// 4. SAVE PRODUCT
 function saveProduct() {
-    let name = document.getElementById("pName").value;
-    let cat = document.getElementById("pCategory").value;
-    let qty = document.getElementById("pQty").value;
-    let price = document.getElementById("pPrice").value;
-    let date = new Date().toLocaleDateString('en-GB');
+    const name = document.getElementById("pName").value;
+    const cat = document.getElementById("pCategory").value;
+    const qty = document.getElementById("pQty").value;
+    const price = document.getElementById("pPrice").value;
+    const date = new Date().toLocaleDateString('en-GB');
 
     if (!name || !qty || !price) {
-        alert("Please fill all fields!");
+        alert("Please fill in all fields!");
         return;
     }
 
@@ -264,25 +270,62 @@ function saveProduct() {
     showToast("Product Saved! ✅");
 }
 
-// 5. REMOVE ROW
+// 5. REMOVE PRODUCT
 function removeRow(index) {
     let products = JSON.parse(localStorage.getItem("myInventory")) || [];
     products.splice(index, 1);
     localStorage.setItem("myInventory", JSON.stringify(products));
     renderTable();
+    showToast("Item Removed 🗑️");
 }
 
 // 6. DASHBOARD TOTALS
 function updateDashboard() {
-    let rows = document.querySelectorAll("#inventory-body tr");
+    const products = JSON.parse(localStorage.getItem("myInventory")) || [];
     let totalVal = 0;
-    rows.forEach(row => {
-        let q = parseFloat(row.cells[4].innerText) || 0;
-        let p = parseFloat(row.cells[5].innerText) || 0;
-        totalVal += (q * p);
+    products.forEach(p => {
+        totalVal += (parseFloat(p.qty) * parseFloat(p.price));
     });
-    document.getElementById("total-items-count").innerText = rows.length;
+    document.getElementById("total-items-count").innerText = products.length;
     document.getElementById("total-value-count").innerText = "KES " + totalVal.toLocaleString();
+}
+
+// 7. DARK MODE TOGGLE
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    }
+    // 8. EXPORT TO EXCEL (CSV)
+function exportTableToCSV() {
+    let products = JSON.parse(localStorage.getItem("myInventory")) || [];
+    
+    if (products.length === 0) {
+        alert("No data to export!");
+        return;
+    }
+
+    // Create the headers for the Excel file
+    let csv = "Product,Category,Date,Quantity,Price\n";
+
+    // Add each product as a new row
+    products.forEach(p => {
+        let row = `"${p.name}","${p.cat}","${p.date}","${p.qty}","${p.price}"\n`;
+        csv += row;
+    });
+
+    // Create a download link and click it automatically
+    let blob = new Blob([csv], { type: "text/csv" });
+    let url = window.URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "Inventory_Report.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    showToast("Report Downloaded! 📊");
     }
 </script>
 
