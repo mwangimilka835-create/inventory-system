@@ -244,14 +244,13 @@
         <div class="table-container">
             <table id="inventoryTable">
                 <thead>
-                    <tr>
-                        <th>Added Date</th>
-                        <th>Product</th>
-                        <th>Category</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th class="no-print">Actions</th>
-                    </tr>
+    <tr>
+        <th>Added Date</th>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th class="no-print">Actions</th> </tr>
                 </thead>
                 <tbody id="inventory-body"></tbody>
             </table>
@@ -307,8 +306,7 @@
         showToast("Product saved successfully!");
         showSection('inventory');
     }
-
-    function renderTable() {
+function renderTable() {
     const db = JSON.parse(localStorage.getItem("ims_db")) || [];
     const tbody = document.getElementById("inventory-body");
     tbody.innerHTML = "";
@@ -318,9 +316,8 @@
         const row = tbody.insertRow();
         if(isLow) row.className = "low-stock";
 
-        // This creates a pre-written message for WhatsApp
-        const whatsappMsg = `Hello, I would like to order more stock for: ${item.name} (Current Qty: ${item.qty})`;
-        const encodedMsg = encodeURIComponent(whatsappMsg);
+        // This creates the WhatsApp message automatically
+        const whatsappMsg = window.encodeURIComponent(`Hello, I would like to order: ${item.name} (Qty: ${item.qty})`);
 
         row.innerHTML = `
             <td>${item.date}</td>
@@ -329,12 +326,19 @@
             <td>${item.qty} ${isLow ? '⚠️' : ''}</td>
             <td>KES ${item.price.toLocaleString()}</td>
             <td class="no-print" style="display: flex; gap: 8px;">
-                <a href="https://wa.me/254112873218?text=${encodedMsg}" target="_blank" class="btn-order">Order</a>
-                <button onclick="deleteItem(${index})" class="btn-delete">Delete</button>
+                <a href="https://wa.me/254112873218?text=${whatsappMsg}" 
+                   target="_blank" 
+                   style="background:#25D366; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; font-size:12px; font-weight:bold;">
+                   Order
+                </a>
+                <button onclick="deleteItem(${index})" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">
+                   Del
+                </button>
             </td>
         `;
     });
     }
+    
     function updateStats() {
         const db = JSON.parse(localStorage.getItem("ims_db")) || [];
         let totalVal = 0;
