@@ -170,16 +170,7 @@
 <div id="toast">Message Saved</div>
 
 <script>
-    // Check if local storage is empty (first-time visitor)
-if (!localStorage.getItem('products')) {
-    const demoProducts = [
-        { name: "HP Laptop", stock: 12, price: 45000 },
-        { name: "Office Chair", stock: 8, price: 5500 },
-        { name: "Wireless Mouse", stock: 25, price: 1200 }
-    ];
-    localStorage.setItem('products', JSON.stringify(demoProducts));
-    location.reload(); // Reload to show them
-}
+    
     let inventory = JSON.parse(localStorage.getItem("pro_inventory")) || [];
 
     window.onload = () => {
