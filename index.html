@@ -1,9 +1,9 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | Professional Edition</title>
+    <title>StockPro | Intelligent Inventory</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -16,238 +16,257 @@
             --light: #f4f7f6;
             --white: #ffffff;
             --danger: #e74c3c;
-            --success: #2ecc71;
+            --accent: #3498db;
         }
 
-        [data-theme="dark"] {
-            --light: #1a1a1a;
-            --white: #2d2d2d;
-            --dark: #ecf0f1;
+        body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--dark); margin: 0; line-height: 1.6; }
+        
+        /* Navigation & Context */
+        nav { background: var(--white); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); sticky: top; }
+        .nav-links a { margin-left: 20px; text-decoration: none; color: var(--dark); font-weight: 500; cursor: pointer; }
+        .nav-links a.active { color: var(--primary); font-weight: 700; }
+
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 20px; }
+
+        /* Helpful Context Header */
+        .page-header { margin-bottom: 2rem; border-bottom: 2px solid #eee; padding-bottom: 1rem; }
+        .page-header p { color: #666; font-size: 0.95rem; }
+
+        /* Dashboard Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .card { background: var(--white); padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+
+        /* Call to Action (CTA) Buttons */
+        .cta-btn { 
+            background: var(--primary); color: white; border: none; padding: 12px 24px; 
+            border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; 
+            align-items: center; gap: 10px; transition: 0.3s; width: 100%; justify-content: center;
+        }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 3rem; color: #999; }
+        .empty-state i { font-size: 4rem; color: #ddd; margin-bottom: 1rem; }
+
+        /* Status Pills */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+        .badge-low { background: #fee2e2; color: #ef4444; }
+        .badge-good { background: #dcfce7; color: #22c55e; }
+
+        input, select { 
+            width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eef; 
+            border-radius: 10px; background: #fff; font-size: 1rem; box-sizing: border-box;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); color: var(--dark); margin: 0; transition: 0.3s; }
-        
-        /* Navigation */
-        nav { background: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .nav-links a { margin-left: 20px; text-decoration: none; color: var(--dark); font-weight: 600; cursor: pointer; }
-        .nav-links a:hover { color: var(--primary); }
-
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .page { display: none; animation: fadeIn 0.4s; }
-        .active-page { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Cards & UI */
-        .card { background: var(--white); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; background: var(--light); color: var(--dark); box-sizing: border-box; }
-        
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
-        .btn-primary { background: var(--primary); }
-        .btn-wa { background: #25D366; }
-        
-        /* Table & Filters */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 1rem; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.1); }
-        
-        /* Popup Notifications */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
-        .toast { background: var(--dark); color: white; padding: 12px 24px; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: slideIn 0.3s; }
-        
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        th { text-align: left; color: #888; font-size: 0.85rem; text-transform: uppercase; padding: 15px; }
+        td { padding: 15px; border-top: 1px solid #f0f0f0; }
+
+        /* Notification Toast */
+        #notification { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            background: var(--dark); color: white; padding: 12px 30px; 
+            border-radius: 50px; display: none; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);"><i class="fas fa-cubes"></i> StockPro</div>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary); letter-spacing: -1px;">
+            <i class="fas fa-layer-group"></i> StockPro
+        </div>
         <div class="nav-links">
-            <a onclick="showPage('dashboard')">Dashboard</a>
-            <a onclick="showPage('inventory')">Inventory</a>
-            <a onclick="toggleTheme()"><i class="fas fa-moon"></i></a>
+            <a onclick="showSection('overview')" id="nav-overview" class="active">Overview</a>
+            <a onclick="showSection('inventory')" id="nav-inventory">Inventory</a>
+            <a onclick="showSection('reports')" id="nav-reports">Reports</a>
         </div>
     </nav>
 
     <div class="container">
         
-        <div id="dashboard" class="page active-page">
-            <h2>Business Overview</h2>
-            <div class="stats-grid">
-                <div class="card" style="border-left: 5px solid var(--primary);">
-                    <small>Total Valuation</small>
-                    <h3 id="total-val">KES 0</h3>
+        <div id="overview" class="section">
+            <div class="page-header">
+                <h1>Business Insights</h1>
+                <p>Welcome back! Here is a summary of your current stock value and critical alerts.</p>
+            </div>
+            
+            <div class="grid">
+                <div class="card" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">
+                    <small>Total Inventory Value</small>
+                    <h2 id="total-val" style="font-size: 2rem; margin: 5px 0;">KES 0</h2>
+                    <p style="font-size: 0.8rem; opacity: 0.9;">Updated in real-time</p>
                 </div>
-                <div class="card" style="border-left: 5px solid #3498db;">
-                    <small>Total Items</small>
-                    <h3 id="total-qty">0</h3>
+                
+                <div class="card">
+                    <h3><i class="fas fa-rocket"></i> Fast Action</h3>
+                    <p style="font-size: 0.9rem; color: #666;">Need to restock or record a sale? Start here.</p>
+                    <button class="cta-btn" onclick="showSection('inventory')">
+                        Go to Inventory <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
             </div>
 
             <div class="card">
-                <h3><i class="fas fa-plus-circle"></i> Quick Add</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <input type="text" id="p-name" placeholder="Item Name">
-                    <select id="p-cat">
-                        <option value="Electronics">Electronics</option>
-                        <option value="Groceries">Groceries</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Other">Other</option>
-                    </select>
+                <h3><i class="fas fa-bell"></i> Critical Stock Alerts</h3>
+                <div id="alerts-container">
+                    <p style="color: #bbb;">No critical alerts at this time.</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <input type="number" id="p-qty" placeholder="Quantity">
-                    <input type="number" id="p-price" placeholder="Price">
-                </div>
-                <button class="btn btn-primary" style="width: 100%;" onclick="addItem()">Save to Inventory</button>
             </div>
         </div>
 
-        <div id="inventory" class="page">
-            <h2>Inventory Management</h2>
-            <div class="card">
-                <div class="filter-bar">
-                    <input type="text" id="search" placeholder="Search by name..." onkeyup="renderTable()">
-                    <select id="filter-cat" onchange="renderTable()" style="width: 150px;">
-                        <option value="All">All Categories</option>
+        <div id="inventory" class="section" style="display:none;">
+            <div class="page-header">
+                <h1>Inventory Control</h1>
+                <p>Add new products, categorize them, and manage stock levels.</p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Step 1: Add New Product</h3>
+                    <input type="text" id="p-name" placeholder="Product Name">
+                    <select id="p-cat">
+                        <option value="General">General Category</option>
                         <option value="Electronics">Electronics</option>
                         <option value="Groceries">Groceries</option>
-                        <option value="Fashion">Fashion</option>
+                        <option value="Office">Office Supplies</option>
                     </select>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="p-qty" placeholder="Qty">
+                        <input type="number" id="p-price" placeholder="Price">
+                    </div>
+                    <button class="cta-btn" onclick="addItem()">Confirm & Save Item</button>
                 </div>
-                <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
-                    <button class="btn" style="background: #f39c12;" onclick="exportCSV()"><i class="fas fa-file-csv"></i> CSV</button>
-                    <button class="btn" style="background: #8e44ad;" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-                    <button class="btn btn-wa" onclick="sendWA()"><i class="fab fa-whatsapp"></i> WhatsApp List</button>
+
+                <div class="card" style="background: #fdfdfd; border: 1px dashed #ccc;">
+                    <h4><i class="fas fa-lightbulb" style="color: gold;"></i> Pro-Tip</h4>
+                    <p style="font-size: 0.85rem;">Keep your product names clear (e.g., "Cowbell Milk 500ml") to make searching and reporting easier for your suppliers.</p>
+                    <hr>
+                    <button class="cta-btn" style="background: #25D366;" onclick="sendWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> Send List to Supplier
+                    </button>
                 </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Category</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stock-table"></tbody>
-                    </table>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Step 2: Review Stock</h3>
+                    <input type="text" id="search" placeholder="Search by name..." onkeyup="renderTable()" style="width: 250px; margin: 0;">
+                </div>
+                <div id="table-wrapper">
+                    </div>
+            </div>
+        </div>
+
+        <div id="reports" class="section" style="display:none;">
+            <div class="page-header">
+                <h1>Reports & Exports</h1>
+                <p>Generate professional documents for accounting and audits.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <i class="fas fa-file-pdf fa-2x" style="color: #e74c3c;"></i>
+                    <h3>PDF Audit</h3>
+                    <p>Best for official signatures and printing.</p>
+                    <button class="cta-btn" style="background: #e74c3c;" onclick="exportPDF()">Download PDF</button>
+                </div>
+                <div class="card">
+                    <i class="fas fa-file-excel fa-2x" style="color: #27ae60;"></i>
+                    <h3>Excel/CSV Data</h3>
+                    <p>Best for data analysis and bulk uploads.</p>
+                    <button class="cta-btn" style="background: #27ae60;" onclick="exportCSV()">Download CSV</button>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <div id="toast-container"></div>
+    <div id="notification">Action Successful!</div>
 
     <script>
-        let inventory = JSON.parse(localStorage.getItem('stockPro_v3')) || [];
+        let inventory = JSON.parse(localStorage.getItem('stock_pro_ultimate')) || [];
 
-        // Navigation System
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.getElementById(pageId).classList.add('active-page');
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById(id).style.display = 'block';
+            document.getElementById('nav-' + id).classList.add('active');
         }
 
-        // Theme Toggle
-        function toggleTheme() {
-            const body = document.body;
-            const current = body.getAttribute('data-theme');
-            body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        function notify(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 3000);
         }
 
-        // Popup Message System
-        function showToast(msg, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Add Logic
         function addItem() {
             const name = document.getElementById('p-name').value;
             const cat = document.getElementById('p-cat').value;
             const qty = parseInt(document.getElementById('p-qty').value);
             const price = parseFloat(document.getElementById('p-price').value);
 
-            if(!name || isNaN(qty)) return showToast("Please fill all fields!", "error");
+            if(!name || isNaN(qty)) return alert("Please provide valid product details.");
 
             inventory.push({ id: Date.now(), name, cat, qty, price });
-            saveAndRefresh();
-            showToast(`${name} added successfully!`);
+            save();
+            notify("Product added to inventory!");
             
-            // Clear inputs
             ['p-name', 'p-qty', 'p-price'].forEach(id => document.getElementById(id).value = '');
         }
 
         function deleteItem(id) {
-            inventory = inventory.filter(i => i.id !== id);
-            saveAndRefresh();
-            showToast("Item removed", "error");
+            if(confirm("Are you sure you want to remove this item?")) {
+                inventory = inventory.filter(i => i.id !== id);
+                save();
+                notify("Item removed.");
+            }
         }
 
-        function saveAndRefresh() {
-            localStorage.setItem('stockPro_v3', JSON.stringify(inventory));
+        function save() {
+            localStorage.setItem('stock_pro_ultimate', JSON.stringify(inventory));
             renderTable();
-            updateStats();
+            updateDashboard();
         }
 
-        function updateStats() {
-            let totalVal = 0;
-            let totalQty = 0;
+        function updateDashboard() {
+            let total = 0;
+            let alerts = "";
             inventory.forEach(i => {
-                totalVal += (i.qty * i.price);
-                totalQty += i.qty;
+                total += (i.qty * i.price);
+                if(i.qty < 5) {
+                    alerts += `<div style="color: var(--danger); margin-bottom: 5px;">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>${i.name}</strong> is low on stock (${i.qty} left)
+                               </div>`;
+                }
             });
-            document.getElementById('total-val').innerText = `KES ${totalVal.toLocaleString()}`;
-            document.getElementById('total-qty').innerText = totalQty;
+            document.getElementById('total-val').innerText = `KES ${total.toLocaleString()}`;
+            document.getElementById('alerts-container').innerHTML = alerts || "Everything is in stock!";
         }
 
         function renderTable() {
-            const table = document.getElementById('stock-table');
+            const container = document.getElementById('table-wrapper');
             const search = document.getElementById('search').value.toLowerCase();
-            const catFilter = document.getElementById('filter-cat').value;
-            table.innerHTML = '';
+            const filtered = inventory.filter(i => i.name.toLowerCase().includes(search));
 
-            const filtered = inventory.filter(i => {
-                const matchesSearch = i.name.toLowerCase().includes(search);
-                const matchesCat = catFilter === "All" || i.cat === catFilter;
-                return matchesSearch && matchesCat;
-            });
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><br>No products found. Start by adding one above!</div>`;
+                return;
+            }
 
+            let html = `<table><thead><tr><th>Product</th><th>Category</th><th>Stock</th><th>Price</th><th>Action</th></tr></thead><tbody>`;
             filtered.forEach(i => {
-                table.innerHTML += `
-                    <tr>
-                        <td><strong>${i.name}</strong></td>
-                        <td><span style="font-size: 0.8rem; background: #eee; padding: 2px 8px; border-radius: 10px; color: #333;">${i.cat}</span></td>
-                        <td style="color: ${i.qty < 5 ? 'red' : 'inherit'}">${i.qty}</td>
-                        <td>${i.price.toLocaleString()}</td>
-                        <td><i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="deleteItem(${i.id})"></i></td>
-                    </tr>`;
+                const badge = i.qty < 5 ? 'badge-low' : 'badge-good';
+                html += `<tr>
+                    <td><strong>${i.name}</strong></td>
+                    <td><small>${i.cat}</small></td>
+                    <td><span class="badge ${badge}">${i.qty} units</span></td>
+                    <td>KES ${i.price.toLocaleString()}</td>
+                    <td><i class="fas fa-trash" style="color: #ddd; cursor:pointer;" onclick="deleteItem(${i.id})"></i></td>
+                </tr>`;
             });
-        }
-
-        function sendWA() {
-            let msg = "*StockPro Inventory Summary*%0A%0A";
-            inventory.forEach(i => msg += `• ${i.name} (${i.cat}): ${i.qty} units%0A`);
-            window.open(`https://wa.me/254112873218?text=${msg}`, '_blank');
-        }
-
-        function exportCSV() {
-            let csv = "Item,Category,Qty,Price\n";
-            inventory.forEach(i => csv += `${i.name},${i.cat},${i.qty},${i.price}\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Inventory_Export.csv';
-            a.click();
+            html += `</tbody></table>`;
+            container.innerHTML = html;
         }
 
         function exportPDF() {
@@ -255,17 +274,33 @@
             const doc = new jsPDF();
             doc.text("StockPro Inventory Report", 14, 15);
             doc.autoTable({
-                head: [['Product', 'Category', 'Qty', 'Price']],
-                body: inventory.map(i => [i.name, i.cat, i.qty, i.price]),
-                startY: 25
+                head: [['Product', 'Category', 'Stock', 'Price']],
+                body: inventory.map(i => [i.name, i.cat, i.qty, i.price])
             });
             doc.save('Inventory_Report.pdf');
         }
 
-        // Initialize
-        updateStats();
+        function exportCSV() {
+            let csv = "Product,Category,Qty,Price\n";
+            inventory.forEach(i => csv += `${i.name},${i.cat},${i.qty},${i.price}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Inventory_Export.csv';
+            a.click();
+        }
+
+        function sendWhatsApp() {
+            let msg = "*StockPro Order List*%0A%0A";
+            inventory.forEach(i => {
+                if(i.qty < 10) msg += `• *${i.name}*: Current Stock ${i.qty}%0A`;
+            });
+            window.open(`https://wa.me/254700000000?text=${msg}`, '_blank');
+        }
+
+        // Init
+        updateDashboard();
         renderTable();
     </script>
 </body>
-                    </html>  
-        
+      </html>
