@@ -1,210 +1,106 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro Cloud | Portfolio Edition</title>
+    <title>StockPro Cloud | Portfolio</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* --- CSS STYLING --- */
-        :root { --primary: #2ecc71; --bg: #f4f7f6; --text: #333; --card: #fff; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .card { background: var(--card); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --bg: #f4f7f6;
+            --dark: #2c3e50;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        /* Dashboard (Hidden by default) */
+        #dashboard {
+            display: none;
+            width: 90%;
+            max-width: 900px;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+
+        h2 { color: var(--dark); margin-bottom: 20px; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-main { background: var(--primary); color: white; }
+        .btn-main:hover { background: #27ae60; }
         
-        #login-screen { position: fixed; inset: 0; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .login-box { background: white; padding: 40px; border-radius: 10px; text-align: center; width: 300px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        
-        input, button { padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:hover { opacity: 0.9; }
-        .btn-small { width: auto; padding: 5px 10px; font-size: 14px; margin-right: 5px; }
-        .btn-danger { background: #e74c3c; }
-        .btn-export { background: #3498db; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f9f9f9; }
-        .flex-row { display: flex; gap: 10px; }
+        .btn-pdf { background: #8e44ad; color: white; width: auto; padding: 10px 20px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th { background-color: #f9f9f9; color: var(--dark); }
+
+        .status-msg {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
+
     <div id="login-screen">
-        <div class="login-box">
-            <h2>StockPro Cloud</h2>
-            <p>Enter name to view portfolio</p>
-            <input type="text" id="visitor-name" placeholder="E.g. Recruiter">
-            <button onclick="startApp()">Enter Dashboard</button>
-        </div>
-    </div>
-
-    <div id="dashboard" class="container" style="display: none;">
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Welcome, <span id="display-name"></span></h2>
-            <button class="btn-small" onclick="location.reload()" style="background: #7f8c8d;">Logout</button>
-        </div>
-
-        <div class="card">
-            <h3>Add / Edit Product</h3>
-            <form id="inventoryForm">
-                <input type="hidden" id="edit-id">
-                <input type="text" id="itemName" placeholder="Product Name (e.g. Milk)" required>
-                <div class="flex-row">
-                    <input type="number" id="itemQty" placeholder="Quantity" required>
-                    <input type="number" id="itemPrice" placeholder="Price (KES)" required>
-                </div>
-                <button type="submit" id="submitBtn">Save to Cloud Database</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <div style="margin-bottom: 15px;">
-                <button class="btn-small btn-export" onclick="downloadCSV()">Export CSV</button>
-                <button class="btn-small" onclick="downloadPDF()" style="background: #9b59b6;">Export PDF</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <script>
-        // 1. REPLACE THESE TWO LINES WITH YOUR ACTUAL SUPABASE DETAILS
-        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-        const SUPABASE_KEY = 'YOUR_ANON_PUBLIC_KEY';
-        
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let stockData = [];
-
-        // 2. Login Logic
-        function startApp() {
-            const name = document.getElementById('visitor-name').value;
-            if(name) {
-                document.getElementById('display-name').innerText = name;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                fetchInventory();
-            }
-        }
-
-        // 3. Fetch Data from Cloud
-        async function fetchInventory() {
-            const { data, error } = await supabase.from('inventory').select('*').order('created_at', { ascending: false });
-            if (error) {
-                console.error("Fetch Error:", error);
-                alert("Could not load data. Check console for details.");
-            } else {
-                stockData = data || [];
-                renderTable();
-            }
-        }
-
-        // 4. Save or Update Data
-        document.getElementById('inventoryForm').onsubmit = async (e) => {
-            e.preventDefault();
-            
-            const id = document.getElementById('edit-id').value;
-            
-            // EXACT MATCH FOR YOUR SQL COLUMNS
-            const payload = {
-                Item_Name: document.getElementById('itemName').value,
-                Quantity: parseInt(document.getElementById('itemQty').value),
-                Price: parseFloat(document.getElementById('itemPrice').value)
-            };
-
-            if (id) {
-                // Update existing item
-                const { error } = await supabase.from('inventory').update(payload).eq('id', id);
-                if (error) {
-                    alert("Update failed: " + error.message);
-                } else {
-                    document.getElementById('submitBtn').innerText = "Save to Cloud Database";
-                    document.getElementById('edit-id').value = "";
-                }
-            } else {
-                // Insert new item
-                const { error } = await supabase.from('inventory').insert([payload]);
-                if (error) alert("Save failed: " + error.message);
-            }
-
-            document.getElementById('inventoryForm').reset();
-            fetchInventory();
-        };
-
-        // 5. Delete Data
-        async function deleteItem(id) {
-            if(confirm("Delete this item permanently?")) {
-                await supabase.from('inventory').delete().eq('id', id);
-                fetchInventory();
-            }
-        }
-
-        // 6. Edit Data (Fill form)
-        function editItem(id) {
-            const item = stockData.find(i => i.id === id);
-            document.getElementById('itemName').value = item.Item_Name;
-            document.getElementById('itemQty').value = item.Quantity;
-            document.getElementById('itemPrice').value = item.Price;
-            document.getElementById('edit-id').value = item.id;
-            document.getElementById('submitBtn').innerText = "Update Product";
-            window.scrollTo(0, 0);
-        }
-
-        // 7. Render UI Table
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            stockData.forEach(item => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${item.Item_Name}</td>
-                        <td>${item.Quantity}</td>
-                        <td>KES ${item.Price}</td>
-                        <td>
-                            <button class="btn-small" style="background:#f1c40f; color:#000;" onclick="editItem('${item.id}')">Edit</button>
-                            <button class="btn-small btn-danger" onclick="deleteItem('${item.id}')">Del</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        // 8. PDF Export
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("StockPro Inventory", 14, 15);
-            doc.autoTable({ 
-                head: [['Product', 'Qty', 'Price']], 
-                body: stockData.map(i => [i.Item_Name, i.Quantity, i.Price]) 
-            });
-            doc.save("Stock_Report.pdf");
-        }
-
-        // 9. CSV Export
-        function downloadCSV() {
-            let csv = "Product,Quantity,Price\n";
-            stockData.forEach(i => csv += `${i.Item_Name},${i.Quantity},${i.Price}\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "inventory.csv";
-            a.click();
-        }
-    </script>
-</body>
-    </html>
