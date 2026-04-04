@@ -3,104 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro Cloud | Portfolio</title>
+    <title>StockPro | Ultimate Inventory</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
             --primary: #2ecc71;
-            --secondary: #3498db;
+            --accent: #3498db;
             --bg: #f4f7f6;
-            --dark: #2c3e50;
-            --white: #ffffff;
+            --card: #ffffff;
+            --text: #2c3e50;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --card: #2d2d2d;
+            --text: #ecf0f1;
+            --primary: #27ae60;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* Login Screen */
-        #login-screen {
-            background: var(--white);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 350px;
-        }
-
-        /* Dashboard (Hidden by default) */
-        #dashboard {
-            display: none;
-            width: 90%;
-            max-width: 900px;
-            background: var(--white);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            margin: 20px;
-        }
-
-        h2 { color: var(--dark); margin-bottom: 20px; }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
             transition: 0.3s;
-            margin-top: 10px;
         }
 
-        .btn-main { background: var(--primary); color: white; }
-        .btn-main:hover { background: #27ae60; }
+        /* Navigation */
+        nav {
+            background: var(--card);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        .nav-links button { background: none; border: none; color: var(--text); cursor: pointer; font-size: 1.2rem; margin-left: 15px; }
+
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+
+        /* Cards & Stats */
+        .card { background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        .btn-pdf { background: #8e44ad; color: white; width: auto; padding: 10px 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: var(--card); padding: 20px; border-radius: 12px; text-align: center; border-left: 5px solid var(--primary); }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-        }
+        /* Form Styling */
+        .input-group { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: var(--bg); color: var(--text); }
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-whatsapp { background: #25D366; color: white; width: 100%; margin-top: 10px; }
+        .btn-pdf { background: #8e44ad; color: white; width: 100%; }
 
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 12px; background: rgba(0,0,0,0.05); }
+        td { padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); }
 
-        th { background-color: #f9f9f9; color: var(--dark); }
+        /* Stock Status Colors */
+        .status-low { color: var(--danger); font-weight: bold; }
+        .status-mid { color: var(--warning); font-weight: bold; }
+        .status-good { color: var(--primary); font-weight: bold; }
 
-        .status-msg {
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            display: none;
+        @media (max-width: 600px) {
+            .input-group { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
-    <div id="login-screen">
+<nav>
+    <div class="nav-brand"><i class="fas fa-boxes"></i> StockPro</div>
+    <div class="nav-links">
+        <button onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fas fa-moon" id="theme-icon"></i></button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="stats-grid">
+        <div class="stat-box">
+            <small>Total Valuation</small>
+            <h2 id="total-val">KES 0</h2>
+        </div>
+        <div class="stat-box" style="border-color: var(--accent);">
+            <small>Unique Items</small>
+            <h2 id="total-items">0</h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3><i class="fas fa-plus-circle"></i> Add New Stock</h3>
+        <div class="input-group">
+            <input type="text" id="p-name" placeholder="Item Name (e.g. Milk)">
+            <input type="number" id="p-qty" placeholder="Qty">
+            <input type="number" id="p-price" placeholder="Price (KES)">
+            <button class="btn btn-add" onclick="addItem()"><i class="fas fa-save"></i> Save</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <button class="btn btn-pdf" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Download Report</button>
+        <button class="btn btn-whatsapp" onclick="sendOrder()"><i class="fab fa-whatsapp"></i> Order on WhatsApp</button>
+    </div>
+
+    <div class="card">
+        <input type="text" id="search" placeholder="🔍 Search inventory..." onkeyup="renderTable()">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="inventory-table"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let inventory = JSON.parse(localStorage.getItem('stockProData')) || [];
+
+    // --- DARK MODE LOGIC ---
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        if(body.getAttribute('data-theme') === 'light') {
+            body.setAttribute('data-theme', 'dark');
+            icon.className = 'fas fa-sun';
+        } else {
+            body.setAttribute('data-theme', 'light');
+            icon.className = 'fas fa-moon';
+        }
+    }
+
+    // --- ADD ITEM ---
+    function addItem() {
+        const name = document.getElementById('p-name').value;
+        const qty = parseInt(document.getElementById('p-qty').value);
+        const price = parseFloat(document.getElementById('p-price').value);
+
+        if(!name || isNaN(qty) || isNaN(price)) return alert("Please fill all details correctly!");
+
+        inventory.push({ id: Date.now(), name, qty, price });
+        updateApp();
+        
+        document.getElementById('p-name').value = '';
+        document.getElementById('p-qty').value = '';
+        document.getElementById('p-price').value = '';
+    }
+
+    // --- WHATSAPP ORDER ---
+    function sendOrder() {
+        if(inventory.length === 0) return alert("Inventory is empty!");
+        
+        let message = "📦 *StockPro Inventory Order* %0A%0A";
+        inventory.forEach(i => {
+            message += `• ${i.name}: ${i.qty} units @ KES ${i.price}%0A`;
+        });
+        
+        // Replace with your phone number (e.g., 254700000000)
+        const phone = "254700000000"; 
+        window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    }
+
+    // --- DELETE ITEM ---
+    function deleteItem(id) {
+        if(confirm("Delete this item?")) {
+            inventory = inventory.filter(i => i.id !== id);
+            updateApp();
+        }
+    }
+
+    // --- CORE LOGIC ---
+    function updateApp() {
+        localStorage.setItem('stockProData', JSON.stringify(inventory));
+        renderTable();
+    }
+
+    function renderTable() {
+        const tableBody = document.getElementById('inventory-table');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        tableBody.innerHTML = '';
+        
+        let totalVal = 0;
+        let filtered = inventory.filter(i => i.name.toLowerCase().includes(searchTerm));
+
+        filtered.forEach(item => {
+            totalVal += (item.qty * item.price);
+            
+            // Appearing Colors Logic (Low stock = Red, Mid = Yellow, Good = Green)
+            let statusClass = "status-good";
+            if(item.qty < 5) statusClass = "status-low";
+            else if(item.qty < 15) statusClass = "status-mid";
+
+            tableBody.innerHTML += `
+                <tr>
+                    <td><strong>${item.name}</strong></td>
+                    <td class="${statusClass}">${item.qty}</td>
+                    <td>${item.price.toLocaleString()}</td>
+                    <td>
+                        <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+        });
+
+        document.getElementById('total-items').innerText = filtered.length;
+        document.getElementById('total-val').innerText = `KES ${totalVal.toLocaleString()}`;
+    }
+
+    // --- PDF EXPORT ---
+    function exportPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text("StockPro Inventory Report", 14, 20);
+        doc.autoTable({
+            head: [['Item Name', 'Quantity', 'Price (KES)', 'Subtotal']],
+            body: inventory.map(i => [i.name, i.qty, i.price, (i.qty * i.price)]),
+            startY: 30,
+            theme: 'striped'
+        });
+        doc.save('StockPro_Report.pdf');
+    }
+
+    renderTable();
+</script>
+
+</body>
+                </html>
