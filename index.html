@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | Intelligent Inventory</title>
+    <title>StockPro | Secure Setup</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -11,296 +11,208 @@
 
     <style>
         :root {
-            --primary: #2ecc71;
-            --dark: #2c3e50;
-            --light: #f4f7f6;
-            --white: #ffffff;
-            --danger: #e74c3c;
-            --accent: #3498db;
+            --primary: #2ecc71; --dark: #2c3e50; --light: #f4f7f6;
+            --white: #ffffff; --text: #333; --border: #eef0f2;
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--dark); margin: 0; line-height: 1.6; }
+        [data-theme="dark"] {
+            --light: #121212; --white: #1e1e1e; --text: #e0e0e0;
+            --dark: #ffffff; --border: #333;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--text); margin: 0; transition: 0.3s; }
         
-        /* Navigation & Context */
-        nav { background: var(--white); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); sticky: top; }
-        .nav-links a { margin-left: 20px; text-decoration: none; color: var(--dark); font-weight: 500; cursor: pointer; }
-        .nav-links a.active { color: var(--primary); font-weight: 700; }
-
-        .container { max-width: 1100px; margin: 2rem auto; padding: 0 20px; }
-
-        /* Helpful Context Header */
-        .page-header { margin-bottom: 2rem; border-bottom: 2px solid #eee; padding-bottom: 1rem; }
-        .page-header p { color: #666; font-size: 0.95rem; }
-
-        /* Dashboard Cards */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .card { background: var(--white); padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-
-        /* Call to Action (CTA) Buttons */
-        .cta-btn { 
-            background: var(--primary); color: white; border: none; padding: 12px 24px; 
-            border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; 
-            align-items: center; gap: 10px; transition: 0.3s; width: 100%; justify-content: center;
+        /* --- AUTH & REGISTRATION --- */
+        #auth-screen {
+            position: fixed; inset: 0; background: var(--primary);
+            display: flex; align-items: center; justify-content: center; z-index: 2000;
         }
-        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
 
-        /* Empty State */
-        .empty-state { text-align: center; padding: 3rem; color: #999; }
-        .empty-state i { font-size: 4rem; color: #ddd; margin-bottom: 1rem; }
+        .auth-card {
+            background: var(--white); padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 350px; text-align: center;
+        }
 
-        /* Status Pills */
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-        .badge-low { background: #fee2e2; color: #ef4444; }
-        .badge-good { background: #dcfce7; color: #22c55e; }
+        /* --- NAVIGATION --- */
+        nav { 
+            background: var(--white); padding: 1rem 5%; display: none; 
+            justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 20px; display: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .card { background: var(--white); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
 
         input, select { 
-            width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eef; 
-            border-radius: 10px; background: #fff; font-size: 1rem; box-sizing: border-box;
+            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border); 
+            border-radius: 10px; background: var(--white); color: var(--text); box-sizing: border-box;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: #888; font-size: 0.85rem; text-transform: uppercase; padding: 15px; }
-        td { padding: 15px; border-top: 1px solid #f0f0f0; }
-
-        /* Notification Toast */
-        #notification { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            background: var(--dark); color: white; padding: 12px 30px; 
-            border-radius: 50px; display: none; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
+        .btn { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; }
+        .btn-primary { background: var(--primary); color: white; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        td, th { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        
+        .badge { padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
+        .low { background: #fee2e2; color: #ef4444; }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
-    <nav>
-        <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary); letter-spacing: -1px;">
-            <i class="fas fa-layer-group"></i> StockPro
+    <div id="auth-screen">
+        <div class="auth-card" id="register-ui">
+            <i class="fas fa-user-plus fa-3x" style="color: var(--primary); margin-bottom: 10px;"></i>
+            <h2>Create Account</h2>
+            <p style="font-size: 0.9rem; color: #666;">Set up your local manager profile</p>
+            <input type="text" id="reg-firstname" placeholder="First Name">
+            <input type="text" id="reg-surname" placeholder="Surname">
+            <input type="password" id="reg-pass" placeholder="Create Password">
+            <button class="btn btn-primary" onclick="createAccount()">Register & Enter</button>
         </div>
-        <div class="nav-links">
-            <a onclick="showSection('overview')" id="nav-overview" class="active">Overview</a>
-            <a onclick="showSection('inventory')" id="nav-inventory">Inventory</a>
-            <a onclick="showSection('reports')" id="nav-reports">Reports</a>
+
+        <div class="auth-card" id="login-ui" style="display: none;">
+            <i class="fas fa-lock fa-3x" style="color: var(--primary); margin-bottom: 10px;"></i>
+            <h2 id="login-greeting">Welcome Back</h2>
+            <input type="password" id="login-pass" placeholder="Enter Password">
+            <button class="btn btn-primary" onclick="handleLogin()">Unlock Dashboard</button>
+            <p style="font-size: 0.8rem; color: #999; margin-top: 15px; cursor: pointer;" onclick="resetAccount()">Reset App</p>
+        </div>
+    </div>
+
+    <nav id="main-nav">
+        <div style="font-size: 1.4rem; font-weight: 800; color: var(--primary);"><i class="fas fa-boxes"></i> StockPro</div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span id="user-display" style="font-weight: 600;"></span>
+            <button class="btn" style="width: auto; background: none; color: var(--text);" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+            <button class="btn" style="width: auto; background: none; color: #e74c3c;" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </nav>
 
-    <div class="container">
-        
-        <div id="overview" class="section">
-            <div class="page-header">
-                <h1>Business Insights</h1>
-                <p>Welcome back! Here is a summary of your current stock value and critical alerts.</p>
-            </div>
-            
-            <div class="grid">
-                <div class="card" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">
-                    <small>Total Inventory Value</small>
-                    <h2 id="total-val" style="font-size: 2rem; margin: 5px 0;">KES 0</h2>
-                    <p style="font-size: 0.8rem; opacity: 0.9;">Updated in real-time</p>
-                </div>
-                
-                <div class="card">
-                    <h3><i class="fas fa-rocket"></i> Fast Action</h3>
-                    <p style="font-size: 0.9rem; color: #666;">Need to restock or record a sale? Start here.</p>
-                    <button class="cta-btn" onclick="showSection('inventory')">
-                        Go to Inventory <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
+    <div class="container" id="app-container">
+        <div class="grid">
             <div class="card">
-                <h3><i class="fas fa-bell"></i> Critical Stock Alerts</h3>
-                <div id="alerts-container">
-                    <p style="color: #bbb;">No critical alerts at this time.</p>
-                </div>
+                <h3>Inventory Value</h3>
+                <h2 id="total-val">KES 0</h2>
             </div>
-        </div>
-
-        <div id="inventory" class="section" style="display:none;">
-            <div class="page-header">
-                <h1>Inventory Control</h1>
-                <p>Add new products, categorize them, and manage stock levels.</p>
-            </div>
-
-            <div class="grid">
-                <div class="card">
-                    <h3>Step 1: Add New Product</h3>
-                    <input type="text" id="p-name" placeholder="Product Name">
-                    <select id="p-cat">
-                        <option value="General">General Category</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Groceries">Groceries</option>
-                        <option value="Office">Office Supplies</option>
-                    </select>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="number" id="p-qty" placeholder="Qty">
-                        <input type="number" id="p-price" placeholder="Price">
-                    </div>
-                    <button class="cta-btn" onclick="addItem()">Confirm & Save Item</button>
-                </div>
-
-                <div class="card" style="background: #fdfdfd; border: 1px dashed #ccc;">
-                    <h4><i class="fas fa-lightbulb" style="color: gold;"></i> Pro-Tip</h4>
-                    <p style="font-size: 0.85rem;">Keep your product names clear (e.g., "Cowbell Milk 500ml") to make searching and reporting easier for your suppliers.</p>
-                    <hr>
-                    <button class="cta-btn" style="background: #25D366;" onclick="sendWhatsApp()">
-                        <i class="fab fa-whatsapp"></i> Send List to Supplier
-                    </button>
-                </div>
-            </div>
-
             <div class="card">
-                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>Step 2: Review Stock</h3>
-                    <input type="text" id="search" placeholder="Search by name..." onkeyup="renderTable()" style="width: 250px; margin: 0;">
+                <h3>Add New Product</h3>
+                <input type="text" id="p-name" placeholder="Product Name">
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="p-qty" placeholder="Qty">
+                    <input type="number" id="p-price" placeholder="Price">
                 </div>
-                <div id="table-wrapper">
-                    </div>
+                <button class="btn btn-primary" onclick="addItem()">Save Item</button>
             </div>
         </div>
 
-        <div id="reports" class="section" style="display:none;">
-            <div class="page-header">
-                <h1>Reports & Exports</h1>
-                <p>Generate professional documents for accounting and audits.</p>
-            </div>
-            <div class="grid">
-                <div class="card">
-                    <i class="fas fa-file-pdf fa-2x" style="color: #e74c3c;"></i>
-                    <h3>PDF Audit</h3>
-                    <p>Best for official signatures and printing.</p>
-                    <button class="cta-btn" style="background: #e74c3c;" onclick="exportPDF()">Download PDF</button>
-                </div>
-                <div class="card">
-                    <i class="fas fa-file-excel fa-2x" style="color: #27ae60;"></i>
-                    <h3>Excel/CSV Data</h3>
-                    <p>Best for data analysis and bulk uploads.</p>
-                    <button class="cta-btn" style="background: #27ae60;" onclick="exportCSV()">Download CSV</button>
-                </div>
-            </div>
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Product List</h3>
+            <table>
+                <thead><tr><th>Item</th><th>Stock</th><th>Price</th><th>Action</th></tr></thead>
+                <tbody id="inventory-body"></tbody>
+            </table>
         </div>
-
     </div>
 
-    <div id="notification">Action Successful!</div>
-
     <script>
-        let inventory = JSON.parse(localStorage.getItem('stock_pro_ultimate')) || [];
+        let inventory = JSON.parse(localStorage.getItem('stock_pro_data')) || [];
+        let account = JSON.parse(localStorage.getItem('stock_pro_account'));
 
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-            document.getElementById(id).style.display = 'block';
-            document.getElementById('nav-' + id).classList.add('active');
+        window.onload = () => {
+            if(account) {
+                document.getElementById('register-ui').style.display = 'none';
+                document.getElementById('login-ui').style.display = 'block';
+                document.getElementById('login-greeting').innerText = `Hello, ${account.fname}`;
+            }
+        };
+
+        // 1. REGISTRATION logic
+        function createAccount() {
+            const fname = document.getElementById('reg-firstname').value;
+            const sname = document.getElementById('reg-surname').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            if(!fname || !sname || !pass) return alert("Please fill all fields!");
+
+            const newAccount = { fname, sname, pass };
+            localStorage.setItem('stock_pro_account', JSON.stringify(newAccount));
+            account = newAccount;
+            enterApp();
         }
 
-        function notify(msg) {
-            const n = document.getElementById('notification');
-            n.innerText = msg;
-            n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 3000);
+        // 2. LOGIN logic
+        function handleLogin() {
+            const inputPass = document.getElementById('login-pass').value;
+            if(inputPass === account.pass) {
+                enterApp();
+            } else {
+                alert("Incorrect Password!");
+            }
+        }
+
+        function enterApp() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-nav').style.display = 'flex';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('user-display').innerText = `${account.fname} ${account.sname}`;
+            updateUI();
+        }
+
+        function logout() { location.reload(); }
+
+        function resetAccount() {
+            if(confirm("This will delete your account and all items. Continue?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // 3. THEME & CORE
+        function toggleTheme() {
+            const body = document.body;
+            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
         }
 
         function addItem() {
             const name = document.getElementById('p-name').value;
-            const cat = document.getElementById('p-cat').value;
             const qty = parseInt(document.getElementById('p-qty').value);
             const price = parseFloat(document.getElementById('p-price').value);
 
-            if(!name || isNaN(qty)) return alert("Please provide valid product details.");
+            if(!name || isNaN(qty)) return;
 
-            inventory.push({ id: Date.now(), name, cat, qty, price });
-            save();
-            notify("Product added to inventory!");
+            inventory.push({ id: Date.now(), name, qty, price });
+            localStorage.setItem('stock_pro_data', JSON.stringify(inventory));
+            updateUI();
             
-            ['p-name', 'p-qty', 'p-price'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-qty').value = '';
+            document.getElementById('p-price').value = '';
         }
 
         function deleteItem(id) {
-            if(confirm("Are you sure you want to remove this item?")) {
-                inventory = inventory.filter(i => i.id !== id);
-                save();
-                notify("Item removed.");
-            }
+            inventory = inventory.filter(i => i.id !== id);
+            localStorage.setItem('stock_pro_data', JSON.stringify(inventory));
+            updateUI();
         }
 
-        function save() {
-            localStorage.setItem('stock_pro_ultimate', JSON.stringify(inventory));
-            renderTable();
-            updateDashboard();
-        }
-
-        function updateDashboard() {
+        function updateUI() {
+            const body = document.getElementById('inventory-body');
+            body.innerHTML = '';
             let total = 0;
-            let alerts = "";
+
             inventory.forEach(i => {
                 total += (i.qty * i.price);
-                if(i.qty < 5) {
-                    alerts += `<div style="color: var(--danger); margin-bottom: 5px;">
-                                <i class="fas fa-exclamation-triangle"></i> <strong>${i.name}</strong> is low on stock (${i.qty} left)
-                               </div>`;
-                }
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${i.name}</strong></td>
+                        <td><span class="badge ${i.qty < 5 ? 'low' : ''}">${i.qty} units</span></td>
+                        <td>KES ${i.price}</td>
+                        <td><i class="fas fa-trash" style="color:#e74c3c; cursor:pointer;" onclick="deleteItem(${i.id})"></i></td>
+                    </tr>`;
             });
             document.getElementById('total-val').innerText = `KES ${total.toLocaleString()}`;
-            document.getElementById('alerts-container').innerHTML = alerts || "Everything is in stock!";
         }
-
-        function renderTable() {
-            const container = document.getElementById('table-wrapper');
-            const search = document.getElementById('search').value.toLowerCase();
-            const filtered = inventory.filter(i => i.name.toLowerCase().includes(search));
-
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><br>No products found. Start by adding one above!</div>`;
-                return;
-            }
-
-            let html = `<table><thead><tr><th>Product</th><th>Category</th><th>Stock</th><th>Price</th><th>Action</th></tr></thead><tbody>`;
-            filtered.forEach(i => {
-                const badge = i.qty < 5 ? 'badge-low' : 'badge-good';
-                html += `<tr>
-                    <td><strong>${i.name}</strong></td>
-                    <td><small>${i.cat}</small></td>
-                    <td><span class="badge ${badge}">${i.qty} units</span></td>
-                    <td>KES ${i.price.toLocaleString()}</td>
-                    <td><i class="fas fa-trash" style="color: #ddd; cursor:pointer;" onclick="deleteItem(${i.id})"></i></td>
-                </tr>`;
-            });
-            html += `</tbody></table>`;
-            container.innerHTML = html;
-        }
-
-        function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("StockPro Inventory Report", 14, 15);
-            doc.autoTable({
-                head: [['Product', 'Category', 'Stock', 'Price']],
-                body: inventory.map(i => [i.name, i.cat, i.qty, i.price])
-            });
-            doc.save('Inventory_Report.pdf');
-        }
-
-        function exportCSV() {
-            let csv = "Product,Category,Qty,Price\n";
-            inventory.forEach(i => csv += `${i.name},${i.cat},${i.qty},${i.price}\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'Inventory_Export.csv';
-            a.click();
-        }
-
-        function sendWhatsApp() {
-            let msg = "*StockPro Order List*%0A%0A";
-            inventory.forEach(i => {
-                if(i.qty < 10) msg += `• *${i.name}*: Current Stock ${i.qty}%0A`;
-            });
-            window.open(`https://wa.me/254112873218?text=${msg}`, '_blank');
-        }
-
-        // Init
-        updateDashboard();
-        renderTable();
     </script>
 </body>
-      </html>
+                </html>
