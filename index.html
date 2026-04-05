@@ -3,273 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | Midnight Suite</title>
+    <title>StockPro | Royal Purple</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
-        /* DEEP ATTRACTIVE THEME */
         :root { 
-            --bg: #0f172a; --card: #1e293b; --text: #f8fafc; 
-            --primary: #fbbf24; --secondary: #38bdf8; --danger: #ef4444; --accent: #334155;
-        }
-        [data-theme="light"] { 
-            --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --accent: #e2e8f0;
+            --bg: #1a1625; --card: #2d2640; --text: #eee7ff; 
+            --primary: #d4af37; --secondary: #9d81ff; --danger: #ff5e5e; --accent: #3d3454;
         }
         
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; overflow-x: hidden; }
         
-        /* AUTHENTICATION SCREEN */
-        #auth-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--accent); }
-        .auth-card h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 5px; letter-spacing: -1px; font-weight: 900; }
+        /* LOGIN FIX */
+        #auth-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; border-top: 4px solid var(--primary); }
+        .auth-card { background: var(--card); padding: 30px; border-radius: 15px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        
+        /* COMPACT NAVIGATION */
+        nav { background: var(--card); padding: 12px 5%; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--accent); }
+        .nav-brand { font-weight: 900; color: var(--primary); letter-spacing: 1px; }
+        .nav-item { cursor: pointer; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; }
+        .nav-item.active { opacity: 1; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
-        /* NAVIGATION */
-        nav { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); padding: 15px 5%; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--accent); }
-        .nav-brand { font-weight: 800; color: var(--primary); font-size: 1.2rem; }
-        .nav-item { cursor: pointer; color: var(--text); opacity: 0.6; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
-        .nav-item.active { opacity: 1; color: var(--primary); }
+        .container { max-width: 600px; margin: 1rem auto; padding: 0 15px; display: none; }
+        .page { display: none; } .page.active { display: block; }
 
-        .container { max-width: 800px; margin: 1.5rem auto; padding: 0 20px; display: none; }
-        .page { display: none; animation: slideUp 0.4s ease; }
-        .page.active { display: block; }
-        @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        /* REFINED CARDS */
+        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--accent); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 8px; box-sizing: border-box; }
+        .btn { padding: 14px; border: none; cursor: pointer; border-radius: 8px; font-weight: 700; width: 100%; transition: 0.2s; }
+        .btn-main { background: var(--primary); color: #1a1625; }
 
-        /* CARDS & INPUTS */
-        .card { background: var(--card); padding: 25px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--accent); position: relative; overflow: hidden; }
-        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-        .btn { padding: 14px; border: none; cursor: pointer; border-radius: 8px; font-weight: 700; width: 100%; transition: 0.2s; text-transform: uppercase; }
-        .btn-main { background: var(--primary); color: #0f172a; }
-        .btn-main:hover { background: #eab308; }
+        /* COMPACT CHART */
+        #chart-container { height: 180px; margin-bottom: 15px; display: none; }
 
         /* TABLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; padding: 12px; color: var(--primary); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--accent); }
-        td { padding: 15px 12px; border-bottom: 1px solid var(--accent); font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 10px; color: var(--secondary); text-transform: uppercase; font-size: 0.65rem; border-bottom: 1px solid var(--accent); }
+        td { padding: 12px 10px; border-bottom: 1px solid var(--accent); }
         
-        .badge-low { background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.7rem; border: 1px solid var(--danger); }
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #0f172a; padding: 12px 30px; border-radius: 50px; font-weight: bold; display: none; z-index: 10001; }
-        #alert-box { background: var(--danger); color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; font-weight: 600; text-align: center; }
+        .low-stock { color: var(--danger); font-weight: bold; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #1a1625; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: none; z-index: 10001; }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
     <div id="auth-overlay">
         <div class="auth-card">
-            <h1>STOCKPRO</h1>
-            <p style="opacity:0.6; margin-bottom:25px; font-size: 0.9rem;">Midnight Enterprise Edition</p>
-            <input type="text" id="user-input" placeholder="Username (admin / staff)">
-            <input type="password" id="pass-input" placeholder="Password (1234)">
-            <button class="btn btn-main" onclick="handleAuth()">Access System</button>
-            <button class="btn" style="background:transparent; color:var(--text); margin-top:10px; font-size:0.8rem;" onclick="enter('Guest')">Guest View</button>
-            <p style="font-size:0.65rem; margin-top:20px; opacity:0.4;">Admin: admin / 1234</p>
+            <h2 style="color:var(--primary); margin-top:0;">STOCKPRO</h2>
+            <input type="text" id="u" placeholder="Username (admin/staff)">
+            <input type="password" id="p" placeholder="Key (1234)">
+            <button class="btn btn-main" onclick="login()">LOGIN</button>
+            <p style="font-size:0.6rem; opacity:0.4; margin-top:15px;">Admin: admin | 1234</p>
         </div>
     </div>
 
-    <nav id="top-nav">
+    <nav id="navbar">
         <div class="nav-brand">STOCKPRO</div>
-        <div style="display:flex; gap:20px; align-items:center;">
-            <div class="nav-item active" onclick="showPage('dash', event)">Dashboard</div>
-            <div class="nav-item" onclick="showPage('inv', event)">Ledger</div>
-            <div class="nav-item" onclick="showPage('rep', event)">Reports</div>
-            <div class="nav-item" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+        <div style="display:flex; gap:15px;">
+            <div class="nav-item active" onclick="tab('dash', event)">Home</div>
+            <div class="nav-item" onclick="tab('inv', event)">Ledger</div>
+            <div class="nav-item" onclick="tab('rep', event)">Docs</div>
         </div>
     </nav>
 
-    <div class="container" id="app-main">
-        <div id="alert-box">⚠️ Stock Alert: Some assets require restocking.</div>
-
-        <section id="page-dash" class="page active">
-            <div id="admin-summary" style="display:none; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
-                <div class="card" style="text-align:center;"><small style="opacity:0.6">TOTAL VALUE</small><h2 id="total-val" style="color:var(--primary); margin:5px 0;">KES 0</h2></div>
-                <div class="card" style="text-align:center;"><small style="opacity:0.6">ITEMS</small><h2 id="total-items" style="margin:5px 0;">0</h2></div>
+    <div class="container" id="app">
+        <section id="p-dash" class="page active">
+            <div id="adm-head" style="display:none; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                <div class="card" style="text-align:center;"><small>VALUATION</small><div id="stat-v" style="color:var(--primary); font-weight:bold;">0</div></div>
+                <div class="card" style="text-align:center;"><small>ASSETS</small><div id="stat-i" style="font-weight:bold;">0</div></div>
             </div>
 
-            <div id="admin-chart-card" class="card" style="display:none; height: 280px;">
-                <canvas id="mainChart"></canvas>
-            </div>
+            <div id="chart-container" class="card"><canvas id="myChart"></canvas></div>
             
             <div class="card">
-                <h3 style="margin-top:0; color:var(--primary)">Asset Intake</h3>
-                <div id="qr-reader" style="display:none; margin-bottom:15px; border-radius:12px; overflow:hidden;"></div>
-                <button class="btn" style="background:var(--accent); color:var(--text); margin-bottom:10px;" onclick="toggleScanner()"><i class="fas fa-barcode"></i> Scan Item</button>
-                <input id="in-name" placeholder="Item Name">
-                <input id="in-qty" type="number" placeholder="Quantity">
-                <div id="admin-pricing" style="display:none;"><input id="in-price" type="number" placeholder="Unit Price (KES)"></div>
-                <select id="in-cat"><option>Hardware</option><option>Software</option><option>Materials</option></select>
-                <button class="btn btn-main" onclick="commitAsset()">Commit Asset</button>
+                <h4 style="margin:0 0 10px 0; color:var(--secondary)">New Entry</h4>
+                <input id="n" placeholder="Item Name">
+                <input id="q" type="number" placeholder="Quantity">
+                <div id="adm-price" style="display:none;"><input id="pr" type="number" placeholder="Price (KES)"></div>
+                <select id="c"><option>Hardware</option><option>Software</option><option>Materials</option></select>
+                <button class="btn btn-main" onclick="save()">COMMIT ASSET</button>
             </div>
         </section>
 
-        <section id="page-inv" class="page">
+        <section id="p-inv" class="page">
             <div class="card">
-                <input placeholder="Search Ledger..." onkeyup="renderLedger()" id="search-bar" style="margin-top:0;">
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead><tr><th>Asset & Time</th><th>Stock</th><th class="adm-col">Price</th><th>Action</th></tr></thead>
-                        <tbody id="ledger-body"></tbody>
-                    </table>
-                </div>
+                <input placeholder="Quick Search..." onkeyup="render()" id="search">
+                <table>
+                    <thead><tr><th>Asset</th><th>Stock</th><th class="adm-only">KES</th></tr></thead>
+                    <tbody id="table"></tbody>
+                </table>
             </div>
         </section>
 
-        <section id="page-rep" class="page">
-            <div class="card" onclick="exportPDF()" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-                <span>Audit Report (PDF)</span><i class="fas fa-file-pdf" style="color:var(--danger)"></i>
-            </div>
-            <div id="admin-csv-btn" class="card" onclick="exportCSV()" style="display:none; cursor:pointer; justify-content:space-between; align-items:center;">
-                <span>Data Export (CSV)</span><i class="fas fa-file-csv" style="color:var(--secondary)"></i>
-            </div>
-            <button class="btn" style="background:#16a34a; color:white; margin-top:10px;" onclick="whatsappSync()"><i class="fab fa-whatsapp"></i> Sync to WhatsApp</button>
+        <section id="p-rep" class="page">
+            <div class="card" onclick="genPDF()" style="cursor:pointer">Audit PDF Export <i class="fas fa-file-pdf" style="float:right"></i></div>
+            <button class="btn" style="background:#25D366; color:white;" onclick="waSync()">WhatsApp Update</button>
         </section>
     </div>
 
     <div id="toast"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script>
-        let stockData = JSON.parse(localStorage.getItem('milka_db')) || [];
-        let currentRole = 'Guest'; let chartInstance = null; let scanner = null;
+        let db = JSON.parse(localStorage.getItem('milka_pro_db')) || [];
+        let role = 'Guest'; let chart = null;
 
-        function handleAuth() {
-            // FIX: Trim and ignore case so "Admin" or "admin" works
-            let u = document.getElementById('user-input').value.trim().toLowerCase();
-            let p = document.getElementById('pass-input').value.trim();
-            
-            if (u === 'admin' && p === '1234') enter('Admin');
-            else if (u === 'staff' && p === 'staff') enter('Staff');
-            else alert("Login Failed: Use admin / 1234");
+        function login() {
+            let user = document.getElementById('u').value.trim().toLowerCase();
+            let pass = document.getElementById('p').value.trim();
+            if (user === 'admin' && pass === '1234') start('Admin');
+            else if (user === 'staff' && pass === 'staff') start('Staff');
+            else alert("Try admin / 1234");
         }
 
-        function enter(role) {
-            currentRole = role; 
-            document.getElementById('auth-overlay').style.display='none'; 
-            document.getElementById('top-nav').style.display='flex'; 
-            document.getElementById('app-main').style.display='block';
-            
-            if(role === 'Admin') {
-                document.getElementById('admin-summary').style.display = 'grid';
-                document.getElementById('admin-chart-card').style.display = 'block';
-                document.getElementById('admin-pricing').style.display = 'block';
-                document.getElementById('admin-csv-btn').style.display = 'flex';
+        function start(r) {
+            role = r;
+            document.getElementById('auth-overlay').style.display='none';
+            document.getElementById('navbar').style.display='flex';
+            document.getElementById('app').style.display='block';
+            if(r === 'Admin') {
+                document.getElementById('adm-head').style.display = 'grid';
+                document.getElementById('adm-price').style.display = 'block';
+                document.getElementById('chart-container').style.display = 'block';
                 initChart();
             }
-            refreshSystem();
+            refresh();
         }
 
-        function commitAsset() {
-            let name = document.getElementById('in-name').value, qty = parseInt(document.getElementById('in-qty').value);
-            if(!name || isNaN(qty)) return showToast("Please enter Name and Qty");
-            
-            let time = new Date().toLocaleString([], {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'});
-            stockData.push({ 
-                id: Date.now(), 
-                name, 
-                qty, 
-                price: document.getElementById('in-price').value || 0, 
-                cat: document.getElementById('in-cat').value, 
-                time 
-            });
-            
-            localStorage.setItem('milka_db', JSON.stringify(stockData));
-            refreshSystem();
-            showToast("Asset Secured");
-            document.getElementById('in-name').value = ''; document.getElementById('in-qty').value = '';
+        function save() {
+            let name = document.getElementById('n').value, qty = parseInt(document.getElementById('q').value);
+            if(!name || isNaN(qty)) return toast("Fill all fields");
+            let time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            db.push({ id:Date.now(), name, qty, price:document.getElementById('pr').value||0, cat:document.getElementById('c').value, time });
+            localStorage.setItem('milka_pro_db', JSON.stringify(db));
+            refresh(); toast("Saved");
+            document.getElementById('n').value=''; document.getElementById('q').value='';
         }
 
-        function renderLedger() {
-            let body = document.getElementById('ledger-body'), search = document.getElementById('search-bar').value.toLowerCase(), lowFlag = false;
-            body.innerHTML = '';
-            stockData.filter(i => i.name.toLowerCase().includes(search)).forEach(i => {
-                if(i.qty < 5) lowFlag = true;
-                body.innerHTML += `<tr>
-                    <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.time}</small></td>
-                    <td><span class="${i.qty < 5 ? 'badge-low' : ''}">${i.qty} Units</span></td>
-                    <td class="adm-col" style="display:${currentRole==='Admin'?'table-cell':'none'}">KES ${i.price}</td>
-                    <td>${currentRole==='Admin' ? `<i class='fas fa-trash' style="color:var(--danger)" onclick='deleteItem(${i.id})'></i>` : ''}</td>
+        function render() {
+            let b = document.getElementById('table'), s = document.getElementById('search').value.toLowerCase();
+            b.innerHTML = '';
+            db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
+                b.innerHTML += `<tr>
+                    <td>${i.name}<br><small style="opacity:0.4">${i.time}</small></td>
+                    <td class="${i.qty < 5 ? 'low-stock' : ''}">${i.qty}</td>
+                    <td style="display:${role==='Admin'?'table-cell':'none'}">${i.price}</td>
                 </tr>`;
             });
-            document.getElementById('alert-box').style.display = lowFlag ? 'block' : 'none';
         }
 
         function initChart() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Hardware', 'Software', 'Materials'],
-                    datasets: [{
-                        data: [0, 0, 0],
-                        backgroundColor: ['#fbbf24', '#38bdf8', '#64748b'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { position: 'bottom', labels: { color: '#f8fafc', font: { size: 10 } } } } 
-                }
+            const ctx = document.getElementById('myChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: ['H/W', 'S/W', 'Mat'], datasets: [{ data: [0, 0, 0], backgroundColor: '#d4af37' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#eee7ff' } }, x: { ticks: { color: '#eee7ff' } } } }
             });
-            updateChart();
+            updChart();
         }
 
-        function updateChart() {
-            if(!chartInstance) return;
-            chartInstance.data.datasets[0].data = ['Hardware', 'Software', 'Materials'].map(c => stockData.filter(i => i.cat === c).length);
-            chartInstance.update();
+        function updChart() {
+            if(!chart) return;
+            chart.data.datasets[0].data = ['Hardware', 'Software', 'Materials'].map(c => db.filter(i => i.cat === c).length);
+            chart.update();
         }
 
-        function refreshSystem() { 
-            renderLedger(); 
-            let val = stockData.reduce((s,i)=>s+(i.qty*i.price),0); 
-            document.getElementById('total-val').innerText = 'KES ' + val.toLocaleString(); 
-            document.getElementById('total-items').innerText = stockData.length; 
-            if(chartInstance) updateChart(); 
+        function refresh() { 
+            render(); 
+            let v = db.reduce((s,i)=>s+(i.qty*i.price),0); 
+            document.getElementById('stat-v').innerText = v.toLocaleString(); 
+            document.getElementById('stat-i').innerText = db.length; 
+            if(chart) updChart(); 
         }
 
-        function deleteItem(id) { if(confirm("Remove this asset?")) { stockData = stockData.filter(i=>i.id!==id); localStorage.setItem('milka_db', JSON.stringify(stockData)); refreshSystem(); } }
-        
-        function showPage(p, e) {
+        function tab(p, e) {
             document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-            document.getElementById('page-'+p).classList.add('active');
+            document.getElementById('p-'+p).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
             e.currentTarget.classList.add('active');
         }
 
-        function toggleTheme() {
-            let b = document.body;
-            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-        }
-
-        function exportPDF() {
-            const { jsPDF } = window.jspdf; let d = new jsPDF();
-            d.setFontSize(18); d.text("StockPro Audit Ledger", 14, 20);
-            d.autoTable({ head:[['Asset','Qty','Price','Recorded']], body: stockData.map(i=>[i.name, i.qty, i.price, i.time]), startY: 30 });
-            d.save('Audit_Report.pdf');
-        }
-
-        function exportCSV() {
-            let c = "Item,Qty,Price,Time\n"; stockData.forEach(i=>c+=`${i.name},${i.qty},${i.price},${i.time}\n`);
-            let b = new Blob([c],{type:'text/csv'}), a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Stock_Ledger.csv'; a.click();
-        }
-
-        function toggleScanner() {
-            let r = document.getElementById('qr-reader');
-            if(!scanner){
-                r.style.display='block'; scanner=new Html5Qrcode("qr-reader");
-                scanner.start({facingMode:"environment"},{fps:10,qrbox:250},(t)=>{document.getElementById('in-name').value=t; toggleScanner();});
-            } else { scanner.stop().then(()=>{scanner=null;r.style.display='none';}); }
-        }
-
-        function whatsappSync() { 
-            let m = '*STOCKPRO UPDATE*%0A'; 
-            stockData.forEach(i=>m+=`${i.name}: ${i.qty} Units%0A`); 
-            window.open('https://wa.me/254700000000?text='+m); 
-        }
-
-        function showToast(m) { let t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+        function toast(m) { let t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+        function waSync() { let m = 'Stock Update:%0A'; db.forEach(i=>m+=`${i.name}: ${i.qty}%0A`); window.open('https://wa.me/254700000000?text='+m); }
     </script>
 </body>
                 </html>
