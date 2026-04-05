@@ -112,7 +112,7 @@
         function chart() { let ctx=document.getElementById('ch').getContext('2d'); myCh=new Chart(ctx,{type:'doughnut',data:{labels:['Hardware','Software','Materials'],datasets:[{data:[0,0,0],backgroundColor:['#d4af37','#1e272e','#353b48']}]}}); updCh(); }
         function updCh() { if(!myCh) return; let cats=['Hardware','Software','Materials']; myCh.data.datasets[0].data=cats.map(c=>db.filter(i=>i.cat===c).length); myCh.update(); }
         function nav(p) { document.querySelectorAll('.page').forEach(x=>x.classList.remove('active')); document.getElementById('p-'+p).classList.add('active'); }
-        function wa() { let m='Stock Update:%0A'; db.forEach(i=>m+=i.name+': '+i.qty+'%0A'); window.open('https://wa.me/254700000000?text='+m); }
+        function wa() { let m='Stock Update:%0A'; db.forEach(i=>m+=i.name+': '+i.qty+'%0A'); window.open('https://wa.me/254112873218?text='+m); }
         function sc() { let r=document.getElementById('qr'); if(!qrc){r.style.display='block'; qrc=new Html5Qrcode("qr"); qrc.start({facingMode:"environment"},{fps:10,qrbox:250},(t)=>{document.getElementById('n').value=t; sc();});}else{qrc.stop().then(()=>{qrc=null;r.style.display='none';});} }
     </script>
 </body>
