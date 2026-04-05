@@ -11,29 +11,23 @@
     <style>
         :root { --p: #1e272e; --s: #d4af37; --bg: #f4f7f6; --c: #ffffff; --t: #2c3e50; --a: #dcdde1; --d: #c23616; }
         [data-theme="dark"] { --bg: #13171a; --c: #1e272e; --t: #f5f6fa; --a: #353b48; }
-        
         body { font-family: 'Georgia', serif; background: var(--bg); color: var(--t); margin: 0; transition: 0.3s; }
         nav { background: var(--p); padding: 15px 5%; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--s); }
         .nav-brand { font-size: 1.5rem; font-weight: 800; color: var(--s); letter-spacing: 2px; }
         .nav-item { cursor: pointer; color: #fff; opacity: 0.7; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; }
         .nav-item.active { opacity: 1; color: var(--s); border-bottom: 2px solid var(--s); }
-        
         #auth-overlay { position: fixed; inset: 0; background: var(--p); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .auth-card { background: var(--c); padding: 35px; border-radius: 4px; width: 90%; max-width: 380px; text-align: center; border-top: 5px solid var(--s); }
-        
         .container { max-width: 900px; margin: 1.5rem auto; padding: 0 15px; display: none; }
         .page { display: none; } .page.active { display: block; }
         .card { background: var(--c); padding: 20px; border-radius: 4px; border-left: 4px solid var(--s); margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        
         .admin-only, .staff-only { display: none; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--a); background: var(--bg); color: var(--t); border-radius: 4px; box-sizing: border-box; }
         .btn { padding: 15px; border: none; cursor: pointer; text-transform: uppercase; font-weight: 800; width: 100%; margin-top: 10px; }
         .btn-main { background: var(--s); color: var(--p); }
-        
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 10px; color: var(--s); border-bottom: 2px solid var(--s); font-size: 0.7rem; }
         td { padding: 10px; border-bottom: 1px solid var(--a); font-size: 0.8rem; }
-        
         .badge-low { color: var(--d); font-weight: bold; border: 1px solid var(--d); padding: 2px 5px; border-radius: 3px; font-size: 0.65rem; }
         #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--p); color: var(--s); padding: 12px 25px; display: none; z-index: 10001; }
         #alert-box { background: rgba(194, 54, 22, 0.1); border: 1px solid var(--d); color: var(--d); padding: 15px; border-radius: 4px; margin-bottom: 20px; display: none; }
@@ -46,7 +40,7 @@
             <h1 style="color:var(--p)">STOCKPRO</h1>
             <input type="text" id="user" placeholder="Username (admin/staff)">
             <input type="password" id="pass" placeholder="Password (1234)">
-            <button class="btn btn-main" onclick="auth()">Login to Suite</button>
+            <button class="btn btn-main" onclick="auth()">Login</button>
             <button class="btn" style="background:var(--a);" onclick="go('Guest')">Guest View</button>
             <p style="font-size:0.6rem; opacity:0.5; margin-top:10px;">Admin: admin / 1234 | Staff: staff / staff</p>
         </div>
@@ -70,7 +64,9 @@
                 <div class="card" style="text-align:center;"><small>VALUATION</small><h2 id="v-val">0</h2></div>
                 <div class="card" style="text-align:center;"><small>SKUs</small><h2 id="v-items">0</h2></div>
             </div>
-            <div class="admin-only card"><canvas id="ch" style="max-height:200px;"></canvas></div>
+            <div class="admin-only card" style="height: 250px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
             
             <div class="staff-only card">
                 <h3>Asset Entry</h3>
@@ -109,22 +105,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script>
         let db = JSON.parse(localStorage.getItem('st_db')) || [];
-        let user = 'Guest', myCh = null, qrc = null;
+        let userRole = 'Guest'; 
+        let myChart = null; 
+        let qrc = null;
 
         function auth() {
             let u = document.getElementById('user').value.toLowerCase();
             let p = document.getElementById('pass').value;
             if (u === 'admin' && p === '1234') go('Admin');
             else if (u === 'staff' && p === 'staff') go('Staff');
-            else alert("Login Failed: Check username/password");
+            else alert("Login Failed");
         }
 
         function go(r) {
-            user = r; document.getElementById('auth-overlay').style.display='none'; 
+            userRole = r; 
+            document.getElementById('auth-overlay').style.display='none'; 
             document.getElementById('nb').style.display='flex'; 
             document.getElementById('main').style.display='block';
-            if(r === 'Admin') { document.querySelectorAll('.admin-only, .staff-only').forEach(e => e.style.display = 'block'); chart(); }
-            else if(r === 'Staff') document.querySelectorAll('.staff-only').forEach(e => e.style.display = 'block');
+            
+            if(r === 'Admin') {
+                document.querySelectorAll('.admin-only, .staff-only').forEach(e => e.style.display = 'block');
+                initChart(); // Start chart for Admin
+            } else if(r === 'Staff') {
+                document.querySelectorAll('.staff-only').forEach(e => e.style.display = 'block');
+            }
             upd();
         }
 
@@ -142,6 +146,7 @@
             db.push({ id:Date.now(), name, qty, price:document.getElementById('pr').value||0, cat:document.getElementById('ct').value, time });
             localStorage.setItem('st_db', JSON.stringify(db));
             upd(); toast("Item Added");
+            document.getElementById('n').value = ''; document.getElementById('q').value = '';
         }
 
         function draw() {
@@ -153,13 +158,59 @@
                     <td><strong>${i.name}</strong><br><small>${i.time}</small></td>
                     <td><span class="${i.qty < 5 ? 'badge-low' : ''}">${i.qty} UNITS</span></td>
                     <td class="admin-only">KES ${i.price}</td>
-                    <td>${user==='Admin' ? `<i class='fas fa-trash' onclick='del(${i.id})'></i>` : ''}</td>
+                    <td>${userRole==='Admin' ? `<i class='fas fa-trash' onclick='del(${i.id})'></i>` : ''}</td>
                 </tr>`;
             });
             let box = document.getElementById('alert-box');
             if(lows.length > 0) { box.style.display='block'; document.getElementById('low-list').innerText = lows.join(', '); }
             else box.style.display='none';
-            if(user==='Admin') document.querySelectorAll('.admin-only').forEach(e=>e.style.display='table-cell');
+            if(userRole==='Admin') document.querySelectorAll('.admin-only').forEach(e=>e.style.display='table-cell');
+        }
+
+        function del(id) { if(confirm("Delete?")) { db = db.filter(i=>i.id!==id); localStorage.setItem('st_db', JSON.stringify(db)); upd(); } }
+
+        function upd() { 
+            draw(); 
+            let v = db.reduce((s,i)=>s+(i.qty*i.price),0); 
+            document.getElementById('v-val').innerText='KES '+v.toLocaleString(); 
+            document.getElementById('v-items').innerText=db.length; 
+            if(myChart) updCh(); 
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hardware', 'Software', 'Materials'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#d4af37', '#1e272e', '#353b48'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+            updCh();
+        }
+
+        function updCh() {
+            if(!myChart) return;
+            const cats = ['Hardware', 'Software', 'Materials'];
+            myChart.data.datasets[0].data = cats.map(c => db.filter(i => i.cat === c).length);
+            myChart.update();
+        }
+
+        function nav(p, e) {
+            document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+            document.getElementById('p-'+p).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+            e.target.classList.add('active');
         }
 
         function csv() {
@@ -169,19 +220,14 @@
 
         function pdf() {
             const { jsPDF } = window.jspdf; let d = new jsPDF();
-            d.text("StockPro Audit - Milka", 14, 15);
+            d.text("Audit Ledger", 14, 15);
             d.autoTable({ head:[['Asset','Qty','Price','Timestamp']], body: db.map(i=>[i.name, i.qty, i.price, i.time]) });
             d.save('Audit.pdf');
         }
 
-        function del(id) { if(confirm("Delete?")) { db = db.filter(i=>i.id!==id); localStorage.setItem('st_db', JSON.stringify(db)); upd(); } }
-        function upd() { draw(); let v = db.reduce((s,i)=>s+(i.qty*i.price),0); document.getElementById('v-val').innerText='KES '+v.toLocaleString(); document.getElementById('v-items').innerText=db.length; if(myCh) updCh(); }
-        function chart() { let ctx = document.getElementById('ch').getContext('2d'); myCh = new Chart(ctx, { type:'doughnut', data:{ labels:['Hardware','Software','Materials'], datasets:[{data:[0,0,0], backgroundColor:['#d4af37','#1e272e','#353b48']}] } }); updCh(); }
-        function updCh() { let cats=['Hardware','Software','Materials']; myCh.data.datasets[0].data = cats.map(c=>db.filter(i=>i.cat===c).length); myCh.update(); }
-        function nav(p, e) { document.querySelectorAll('.page').forEach(x=>x.classList.remove('active')); document.getElementById('p-'+p).classList.add('active'); document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); e.target.classList.add('active'); }
-        function wa() { let m = 'STOCK ALERT:%0A'; db.forEach(i=>m+=`${i.name}: ${i.qty}%0A`); window.open('https://wa.me/254700000000?text='+m); }
+        function wa() { let m = 'STOCK UPDATE:%0A'; db.forEach(i=>m+=`${i.name}: ${i.qty}%0A`); window.open('https://wa.me/254700000000?text='+msg); }
         function scan() { let r = document.getElementById('reader'); if(!qrc){r.style.display='block'; qrc=new Html5Qrcode("reader"); qrc.start({facingMode:"environment"},{fps:10,qrbox:250},(t)=>{document.getElementById('n').value=t; scan();});}else{qrc.stop().then(()=>{qrc=null;r.style.display='none';});} }
         function toast(m) { let t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
     </script>
 </body>
-    </html>
+                </html>
