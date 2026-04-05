@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | Executive Intelligence</title>
-    <link rel="icon" href="data:,">
+    <title>StockPro | Enterprise Suite</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
+    <script src="https://unpkg.com/html5-qrcode"></script> <style>
         :root {
             --primary: #1e272e; --secondary: #d4af37; --bg: #f4f7f6;
             --card: #ffffff; --text: #2c3e50; --accent: #dcdde1; --danger: #c23616;
@@ -18,122 +16,106 @@
         }
 
         body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.5s; }
-
-        nav { background: var(--primary); padding: 20px 5%; display: none; flex-direction: column; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--secondary); }
-        .nav-brand { font-size: 2rem; font-weight: 800; color: var(--secondary); letter-spacing: 2px; }
-        .nav-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .nav-item { cursor: pointer; color: #fff; opacity: 0.6; padding: 10px 15px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        nav { background: var(--primary); padding: 15px 5%; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--secondary); }
+        .nav-brand { font-size: 1.5rem; font-weight: 800; color: var(--secondary); letter-spacing: 2px; }
+        .nav-item { cursor: pointer; color: #fff; opacity: 0.7; font-size: 0.75rem; text-transform: uppercase; padding: 5px 10px; }
         .nav-item.active { opacity: 1; color: var(--secondary); border-bottom: 2px solid var(--secondary); }
 
         #auth-overlay { position: fixed; inset: 0; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 4px; width: 85%; max-width: 350px; text-align: center; border-top: 5px solid var(--secondary); }
+        .auth-card { background: var(--card); padding: 30px; border-radius: 4px; width: 90%; max-width: 350px; text-align: center; border-top: 5px solid var(--secondary); }
 
-        .container { max-width: 950px; margin: 2rem auto; padding: 0 20px; display: none; }
-        .page { display: none; animation: fadeIn 0.6s ease; }
+        .container { max-width: 900px; margin: 1rem auto; padding: 0 15px; display: none; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .card { background: var(--card); padding: 25px; border-radius: 4px; border-left: 4px solid var(--secondary); margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        
+        .card { background: var(--card); padding: 20px; border-radius: 4px; border-left: 4px solid var(--secondary); margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .admin-only { display: none; } /* Hidden by default */
+
+        /* Scanner Styling */
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 15px; }
+
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-box { padding: 20px; background: var(--primary); color: var(--secondary); text-align: center; border-radius: 4px; border: 1px solid var(--secondary); }
-        .stat-box h2 { font-size: 1.5rem; margin: 5px 0; color: #fff; }
-
-        .alert-banner { background: #fff5f5; border: 1px solid var(--danger); color: var(--danger); padding: 15px; border-radius: 4px; margin-bottom: 20px; display: none; }
-
-        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 10px; }
-
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 4px; }
-        .btn { padding: 15px; border: none; cursor: pointer; text-transform: uppercase; font-weight: 700; width: 100%; transition: 0.3s; margin-top: 10px; }
-        .btn-main { background: var(--secondary); color: var(--primary); }
-        .btn-wa { background: #25D366; color: white; margin-top: 20px; }
-
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th { text-align: left; padding: 12px; color: var(--secondary); border-bottom: 2px solid var(--secondary); font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid var(--accent); font-size: 0.85rem; }
+        .stat-box { padding: 15px; background: var(--primary); color: var(--secondary); text-align: center; border-radius: 4px; border: 1px solid var(--secondary); }
         
-        .badge { padding: 4px 8px; font-size: 0.65rem; font-weight: 800; border: 1px solid; border-radius: 2px; }
-        .badge-low { border-color: var(--danger); color: var(--danger); }
-        .badge-ok { border-color: var(--secondary); color: var(--secondary); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); box-sizing: border-box; }
+        .btn { padding: 15px; border: none; cursor: pointer; text-transform: uppercase; font-weight: 700; width: 100%; transition: 0.3s; margin-top: 10px; display: block; }
+        .btn-main { background: var(--secondary); color: var(--primary); }
+        .btn-wa { background: #25D366; color: white; }
+        .btn-scan { background: var(--primary); color: var(--secondary); border: 1px solid var(--secondary); }
 
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--secondary); padding: 12px 30px; display: none; border: 1px solid var(--secondary); z-index: 10001; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 10px; color: var(--secondary); border-bottom: 2px solid var(--secondary); font-size: 0.7rem; }
+        td { padding: 10px; border-bottom: 1px solid var(--accent); font-size: 0.8rem; }
+        
+        .badge { padding: 3px 6px; font-size: 0.6rem; font-weight: 800; border: 1px solid; }
+        .badge-low { border-color: var(--danger); color: var(--danger); }
+        
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--secondary); padding: 12px 25px; display: none; border: 1px solid var(--secondary); z-index: 10001; }
     </style>
 </head>
 <body data-theme="light">
 
     <div id="auth-overlay">
-        <div class="auth-card" id="setup-box">
-            <h1 style="color:var(--primary); margin:0;">STOCKPRO</h1>
-            <p style="font-size:0.7rem; letter-spacing:2px; margin-bottom:20px;">INTELLIGENCE SUITE</p>
-            <input type="text" id="reg-fname" placeholder="Admin Name">
-            <input type="password" id="reg-pass" placeholder="Master Key">
-            <button class="btn btn-main" onclick="register()">Initialize Suite</button>
-        </div>
-        <div class="auth-card" id="login-box" style="display: none;">
-            <h2 id="greet-user">Verification Required</h2>
-            <input type="password" id="login-pass" placeholder="Enter Access Code">
-            <button class="btn btn-main" onclick="login()">Unlock System</button>
+        <div class="auth-card">
+            <h2 style="color:var(--primary); margin:0;">STOCKPRO</h2>
+            <p style="font-size:0.6rem; letter-spacing:2px; margin-bottom:20px;">ENTERPRISE ACCESS</p>
+            <input type="text" id="login-user" placeholder="Username (Admin/Staff)">
+            <input type="password" id="login-pass" placeholder="Access Key">
+            <button class="btn btn-main" onclick="handleAuth()">Sign In</button>
         </div>
     </div>
 
     <nav id="navbar">
         <div class="nav-brand">STOCKPRO</div>
-        <div class="nav-links">
-            <div class="nav-item active" onclick="nav('dashboard', event)">Executive View</div>
-            <div class="nav-item" onclick="nav('inventory', event)">Asset Ledger</div>
-            <div class="nav-item" onclick="nav('reports', event)">Data Exports</div>
-            <div class="nav-item" onclick="toggleDarkMode()"><i class="fas fa-adjust"></i></div>
+        <div class="nav-links" style="display:flex; gap:10px;">
+            <div class="nav-item active" onclick="nav('dashboard', event)">Home</div>
+            <div class="nav-item" onclick="nav('inventory', event)">Ledger</div>
+            <div class="nav-item" onclick="nav('reports', event)">Exports</div>
+            <div class="nav-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></div>
         </div>
     </nav>
 
     <div class="container" id="app-body">
         
-        <div id="low-stock-alert" class="alert-banner">
-            <i class="fas fa-exclamation-triangle"></i> <strong>Critical Attention:</strong> <span id="alert-list"></span>
-        </div>
-
         <section id="page-dashboard" class="page active">
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <small>TOTAL CAPITAL</small>
-                    <h2 id="stat-val">KES 0</h2>
-                </div>
-                <div class="stat-box">
-                    <small>ACTIVE SKUs</small>
-                    <h2 id="stat-items">0</h2>
-                </div>
+            <div class="admin-only stats-grid">
+                <div class="stat-box"><small>CAPITAL</small><h2 id="stat-val">KES 0</h2></div>
+                <div class="stat-box"><small>SKUs</small><h2 id="stat-items">0</h2></div>
+            </div>
+
+            <div class="admin-only card">
+                <h3 style="margin:0 0 10px 0; font-size:0.9rem;">Financial Allocation</h3>
+                <canvas id="categoryChart" style="max-height: 200px;"></canvas>
             </div>
 
             <div class="card">
-                <h3 style="margin:0; font-size:1rem; color:var(--primary)">Financial Distribution</h3>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
+                <h3 style="margin:0 0 10px 0; font-size:0.9rem;">Asset Intake</h3>
+                <div id="reader" style="display:none;"></div>
+                <button class="btn btn-scan" id="scan-btn" onclick="toggleScanner()">
+                    <i class="fas fa-barcode"></i> Scan Barcode
+                </button>
+                
+                <input type="text" id="p-name" placeholder="Asset Name (or Scan)">
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="p-qty" placeholder="Qty">
+                    <input type="number" id="p-price" placeholder="Price">
                 </div>
-            </div>
-
-            <div class="card">
-                <h3 style="margin-top:0">New Asset Intake</h3>
-                <input type="text" id="p-name" placeholder="Asset Description">
                 <select id="p-cat">
                     <option value="Hardware">Hardware</option>
                     <option value="Software">Software</option>
                     <option value="Materials">Materials</option>
-                    <option value="Labor">Labor</option>
                 </select>
-                <div style="display: flex; gap: 10px;">
-                    <input type="number" id="p-qty" placeholder="Quantity">
-                    <input type="number" id="p-price" placeholder="Price per Unit">
-                </div>
-                <button class="btn btn-main" onclick="addItem()">Commit to Database</button>
+                <button class="btn btn-main" onclick="addItem()">Update Ledger</button>
             </div>
         </section>
 
         <section id="page-inventory" class="page">
             <div class="card">
-                <input type="text" id="search" placeholder="Filter Audit Trail..." onkeyup="renderTable()">
+                <input type="text" id="search" placeholder="Search records..." onkeyup="renderTable()">
                 <div style="overflow-x:auto;">
                     <table>
-                        <thead><tr><th>Asset & Timestamp</th><th>Stock</th><th>Value</th><th></th></tr></thead>
+                        <thead><tr><th>Asset & Date</th><th>Stock</th><th class="admin-only">Price</th><th></th></tr></thead>
                         <tbody id="stock-table"></tbody>
                     </table>
                 </div>
@@ -141,13 +123,9 @@
         </section>
 
         <section id="page-reports" class="page">
-            <h2 style="text-align:center; letter-spacing:1px;">EXECUTIVE REPORTING</h2>
-            <div class="card" onclick="exportPDF()" style="cursor:pointer"><h4><i class="fas fa-file-pdf"></i> Download Audit PDF</h4></div>
-            <div class="card" onclick="exportCSV()" style="cursor:pointer"><h4><i class="fas fa-file-csv"></i> Sync Spreadsheet Ledger</h4></div>
-            
-            <button class="btn btn-wa" onclick="sendWA()">
-                <i class="fab fa-whatsapp"></i> Broadcast Stock to Manager
-            </button>
+            <div class="card" onclick="exportPDF('audit')" style="cursor:pointer"><h4><i class="fas fa-file-pdf"></i> Master Audit</h4></div>
+            <div class="card" onclick="exportPDF('invoice')" style="cursor:pointer"><h4><i class="fas fa-receipt"></i> Professional Invoice</h4></div>
+            <button class="btn btn-wa" onclick="sendWA()"><i class="fab fa-whatsapp"></i> Notify HQ</button>
         </section>
     </div>
 
@@ -157,186 +135,130 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
     <script>
-        let inventory = JSON.parse(localStorage.getItem('sp_intel_data')) || [];
-        let account = JSON.parse(localStorage.getItem('sp_intel_acc'));
+        let inventory = JSON.parse(localStorage.getItem('sp_final_data')) || [];
+        let currentUser = null;
         let myChart = null;
+        let html5QrCode = null;
 
-        window.onload = () => {
-            if(account) {
-                document.getElementById('setup-box').style.display = 'none';
-                document.getElementById('login-box').style.display = 'block';
-                document.getElementById('greet-user').innerText = `Admin: ${account.fname}`;
-            }
-        };
+        function handleAuth() {
+            const user = document.getElementById('login-user').value.toLowerCase();
+            const pass = document.getElementById('login-pass').value;
 
-        function register() {
-            const f = document.getElementById('reg-fname').value;
-            const p = document.getElementById('reg-pass').value;
-            if(!f || !p) return;
-            account = { fname: f, pass: p };
-            localStorage.setItem('sp_intel_acc', JSON.stringify(account));
-            start();
-        }
+            if (user === 'admin' && pass === '1234') currentUser = 'admin';
+            else if (user === 'staff' && pass === 'staff') currentUser = 'staff';
+            else return alert("Access Denied");
 
-        function login() {
-            if(document.getElementById('login-pass').value === account.pass) start();
-            else alert("Invalid Key");
-        }
-
-        function start() {
             document.getElementById('auth-overlay').style.display = 'none';
             document.getElementById('navbar').style.display = 'flex';
             document.getElementById('app-body').style.display = 'block';
-            initChart();
+            
+            if(currentUser === 'admin') {
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                initChart();
+            }
             refresh();
+        }
+
+        function toggleScanner() {
+            const readerDiv = document.getElementById('reader');
+            if (!html5QrCode) {
+                readerDiv.style.display = 'block';
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
+                    (text) => {
+                        document.getElementById('p-name').value = text;
+                        toast("Code Scanned: " + text);
+                        toggleScanner();
+                    });
+            } else {
+                html5QrCode.stop().then(() => {
+                    html5QrCode = null;
+                    readerDiv.style.display = 'none';
+                });
+            }
+        }
+
+        function addItem() {
+            const n = document.getElementById('p-name').value;
+            const q = parseInt(document.getElementById('p-qty').value);
+            const p = parseFloat(document.getElementById('p-price').value) || 0;
+            if(!n || isNaN(q)) return toast("Data Incomplete");
+
+            inventory.push({ id: Date.now(), name: n, qty: q, price: p, cat: document.getElementById('p-cat').value, time: new Date().toLocaleString() });
+            localStorage.setItem('sp_final_data', JSON.stringify(inventory));
+            refresh();
+            if(myChart) updateChart();
+            ['p-name','p-qty','p-price'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function renderTable() {
+            const body = document.getElementById('stock-table');
+            body.innerHTML = '';
+            inventory.forEach(i => {
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${i.name}</strong><br><small>${i.time}</small></td>
+                        <td><span class="badge ${i.qty < 5 ? 'badge-low' : ''}">${i.qty}</span></td>
+                        <td class="admin-only">KES ${i.price.toLocaleString()}</td>
+                        <td>${currentUser === 'admin' ? `<i class="fas fa-trash" onclick="deleteItem(${i.id})"></i>` : ''}</td>
+                    </tr>`;
+            });
+            // Re-apply admin visibility to new rows
+            if(currentUser === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'table-cell');
+        }
+
+        function deleteItem(id) {
+            inventory = inventory.filter(i => i.id !== id);
+            localStorage.setItem('sp_final_data', JSON.stringify(inventory));
+            refresh();
+        }
+
+        function refresh() {
+            renderTable();
+            const val = inventory.reduce((s, i) => s + (i.qty * i.price), 0);
+            document.getElementById('stat-val').innerText = `KES ${val.toLocaleString()}`;
+            document.getElementById('stat-items').innerText = inventory.length;
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Hardware', 'Software', 'Materials'], datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#1e272e', '#accent'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            updateChart();
+        }
+
+        function updateChart() {
+            const cats = ['Hardware', 'Software', 'Materials'];
+            myChart.data.datasets[0].data = cats.map(c => inventory.filter(i => i.cat === c).length);
+            myChart.update();
+        }
+
+        function exportPDF(type) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            if(type === 'invoice') {
+                doc.setFontSize(22); doc.text("OFFICIAL INVOICE", 105, 20, null, null, "center");
+                doc.setFontSize(10); doc.text("StockPro Enterprise | Milka Mumbi", 105, 30, null, null, "center");
+            } else {
+                doc.text("Master Asset Audit", 14, 15);
+            }
+            doc.autoTable({ head:[['Asset','Qty','Price']], body: inventory.map(i=>[i.name, i.qty, i.price]) });
+            doc.save(`${type}.pdf`);
+        }
+
+        function sendWA() {
+            let msg = `*STOCKPRO SYNC*%0A*Role:* ${currentUser}%0AItems: ${inventory.length}`;
+            window.open(`https://wa.me/254700000000?text=${msg}`);
         }
 
         function nav(p, e) {
             document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
             document.getElementById('page-' + p).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            if(e) e.target.classList.add('active');
-        }
-
-        // STEP 3: ADDING TIMESTAMP LOGIC
-        function addItem() {
-            const n = document.getElementById('p-name').value;
-            const q = parseInt(document.getElementById('p-qty').value);
-            const p = parseFloat(document.getElementById('p-price').value);
-            const c = document.getElementById('p-cat').value;
-            if(!n || isNaN(q)) return;
-
-            const now = new Date();
-            const timestamp = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-
-            inventory.push({ 
-                id: Date.now(), 
-                name: n, 
-                cat: c, 
-                qty: q, 
-                price: p, 
-                time: timestamp // AUDIT TRAIL
-            });
-            save();
-            toast("Asset Recorded Successfully");
-            ['p-name','p-qty','p-price'].forEach(id => document.getElementById(id).value = '');
-        }
-
-        function save() {
-            localStorage.setItem('sp_intel_data', JSON.stringify(inventory));
-            refresh();
-            updateChart();
-        }
-
-        function refresh() {
-            renderTable();
-            checkLowStock();
-            const val = inventory.reduce((s, i) => s + (i.qty * i.price), 0);
-            document.getElementById('stat-val').innerText = `KES ${val.toLocaleString()}`;
-            document.getElementById('stat-items').innerText = inventory.length;
-        }
-
-        // STEP 2: LOW STOCK ALERTS LOGIC
-        function checkLowStock() {
-            const low = inventory.filter(i => i.qty < 5);
-            const banner = document.getElementById('low-stock-alert');
-            if(low.length > 0) {
-                banner.style.display = 'block';
-                document.getElementById('alert-list').innerText = low.map(i => i.name).join(', ') + " running low.";
-            } else {
-                banner.style.display = 'none';
-            }
-        }
-
-        function renderTable() {
-            const body = document.getElementById('stock-table');
-            const search = document.getElementById('search').value.toLowerCase();
-            body.innerHTML = '';
-            inventory.filter(i => i.name.toLowerCase().includes(search)).forEach(i => {
-                const bClass = i.qty < 5 ? 'badge-low' : 'badge-ok';
-                body.innerHTML += `
-                    <tr>
-                        <td>
-                            <strong>${i.name.toUpperCase()}</strong><br>
-                            <small style="opacity:0.5">${i.time}</small>
-                        </td>
-                        <td><span class="badge ${bClass}">${i.qty} UNITS</span></td>
-                        <td>${i.price.toLocaleString()}</td>
-                        <td onclick="deleteItem(${i.id})"><i class="fas fa-trash-alt" style="color:var(--danger); cursor:pointer;"></i></td>
-                    </tr>`;
-            });
-        }
-
-        function deleteItem(id) {
-            if(confirm("Confirm asset removal?")) {
-                inventory = inventory.filter(i => i.id !== id);
-                save();
-            }
-        }
-
-        /* --- CHART.JS INTEGRATION --- */
-        function initChart() {
-            const ctx = document.getElementById('categoryChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Hardware', 'Software', 'Materials', 'Labor'],
-                    datasets: [{
-                        label: 'Valuation (KES)',
-                        data: [0, 0, 0, 0],
-                        backgroundColor: '#d4af37',
-                        borderColor: '#1e272e',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-            updateChart();
-        }
-
-        function updateChart() {
-            if(!myChart) return;
-            const cats = ['Hardware', 'Software', 'Materials', 'Labor'];
-            const values = cats.map(c => {
-                return inventory.filter(i => i.cat === c).reduce((sum, item) => sum + (item.qty * item.price), 0);
-            });
-            myChart.data.datasets[0].data = values;
-            myChart.update();
-        }
-
-        // WHATSAPP ORDER WEBHOOK
-        function sendWA() {
-            let msg = `*STOCKPRO EXECUTIVE SUMMARY*%0A*Admin:* ${account.fname}%0A%0A`;
-            const low = inventory.filter(i => i.qty < 5);
-            if(low.length > 0) {
-                msg += `⚠️ *CRITICAL RESTOCK:*%0A`;
-                low.forEach(i => msg += `- ${i.name.toUpperCase()} (Only ${i.qty} left)%0A`);
-            }
-            msg += `%0A📋 *COMPLETE LEDGER:*%0A`;
-            inventory.forEach(i => msg += `- ${i.name.toUpperCase()}: ${i.qty} Units%0A`);
-            window.open(`https://wa.me/254700000000?text=${msg}`);
-        }
-
-        function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text(`Official Audit Ledger: ${account.fname}`, 14, 15);
-            doc.autoTable({ 
-                head: [['Asset', 'Qty', 'Unit Price', 'Recorded On']], 
-                body: inventory.map(i => [i.name.toUpperCase(), i.qty, i.price, i.time]) 
-            });
-            doc.save('StockPro_Audit.pdf');
-        }
-
-        function exportCSV() {
-            let c="Asset,Qty,Price,Timestamp\n"; 
-            inventory.forEach(i=>c+=`${i.name},${i.qty},${i.price},${i.time}\n`);
-            const b=new Blob([c],{type:'text/csv'}); const a=document.createElement('a');
-            a.href=URL.createObjectURL(b); a.download='Ledger.csv'; a.click();
+            e.target.classList.add('active');
         }
 
         function toast(m) {
@@ -344,12 +266,11 @@
             t.innerText = m; t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 2000);
         }
-
+        
         function toggleDarkMode() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
         }
     </script>
 </body>
-    </html>
+                </html>
