@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | Ultimate Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StockPro | Ultimate Final</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -21,29 +21,35 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; overflow-x: hidden; }
         
-        /* Navigation */
+        /* Navigation & Tabs */
         nav { background: var(--card); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
         .tab-box { display: flex; gap: 15px; align-items: center; }
-        .tab { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; }
+        .tab { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; padding: 5px 0; }
         .tab.active { opacity: 1; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
         .container { max-width: 500px; margin: 15px auto; padding: 0 15px; display: none; }
-        .page { display: none; } .page.active { display: block; }
+        .page { display: none; animation: fadeIn 0.3s ease; } 
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* UI Elements */
+        /* Components */
         .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         
-        .btn { padding: 15px; border: none; cursor: pointer; border-radius: 8px; font-weight: 800; width: 100%; text-transform: uppercase; }
+        .btn { padding: 15px; border: none; cursor: pointer; border-radius: 8px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-main { background: var(--primary); color: #120e1a; margin-top: 10px; }
-        .btn-danger { background: var(--danger); color: white; border-radius: 6px; padding: 8px 12px; font-size: 0.7rem; border: none; }
+        .btn-danger { background: var(--danger); color: white; border-radius: 6px; padding: 8px; width: 40px; height: 40px; }
 
-        #qr-view { width: 100%; display: none; border-radius: 10px; margin-bottom: 10px; border: 2px solid var(--primary); background: #000; }
+        /* Scanner Styling */
+        #qr-view { width: 100%; min-height: 250px; display: none; border-radius: 12px; margin-bottom: 15px; border: 2px solid var(--primary); background: #000; overflow: hidden; }
+        
+        /* Table Styling */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; padding: 10px; color: var(--primary); border-bottom: 2px solid var(--accent); font-size: 0.7rem; }
-        td { padding: 12px 10px; border-bottom: 1px solid var(--accent); font-size: 0.9rem; }
+        td { padding: 15px 10px; border-bottom: 1px solid var(--accent); font-size: 0.9rem; }
         
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 12px 24px; border-radius: 50px; display: none; font-weight: bold; z-index: 10001; }
+        /* Action Toasts */
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 12px 24px; border-radius: 50px; display: none; font-weight: bold; z-index: 10001; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body class="dark-mode">
@@ -51,10 +57,11 @@
     <div id="auth-overlay" style="position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:9999;">
         <div style="background:var(--card); padding:30px; border-radius:15px; width:85%; max-width:340px; text-align:center; border:1px solid var(--primary);">
             <h1 style="color:var(--primary); margin:0;">STOCKPRO</h1>
-            <p style="font-size:0.7rem; opacity:0.6; margin: 10px 0;">Personalized Access Control</p>
-            <input type="text" id="u" placeholder="e.g. admin milka" style="margin-top:15px;">
-            <input type="password" id="p" placeholder="Password">
-            <button class="btn btn-main" onclick="doLogin()">Unlock System</button>
+            <p style="font-size:0.7rem; opacity:0.6; margin-top:5px;">System Security Active</p>
+            <input type="text" id="u" placeholder="e.g. admin milka" style="margin-top:20px;">
+            <input type="password" id="p" placeholder="Enter Password">
+            <button class="btn btn-main" onclick="doLogin()">Sign In</button>
+            <p style="font-size:0.6rem; margin-top:15px; opacity:0.4;">Format: [role] [your name]</p>
         </div>
     </div>
 
@@ -69,6 +76,7 @@
     </nav>
 
     <div class="container" id="app">
+        
         <section id="p-dash" class="page active">
             <div id="chart-card" class="card" style="display:none; height: 260px; text-align:center;">
                 <canvas id="stockPie"></canvas>
@@ -76,53 +84,62 @@
 
             <div class="card">
                 <div id="qr-view"></div>
-                <button class="btn" style="background:var(--accent); color:var(--text); margin-bottom:10px;" onclick="scan()"><i class="fas fa-camera"></i> Scan Asset</button>
-                <input id="n" placeholder="Asset Name">
+                <button id="scan-btn" class="btn" style="background:var(--accent); color:var(--text); margin-bottom:10px;" onclick="toggleScanner()">
+                    <i class="fas fa-camera"></i> <span id="scan-text">Scan Barcode</span>
+                </button>
+
+                <input id="n" placeholder="Item Name">
                 <input id="q" type="number" placeholder="Quantity">
                 <div id="adm-pr" style="display:none;"><input id="pr" type="number" placeholder="Price (KES)"></div>
-                <select id="cat"><option>Hardware</option><option>Software</option><option>Materials</option></select>
+                <select id="cat">
+                    <option>Hardware</option>
+                    <option>Software</option>
+                    <option>Materials</option>
+                </select>
                 <button class="btn btn-main" onclick="add()">Commit Asset</button>
             </div>
         </section>
 
         <section id="p-inv" class="page">
             <div class="card">
-                <input placeholder="Search inventory..." onkeyup="draw()" id="find">
+                <input placeholder="Search assets..." onkeyup="draw()" id="find">
                 <table>
-                    <thead><tr><th>Asset</th><th>Qty</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Asset</th><th>Qty</th><th>Del</th></tr></thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
         </section>
 
         <section id="p-rep" class="page">
-            <div class="card" onclick="pdf()" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-                <span>Export Audit (PDF)</span> <i class="fas fa-file-pdf" style="color:var(--danger); font-size:1.2rem;"></i>
+            <div class="card" onclick="pdf()" style="cursor:pointer; display:flex; justify-content:space-between;">
+                <span>Audit Report (PDF)</span> <i class="fas fa-file-pdf" style="color:var(--danger)"></i>
             </div>
-            <div id="adm-csv" class="card" onclick="csv()" style="display:none; cursor:pointer; justify-content:space-between; align-items:center;">
-                <span>Full Ledger (CSV)</span> <i class="fas fa-file-csv" style="color:var(--secondary); font-size:1.2rem;"></i>
+            <div id="adm-csv" class="card" onclick="csv()" style="display:none; cursor:pointer; justify-content:space-between;">
+                <span>Full Export (CSV)</span> <i class="fas fa-file-csv" style="color:var(--secondary)"></i>
             </div>
-            <button class="btn" style="background:#25D366; color:white; margin-top:10px;" onclick="wa()">WhatsApp Update</button>
+            <button class="btn" style="background:#25D366; color:white; margin-top:10px;" onclick="wa()">
+                <i class="fab fa-whatsapp"></i> WhatsApp Sync
+            </button>
         </section>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('stock_v6_stable')) || [];
-        let role = ''; let userName = ''; let chart = null; let scanner = null;
+        let db = JSON.parse(localStorage.getItem('stock_v_final_master')) || [];
+        let role = ''; let userName = ''; let chart = null; let html5QrCode = null;
 
         function doLogin() {
             let u = document.getElementById('u').value.trim().toLowerCase();
             let p = document.getElementById('p').value.trim();
-            if (!u || !p) return alert("Enter Name and Password");
+            if (!u || !p) return alert("Please enter your name and password!");
 
             if (u.startsWith('admin ')) {
                 userName = u.replace('admin ', ''); launch('Admin');
             } else if (u.startsWith('staff ')) {
                 userName = u.replace('staff ', ''); launch('Staff');
             } else {
-                alert("Format: 'admin [name]' or 'staff [name]'");
+                alert("Format Error! Use: 'admin [name]' or 'staff [name]'");
             }
         }
 
@@ -135,9 +152,9 @@
                 document.getElementById('adm-pr').style.display = 'block';
                 document.getElementById('adm-csv').style.display = 'flex';
                 document.getElementById('chart-card').style.display = 'block';
-                initChart();
+                setTimeout(initChart, 200);
             }
-            draw(); toast(`Welcome, ${userName.toUpperCase()}`);
+            draw(); toast(`Signed in as ${userName.toUpperCase()}`);
         }
 
         function toggleMode() {
@@ -148,7 +165,7 @@
                 chart.options.plugins.legend.labels.color = isLight ? '#212529' : '#f0ebff';
                 chart.update();
             }
-            toast(isLight ? "Light Mode" : "Dark Mode");
+            toast(isLight ? "Light Mode Active" : "Dark Mode Active");
         }
 
         function initChart() {
@@ -157,7 +174,11 @@
                 type: 'pie',
                 data: { 
                     labels: ['H/W', 'S/W', 'MAT'], 
-                    datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], borderWidth: 0 }] 
+                    datasets: [{ 
+                        data: [0,0,0], 
+                        backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], 
+                        borderWidth: 0 
+                    }] 
                 },
                 options: { 
                     responsive: true, maintainAspectRatio: false, 
@@ -169,26 +190,28 @@
 
         function updateChart() {
             if(!chart) return;
-            chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length);
+            const counts = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length);
+            chart.data.datasets[0].data = counts;
             chart.update();
         }
 
         function add() {
-            let n = document.getElementById('n').value, q = parseInt(document.getElementById('q').value);
-            if(!n || isNaN(q)) return alert("Check inputs!");
-            if(confirm(`Confirm adding ${n}?`)) {
+            let n = document.getElementById('n').value.trim(), q = parseInt(document.getElementById('q').value);
+            if(!n || isNaN(q)) return alert("Please provide Item Name and Quantity");
+            
+            if(confirm(`Add ${q} units of ${n} to inventory?`)) {
                 db.push({ id: Date.now(), name: n, qty: q, price: document.getElementById('pr').value || 0, cat: document.getElementById('cat').value, addedBy: userName });
-                localStorage.setItem('stock_v6_stable', JSON.stringify(db));
-                draw(); toast("Asset Added");
+                localStorage.setItem('stock_v_final_master', JSON.stringify(db));
+                draw(); toast("Asset Added Successfully");
                 document.getElementById('n').value = ''; document.getElementById('q').value = '';
             }
         }
 
         function del(id) {
-            if(confirm("Permanently delete this item?")) {
+            if(confirm("Are you sure you want to delete this entry?")) {
                 db = db.filter(i => i.id !== id);
-                localStorage.setItem('stock_v6_stable', JSON.stringify(db));
-                draw(); toast("Deleted");
+                localStorage.setItem('stock_v_final_master', JSON.stringify(db));
+                draw(); toast("Entry Deleted");
             }
         }
 
@@ -197,7 +220,7 @@
             b.innerHTML = '';
             db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
                 b.innerHTML += `<tr>
-                    <td>${i.name}<br><small style="opacity:0.5">${i.cat}</small></td>
+                    <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small></td>
                     <td>${i.qty}</td>
                     <td><button class="btn-danger" onclick="del(${i.id})"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
@@ -205,26 +228,38 @@
             updateChart();
         }
 
-        function scan() {
-            const v = document.getElementById('qr-view');
-            if(!scanner) {
-                v.style.display='block'; scanner = new Html5Qrcode("qr-view");
-                scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (t) => { 
+        function toggleScanner() {
+            const qrBox = document.getElementById('qr-view');
+            const btnText = document.getElementById('scan-text');
+            if (!html5QrCode) {
+                qrBox.style.display = 'block';
+                html5QrCode = new Html5Qrcode("qr-view");
+                html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 220 }, (t) => { 
                     document.getElementById('n').value = t; toast("Scanned: " + t);
-                    scanner.stop().then(() => { scanner=null; v.style.display='none'; });
-                }).catch(() => alert("Camera permission required."));
-            } else {
-                scanner.stop().then(() => { scanner=null; v.style.display='none'; });
+                    stopScanner();
+                }).catch(err => { alert("Camera Error: Please allow permissions."); stopScanner(); });
+                btnText.innerText = "Stop Scanner";
+            } else { stopScanner(); }
+        }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode = null;
+                    document.getElementById('qr-view').style.display = 'none';
+                    document.getElementById('scan-text').innerText = "Scan Barcode";
+                }).catch(() => { html5QrCode = null; });
             }
         }
 
         function csv() {
+            if(db.length === 0) return alert("Inventory empty!");
             let c = "Item,Qty,Price,Category,AddedBy\n";
             db.forEach(i => c += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.addedBy}"\n`);
-            const blob = new Blob([c], { type: 'text/csv' });
+            const blob = new Blob([c], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Stock_Ledger.csv";
+            link.download = "Stock_Report.csv";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -232,10 +267,12 @@
         }
 
         function pdf() {
+            if(db.length === 0) return alert("Inventory empty!");
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            doc.text("Inventory Audit", 14, 15);
-            doc.autoTable({ head: [['Item', 'Qty', 'Category', 'User']], body: db.map(i => [i.name, i.qty, i.cat, i.addedBy]) });
-            doc.save('Audit_Report.pdf');
+            doc.setFontSize(18); doc.text("StockPro Inventory Report", 14, 15);
+            doc.setFontSize(10); doc.text("Generated by: " + userName, 14, 22);
+            doc.autoTable({ head: [['Item', 'Qty', 'Category', 'Added By']], body: db.map(i => [i.name, i.qty, i.cat, i.addedBy]), startY: 30 });
+            doc.save('Inventory_Audit.pdf');
             toast("PDF Downloaded");
         }
 
@@ -246,8 +283,17 @@
             e.currentTarget.classList.add('active');
         }
 
-        function toast(m) { let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
-        function wa() { let m = '*Inventory Update*%0A'; db.forEach(i=>m+=`• ${i.name}: ${i.qty}%0A`); window.open('https://wa.me/?text='+m); }
+        function toast(m) { 
+            let t=document.getElementById('toast'); 
+            t.innerText=m; t.style.display='block'; 
+            setTimeout(()=>t.style.display='none',3000); 
+        }
+
+        function wa() { 
+            let m = '*STOCKPRO UPDATE*%0A'; 
+            db.forEach(i=>m+=`• ${i.name}: ${i.qty}%0A`); 
+            window.open('https://wa.me/?text='+m); 
+        }
     </script>
 </body>
-                                                                       </html>
+    </html>
