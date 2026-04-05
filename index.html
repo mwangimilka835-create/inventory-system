@@ -3,30 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | High-Performance Inventory</title>
-    
+    <title>StockPro | Deep Tech Inventory</title>
     <link rel="icon" href="data:,">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* --- OPTIMIZED MODERN UI --- */
         :root {
             --primary: #00b894; --secondary: #6c5ce7; --bg: #f0f3f7;
             --card: #ffffff; --text: #2d3436; --accent: #dfe6e9; --danger: #ff7675;
         }
-
         [data-theme="dark"] {
             --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #334155;
         }
 
         body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            background: var(--bg); color: var(--text); margin: 0; 
-            transition: background 0.3s, color 0.3s; overflow-x: hidden;
+            font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); 
+            color: var(--text); margin: 0; transition: 0.3s; overflow-x: hidden;
         }
 
-        /* --- STACKED NAVIGATION (MOBILE-READY) --- */
+        /* --- NAVIGATION --- */
         nav { 
             background: var(--card); padding: 15px 5%; display: none; 
             flex-direction: column; align-items: center; gap: 10px;
@@ -42,23 +37,23 @@
             cursor: pointer; font-weight: 700; font-size: 0.8rem; transition: 0.2s; 
             color: var(--text); opacity: 0.6; padding: 8px 12px; border-radius: 10px;
         }
-        .nav-item.active { opacity: 1; color: white; background: var(--primary); }
+        .nav-item.active { opacity: 1; color: white; background: var(--primary); box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3); }
 
-        /* --- AUTH OVERLAY --- */
+        /* --- AUTH --- */
         #auth-overlay {
             position: fixed; inset: 0; background: radial-gradient(circle at top left, var(--primary), var(--secondary));
             display: flex; align-items: center; justify-content: center; z-index: 9999;
         }
         .auth-card {
             background: var(--card); padding: 35px; border-radius: 25px; 
-            width: 85%; max-width: 360px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            width: 85%; max-width: 360px; text-align: center;
         }
 
-        /* --- MAIN CONTENT --- */
+        /* --- CONTENT --- */
         .container { max-width: 900px; margin: 1.5rem auto; padding: 0 15px; display: none; }
-        .page { display: none; animation: fadeIn 0.4s ease-out; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { 
             background: var(--card); padding: 22px; border-radius: 20px; 
@@ -69,9 +64,8 @@
         @media (min-width: 500px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
         
         .stat-box { padding: 25px; border-radius: 20px; color: white; position: relative; overflow: hidden; }
-        .stat-box i { position: absolute; right: -5px; bottom: -5px; font-size: 4rem; opacity: 0.1; }
+        .stat-box i { position: absolute; right: -5px; bottom: -5px; font-size: 4rem; opacity: 0.15; }
 
-        /* --- FORMS & TABLES --- */
         input, select { 
             width: 100%; padding: 14px; margin: 8px 0; border: 2px solid var(--accent); 
             border-radius: 12px; background: var(--bg); color: var(--text); font-size: 16px; box-sizing: border-box;
@@ -103,18 +97,17 @@
     <div id="auth-overlay">
         <div class="auth-card" id="setup-box">
             <h1 style="margin:0 0 10px 0; color:var(--primary)">StockPro</h1>
-            <p style="font-size:0.9rem; opacity:0.7">Administrator Registration</p>
             <input type="text" id="reg-fname" placeholder="First Name">
             <input type="text" id="reg-sname" placeholder="Surname">
             <input type="password" id="reg-pass" placeholder="Password">
-            <button class="btn btn-main" onclick="register()">Create Account</button>
+            <button class="btn btn-main" onclick="register()">Create Admin Account</button>
         </div>
         <div class="auth-card" id="login-box" style="display: none;">
             <h1 style="margin:0 0 10px 0; color:var(--primary)">StockPro</h1>
-            <h3 id="greet-user" style="margin:0; opacity:0.8">Welcome back</h3>
+            <h3 id="greet-user" style="margin:0; opacity:0.8">Welcome</h3>
             <input type="password" id="login-pass" placeholder="Enter Password">
-            <button class="btn btn-main" onclick="login()">Unlock System</button>
-            <p onclick="resetApp()" style="font-size: 0.7rem; opacity: 0.4; margin-top: 15px; cursor: pointer;">Full Factory Reset</p>
+            <button class="btn btn-main" onclick="login()">Unlock Suite</button>
+            <p onclick="resetApp()" style="font-size: 0.7rem; opacity: 0.4; margin-top: 15px; cursor: pointer;">Factory Reset</p>
         </div>
     </div>
 
@@ -124,30 +117,29 @@
             <div class="nav-item active" onclick="nav('dashboard', event)">Dashboard</div>
             <div class="nav-item" onclick="nav('inventory', event)">Inventory</div>
             <div class="nav-item" onclick="nav('reports', event)">Reports</div>
-            <div class="nav-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></div>
+            <div class="nav-item" onclick="toggleDarkMode()"><i class="fas fa-adjust"></i></div>
             <div class="nav-item" style="color: var(--danger);" onclick="location.reload()"><i class="fas fa-power-off"></i></div>
         </div>
     </nav>
 
     <div class="container" id="app-body">
-        
         <section id="page-dashboard" class="page active">
             <div class="stats-grid">
                 <div class="stat-box" style="background: linear-gradient(135deg, #00b894, #55efc4);">
-                    <small>Total Value</small><h2 id="stat-val" style="margin:5px 0">KES 0</h2>
-                    <i class="fas fa-coins"></i>
+                    <small>Total Valuation</small><h2 id="stat-val" style="margin:5px 0">KES 0</h2>
+                    <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="stat-box" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
-                    <small>Items Count</small><h2 id="stat-items" style="margin:5px 0">0</h2>
-                    <i class="fas fa-layer-group"></i>
+                    <small>SKU Count</small><h2 id="stat-items" style="margin:5px 0">0</h2>
+                    <i class="fas fa-microchip"></i>
                 </div>
             </div>
 
             <div class="card">
-                <h3 style="margin-top:0">Quick Stock Add</h3>
+                <h3 style="margin-top:0">New Data Entry</h3>
                 <input type="text" id="p-name" placeholder="Item Name">
                 <select id="p-cat">
-                    <option value="General">General Stock</option>
+                    <option value="General">General</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Groceries">Groceries</option>
                     <option value="Fashion">Fashion</option>
@@ -156,7 +148,7 @@
                     <input type="number" id="p-qty" placeholder="Qty">
                     <input type="number" id="p-price" placeholder="Price">
                 </div>
-                <button class="btn btn-main" onclick="addItem()">Update Inventory</button>
+                <button class="btn btn-main" onclick="addItem()">Commit to Database</button>
             </div>
         </section>
 
@@ -176,18 +168,18 @@
         </section>
 
         <section id="page-reports" class="page">
-            <h3 style="text-align:center">Export & Orders</h3>
+            <h3 style="text-align:center">Data Pipelines</h3>
             <div class="card" style="display: flex; align-items: center; gap: 15px; cursor:pointer;" onclick="exportPDF()">
                 <div style="background:#ff767515; padding:15px; border-radius:12px;"><i class="fas fa-file-pdf" style="color:#ff7675"></i></div>
-                <div><h4 style="margin:0">Download PDF</h4><p style="margin:0; font-size:0.7rem; opacity:0.6">Inventory audit document</p></div>
+                <div><h4 style="margin:0">Export PDF Audit</h4><p style="margin:0; font-size:0.7rem; opacity:0.6">Financial-grade reporting</p></div>
             </div>
             <div class="card" style="display: flex; align-items: center; gap: 15px; cursor:pointer;" onclick="exportCSV()">
                 <div style="background:#fdcb6e15; padding:15px; border-radius:12px;"><i class="fas fa-file-csv" style="color:#fdcb6e"></i></div>
-                <div><h4 style="margin:0">Download CSV</h4><p style="margin:0; font-size:0.7rem; opacity:0.6">Open in Excel spreadsheets</p></div>
+                <div><h4 style="margin:0">Sync CSV Data</h4><p style="margin:0; font-size:0.7rem; opacity:0.6">Optimized for Excel/Chrome</p></div>
             </div>
             <div class="card" style="display: flex; align-items: center; gap: 15px; cursor:pointer;" onclick="sendWA()">
                 <div style="background:#00b89415; padding:15px; border-radius:12px;"><i class="fab fa-whatsapp" style="color:#00b894"></i></div>
-                <div><h4 style="margin:0">WhatsApp Order</h4><p style="margin:0; font-size:0.7rem; opacity:0.6">Send stock to supplier</p></div>
+                <div><h4 style="margin:0">WhatsApp Webhook</h4><p style="margin:0; font-size:0.7rem; opacity:0.6">Direct stock notification</p></div>
             </div>
         </section>
     </div>
@@ -198,14 +190,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
     <script>
-        let inventory = JSON.parse(localStorage.getItem('sp_v3_data')) || [];
-        let account = JSON.parse(localStorage.getItem('sp_v3_acc'));
+        let inventory = JSON.parse(localStorage.getItem('sp_tech_data')) || [];
+        let account = JSON.parse(localStorage.getItem('sp_tech_acc'));
 
         window.onload = () => {
             if(account) {
                 document.getElementById('setup-box').style.display = 'none';
                 document.getElementById('login-box').style.display = 'block';
-                document.getElementById('greet-user').innerText = `Welcome back, ${account.fname}`;
+                document.getElementById('greet-user').innerText = `Admin: ${account.fname}`;
             }
             if(localStorage.getItem('sp_theme') === 'dark') toggleDarkMode();
         };
@@ -214,15 +206,15 @@
             const f = document.getElementById('reg-fname').value;
             const s = document.getElementById('reg-sname').value;
             const p = document.getElementById('reg-pass').value;
-            if(!f || !p) return alert("Required fields missing");
+            if(!f || !p) return alert("Fill all fields");
             account = { fname: f, sname: s, pass: p };
-            localStorage.setItem('sp_v3_acc', JSON.stringify(account));
+            localStorage.setItem('sp_tech_acc', JSON.stringify(account));
             start();
         }
 
         function login() {
             if(document.getElementById('login-pass').value === account.pass) start();
-            else alert("Password Incorrect");
+            else alert("Authentication Failed");
         }
 
         function start() {
@@ -236,7 +228,7 @@
             document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
             document.getElementById('page-' + p).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            e.target.classList.add('active');
+            if(e) e.target.classList.add('active');
         }
 
         function toggleDarkMode() {
@@ -251,20 +243,20 @@
             const cat = document.getElementById('p-cat').value;
             const qty = parseInt(document.getElementById('p-qty').value);
             const price = parseFloat(document.getElementById('p-price').value);
-            if(!name || isNaN(qty)) return toast("Please enter valid data");
+            if(!name || isNaN(qty)) return toast("Invalid Input");
 
             inventory.push({ id: Date.now(), name, cat, qty, price });
-            save(); toast("Item Saved");
+            save(); toast("Data Committed");
             ['p-name','p-qty','p-price'].forEach(id => document.getElementById(id).value = '');
         }
 
         function deleteItem(id) {
             inventory = inventory.filter(i => i.id !== id);
-            save(); toast("Removed");
+            save(); toast("SKU Removed");
         }
 
         function save() {
-            localStorage.setItem('sp_v3_data', JSON.stringify(inventory));
+            localStorage.setItem('sp_tech_data', JSON.stringify(inventory));
             refresh();
         }
 
@@ -301,7 +293,7 @@
         function exportPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.text(`Inventory Report: ${account.fname} ${account.sname}`, 14, 15);
+            doc.text(`System Audit: ${account.fname} ${account.sname}`, 14, 15);
             doc.autoTable({
                 head: [['Item', 'Category', 'Stock', 'Price']],
                 body: inventory.map(i => [i.name, i.cat, i.qty, i.price])
@@ -309,27 +301,42 @@
             doc.save('StockPro_Audit.pdf');
         }
 
+        // CHROME OPTIMIZED CSV FUNCTION
         function exportCSV() {
+            if(inventory.length === 0) return toast("No data to export");
+            
             let csv = "Item,Category,Qty,Price\n";
             inventory.forEach(i => csv += `${i.name},${i.cat},${i.qty},${i.price}\n`);
-            const b = new Blob([csv], {type: 'text/csv'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(b); a.download = 'Inventory_Sheet.csv'; a.click();
+            
+            const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+            const link = document.createElement("a");
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "StockPro_Sync.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url); // Clean up memory
+                toast("CSV Exported");
+            }
         }
 
         function sendWA() {
-            let msg = `*STOCKPRO ORDER - MANAGER: ${account.fname}*%0A%0A`;
+            let msg = `*SYSTEM SYNC - ${account.fname.toUpperCase()}*%0A%0A`;
             const low = inventory.filter(i => i.qty < 5);
             if(low.length > 0) {
                 msg += `⚠️ *URGENT RESTOCK:*%0A`;
                 low.forEach(i => msg += `• ${i.name} (${i.qty} Left)%0A`);
             }
-            msg += `%0A📋 *TOTAL STOCK SUMMARY:*%0A`;
+            msg += `%0A📋 *CURRENT SKUs:*%0A`;
             inventory.forEach(i => msg += `• ${i.name}: ${i.qty}%0A`);
-            window.open(`https://wa.me/254700000000?text=${msg}`);
+            window.open(`https://wa.me/254112873218?text=${msg}`);
         }
 
-        function resetApp() { if(confirm("Permanently wipe all data?")) { localStorage.clear(); location.reload(); } }
+        function resetApp() { if(confirm("Permanently wipe local database?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
-                </html>
+    </html>
