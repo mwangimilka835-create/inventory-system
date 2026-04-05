@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StockPro | 2026 Master</title>
+    <title>StockPro | Ultimate 2026</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,52 +13,53 @@
 
     <style>
         :root { 
-            --bg: #120e1a; --card: #1e1a2b; --text: #f0ebff; 
+            --bg: #0f0c15; --card: #1a1625; --text: #f0ebff; 
             --primary: #d4af37; --secondary: #38bdf8; --tertiary: #9d81ff; --danger: #ff4d4d; --accent: #2d2640;
         }
         body.light-mode { 
-            --bg: #f8f9fa; --card: #ffffff; --text: #212529; --accent: #e9ecef;
+            --bg: #fdfdfd; --card: #ffffff; --text: #1a1a1a; --accent: #f0f0f0;
         }
+        
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; overflow-x: hidden; }
         
         /* Navigation */
         nav { background: var(--card); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
         .tab-box { display: flex; gap: 15px; align-items: center; }
-        .tab { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; }
+        .tab { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; padding: 5px 0; }
         .tab.active { opacity: 1; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
         .container { max-width: 500px; margin: 15px auto; padding: 0 15px; display: none; }
-        .page { display: none; animation: fadeIn 0.3s ease; } 
+        .page { display: none; animation: fadeIn 0.4s ease; } 
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* UI Elements */
-        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        /* UI Cards */
+        .card { background: var(--card); padding: 20px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 10px; box-sizing: border-box; font-size: 16px; }
         
-        .btn { padding: 15px; border: none; cursor: pointer; border-radius: 8px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-main { background: var(--primary); color: #120e1a; margin-top: 10px; }
-        .btn-danger { background: var(--danger); color: white; border-radius: 6px; padding: 8px; width: 40px; height: 40px; border: none; }
+        .btn { padding: 16px; border: none; cursor: pointer; border-radius: 10px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-main { background: var(--primary); color: #000; }
+        .btn-danger { background: var(--danger); color: white; border-radius: 8px; width: 42px; height: 42px; border: none; }
 
         /* Scanner */
-        #qr-view { width: 100%; min-height: 250px; display: none; border-radius: 12px; margin-bottom: 15px; border: 2px solid var(--primary); background: #000; overflow: hidden; }
+        #qr-view { width: 100%; min-height: 280px; display: none; border-radius: 12px; margin-bottom: 15px; border: 3px solid var(--primary); background: #000; overflow: hidden; }
         
         /* Table */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; padding: 10px; color: var(--primary); border-bottom: 2px solid var(--accent); font-size: 0.7rem; }
-        td { padding: 15px 10px; border-bottom: 1px solid var(--accent); font-size: 0.9rem; }
+        th { text-align: left; padding: 12px 10px; color: var(--primary); border-bottom: 2px solid var(--accent); font-size: 0.75rem; }
+        td { padding: 15px 10px; border-bottom: 1px solid var(--accent); font-size: 0.95rem; }
         
-        /* THE POP-UP MESSAGE (TOAST) */
-        #toast { position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 14px 28px; border-radius: 50px; display: none; font-weight: 900; z-index: 10001; box-shadow: 0 8px 25px rgba(0,0,0,0.5); font-size: 0.9rem; text-align: center; min-width: 200px; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 35px; opacity: 1; } }
+        /* POP-UP TOAST */
+        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 14px 28px; border-radius: 50px; display: none; font-weight: 900; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.9rem; }
     </style>
 </head>
 <body class="dark-mode">
 
     <div id="auth-overlay" style="position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:9999;">
-        <div style="background:var(--card); padding:30px; border-radius:15px; width:85%; max-width:340px; text-align:center; border:1px solid var(--primary);">
-            <h1 style="color:var(--primary); margin:0;">STOCKPRO</h1>
-            <input type="text" id="u" placeholder="e.g. admin milka" style="margin-top:20px;">
+        <div style="background:var(--card); padding:30px; border-radius:20px; width:85%; max-width:340px; text-align:center; border:1px solid var(--primary);">
+            <h2 style="color:var(--primary); margin:0;">STOCKPRO</h2>
+            <p style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 20px;">Secure Inventory Management</p>
+            <input type="text" id="u" placeholder="e.g. admin milka">
             <input type="password" id="p" placeholder="Password">
             <button class="btn btn-main" onclick="doLogin()">Unlock System</button>
         </div>
@@ -70,23 +71,20 @@
             <div class="tab active" onclick="tab('dash', event)">Home</div>
             <div class="tab" onclick="tab('inv', event)">Ledger</div>
             <div class="tab" onclick="tab('rep', event)">Docs</div>
-            <i class="fas fa-moon" id="mode-icon" onclick="toggleMode()" style="cursor:pointer; color:var(--primary); font-size: 1.2rem;"></i>
+            <i class="fas fa-moon" id="mode-icon" onclick="toggleMode()" style="cursor:pointer; color:var(--primary); font-size: 1.3rem;"></i>
         </div>
     </nav>
 
     <div class="container" id="app">
-        
         <section id="p-dash" class="page active">
             <div id="chart-card" class="card" style="display:none; height: 260px; text-align:center;">
                 <canvas id="stockPie"></canvas>
             </div>
-
             <div class="card">
                 <div id="qr-view"></div>
-                <button id="scan-btn" class="btn" style="background:var(--accent); color:var(--text); margin-bottom:10px;" onclick="toggleScanner()">
+                <button id="scan-btn" class="btn" style="background:var(--accent); color:var(--text); margin-bottom:12px;" onclick="toggleScanner()">
                     <i class="fas fa-camera"></i> <span id="scan-text">Start Scanner</span>
                 </button>
-
                 <input id="n" placeholder="Item Name">
                 <input id="q" type="number" placeholder="Quantity">
                 <div id="adm-pr" style="display:none;"><input id="pr" type="number" placeholder="Price (KES)"></div>
@@ -111,7 +109,7 @@
 
         <section id="p-rep" class="page">
             <div class="card" onclick="pdf()" style="cursor:pointer; display:flex; justify-content:space-between;">
-                <span>Export Audit (PDF)</span> <i class="fas fa-file-pdf" style="color:var(--danger)"></i>
+                <span>Audit (PDF)</span> <i class="fas fa-file-pdf" style="color:var(--danger)"></i>
             </div>
             <div id="adm-csv" class="card" onclick="csv()" style="display:none; cursor:pointer; justify-content:space-between;">
                 <span>Full Ledger (CSV)</span> <i class="fas fa-file-csv" style="color:var(--secondary)"></i>
@@ -125,17 +123,16 @@
     <div id="toast"></div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('stock_master_2026_final')) || [];
+        let db = JSON.parse(localStorage.getItem('stock_final_v10')) || [];
         let role = ''; let userName = ''; let chart = null; let html5QrCode = null;
 
+        // --- LOGIN & AUTH ---
         function doLogin() {
             let u = document.getElementById('u').value.trim().toLowerCase();
             let p = document.getElementById('p').value.trim();
-            if (!u || !p) return alert("Enter Name and Password");
-
             if (u.startsWith('admin ')) { userName = u.replace('admin ', ''); launch('Admin'); }
             else if (u.startsWith('staff ')) { userName = u.replace('staff ', ''); launch('Staff'); }
-            else { alert("Format: 'admin [name]' or 'staff [name]'"); }
+            else { alert("Login format: 'admin [name]' or 'staff [name]'"); }
         }
 
         function launch(r) {
@@ -149,35 +146,31 @@
                 document.getElementById('chart-card').style.display = 'block';
                 setTimeout(initChart, 200);
             }
-            draw(); 
-            toast(`✅ Welcome, ${userName.toUpperCase()}`);
+            draw(); toast(`✅ Access Granted: ${userName.toUpperCase()}`);
         }
 
+        // --- THEME ---
         function toggleMode() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
             document.getElementById('mode-icon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
             if(chart) {
-                chart.options.plugins.legend.labels.color = isLight ? '#212529' : '#f0ebff';
+                chart.options.plugins.legend.labels.color = isLight ? '#1a1a1a' : '#f0ebff';
                 chart.update();
             }
-            toast(isLight ? "☀️ Light Mode Active" : "🌙 Dark Mode Active");
+            toast(isLight ? "☀️ Light Mode" : "🌙 Dark Mode");
         }
 
+        // --- PIE CHART ---
         function initChart() {
             const ctx = document.getElementById('stockPie').getContext('2d');
             chart = new Chart(ctx, {
                 type: 'pie',
                 data: { 
                     labels: ['H/W', 'S/W', 'MAT'], 
-                    datasets: [{ 
-                        data: [0,0,0], 
-                        backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], 
-                        borderWidth: 0 
-                    }] 
+                    datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], borderWidth: 0 }] 
                 },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, 
+                options: { responsive: true, maintainAspectRatio: false, 
                     plugins: { legend: { position: 'bottom', labels: { color: '#f0ebff', font: { weight: 'bold' } } } } 
                 }
             });
@@ -186,14 +179,14 @@
 
         function updateChart() { if(chart) { chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length); chart.update(); } }
 
+        // --- OPERATIONS & CONFIRMATIONS ---
         function add() {
             let n = document.getElementById('n').value.trim(), q = parseInt(document.getElementById('q').value);
             if(!n || isNaN(q)) return alert("Check inputs!");
-            if(confirm(`Confirm adding ${n}?`)) {
+            if(confirm(`Commit ${n} to stock?`)) {
                 db.push({ id: Date.now(), name: n, qty: q, price: document.getElementById('pr').value || 0, cat: document.getElementById('cat').value, addedBy: userName });
-                localStorage.setItem('stock_master_2026_final', JSON.stringify(db));
-                draw(); 
-                toast("📦 Asset Added Successfully");
+                localStorage.setItem('stock_final_v10', JSON.stringify(db));
+                draw(); toast("📦 Asset Committed Successfully");
                 document.getElementById('n').value = ''; document.getElementById('q').value = '';
             }
         }
@@ -201,9 +194,8 @@
         function del(id) {
             if(confirm("Permanently delete this entry?")) {
                 db = db.filter(i => i.id !== id);
-                localStorage.setItem('stock_master_2026_final', JSON.stringify(db));
-                draw(); 
-                toast("🗑️ Entry Deleted");
+                localStorage.setItem('stock_final_v10', JSON.stringify(db));
+                draw(); toast("🗑️ Entry Removed");
             }
         }
 
@@ -216,22 +208,20 @@
             updateChart();
         }
 
+        // --- SCANNER KILL-SWITCH ---
         async function toggleScanner() {
             const qrBox = document.getElementById('qr-view');
             const btnText = document.getElementById('scan-text');
-
             if (!html5QrCode) {
                 qrBox.style.display = 'block';
                 html5QrCode = new Html5Qrcode("qr-view");
-                btnText.innerText = "Stop Scanner";
-                toast("📷 Camera Opening...");
+                btnText.innerText = "Kill Scanner";
+                toast("📷 Opening Camera...");
                 try {
-                    await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 220 }, (t) => { 
-                        document.getElementById('n').value = t; 
-                        toast("🔍 Scanned: " + t); 
-                        stopScanner(); 
+                    await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => { 
+                        document.getElementById('n').value = t; toast("🔍 Scanned: " + t); stopScanner(); 
                     });
-                } catch (err) { alert("Camera Error!"); stopScanner(); }
+                } catch (err) { alert("Enable Camera Permissions!"); stopScanner(); }
             } else { stopScanner(); }
         }
 
@@ -243,28 +233,29 @@
                     document.getElementById('qr-view').innerHTML = ''; 
                     document.getElementById('qr-view').style.display = 'none';
                     document.getElementById('scan-text').innerText = "Start Scanner";
-                    toast("🔒 Camera Closed");
+                    toast("🔒 Camera Stopped");
                 }
             }
         }
 
+        // --- EXPORTS & SYNC ---
         function csv() {
             let c = "Item,Qty,Price,Category,User\n";
             db.forEach(i => c += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.addedBy}"\n`);
             const blob = new Blob([c], { type: 'text/csv' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Stock_Inventory.csv";
+            link.download = "Inventory.csv";
             link.click();
-            toast("📄 CSV Exported");
+            toast("📄 CSV Downloaded");
         }
 
         function pdf() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            doc.text("StockPro Inventory Report", 14, 15);
-            doc.autoTable({ head: [['Item', 'Qty', 'Category', 'Added By']], body: db.map(i => [i.name, i.qty, i.cat, i.addedBy]) });
-            doc.save('Inventory_Audit.pdf');
-            toast("📕 PDF Exported");
+            doc.text("StockPro Audit", 14, 15);
+            doc.autoTable({ head: [['Item', 'Qty', 'Category', 'User']], body: db.map(i => [i.name, i.qty, i.cat, i.addedBy]) });
+            doc.save('Audit.pdf');
+            toast("📕 PDF Downloaded");
         }
 
         function tab(p, e) {
@@ -274,12 +265,10 @@
             e.currentTarget.classList.add('active');
         }
 
-        // --- POP-UP NOTIFICATION LOGIC ---
         function toast(m) { 
-            let t = document.getElementById('toast'); 
-            t.innerText = m; 
-            t.style.display = 'block'; 
-            setTimeout(() => { t.style.display = 'none'; }, 3000); 
+            let t=document.getElementById('toast'); 
+            t.innerText=m; t.style.display='block'; 
+            setTimeout(()=>t.style.display='none', 3000); 
         }
         
         function wa() { 
