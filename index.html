@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | Purple Stable</title>
+    <title>StockPro | Purple Elite</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,203 +12,220 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <style>
+        /* COLOR VARIABLES */
         :root { 
             --bg: #120e1a; --card: #1e1a2b; --text: #f0ebff; 
             --primary: #d4af37; --secondary: #9d81ff; --danger: #ff4d4d; --accent: #2d2640;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        /* LIGHT MODE OVERRIDE */
+        [data-theme="light"] { 
+            --bg: #f4f2f9; --card: #ffffff; --text: #1a1625; 
+            --accent: #e5e0f2;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: background 0.3s; }
         
-        /* LOGIN OVERLAY */
+        /* AUTH OVERLAY */
         #auth-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .auth-card { background: var(--card); padding: 30px; border-radius: 12px; width: 85%; max-width: 340px; text-align: center; border-bottom: 3px solid var(--primary); }
-        
-        /* NAVIGATION */
-        nav { background: var(--card); padding: 12px 20px; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--accent); }
-        .nav-brand { font-weight: 900; color: var(--primary); font-size: 1.1rem; }
-        .nav-tabs { display: flex; gap: 15px; }
-        .tab { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; opacity: 0.5; cursor: pointer; }
-        .tab.active { opacity: 1; color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .auth-card { background: var(--card); padding: 30px; border-radius: 15px; width: 85%; max-width: 340px; text-align: center; border: 1px solid var(--primary); }
+
+        /* NAV */
+        nav { background: var(--card); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
+        .nav-brand { font-weight: 900; color: var(--primary); }
+        .tab-box { display: flex; gap: 15px; align-items: center; }
+        .tab { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; }
+        .tab.active { opacity: 1; color: var(--primary); }
 
         .container { max-width: 500px; margin: 15px auto; padding: 0 15px; display: none; }
         .page { display: none; } .page.active { display: block; }
 
-        /* CARDS & INPUTS */
-        .card { background: var(--card); padding: 18px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--accent); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 6px; box-sizing: border-box; }
-        .btn { padding: 14px; border: none; cursor: pointer; border-radius: 6px; font-weight: 800; width: 100%; text-transform: uppercase; transition: 0.2s; }
-        .btn-main { background: var(--primary); color: #120e1a; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 8px; box-sizing: border-box; }
         
-        /* COMPACT CHART */
-        #chart-zone { height: 160px; display: none; }
+        .btn { padding: 14px; border: none; cursor: pointer; border-radius: 8px; font-weight: 800; width: 100%; text-transform: uppercase; transition: 0.2s; }
+        .btn-main { background: var(--primary); color: #120e1a; }
+        .btn-alt { background: var(--accent); color: var(--text); border: 1px solid var(--secondary); margin-bottom: 10px; }
 
-        /* TABLE */
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        #qr-view { width: 100%; display: none; border-radius: 10px; overflow: hidden; margin-bottom: 10px; border: 2px solid var(--primary); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th { text-align: left; padding: 10px; color: var(--primary); border-bottom: 1px solid var(--accent); }
         td { padding: 12px 10px; border-bottom: 1px solid var(--accent); }
-        .low { color: var(--danger); font-weight: bold; }
         
-        #scan-box { width: 100%; display: none; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--secondary); color: white; padding: 10px 20px; border-radius: 20px; display: none; font-size: 0.8rem; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 10px 20px; border-radius: 50px; display: none; font-weight: bold; z-index: 10001; }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
     <div id="auth-overlay">
         <div class="auth-card">
-            <h2 style="color:var(--primary); margin:0 0 20px 0;">STOCKPRO</h2>
-            <input type="text" id="user-field" placeholder="Admin/Staff">
-            <input type="password" id="pass-field" placeholder="Password">
-            <button class="btn btn-main" onclick="attemptLogin()">Log In</button>
+            <h1 style="color:var(--primary); margin:0;">STOCKPRO</h1>
+            <p style="font-size:0.8rem; opacity:0.5; margin-bottom:20px;">Inventory Management</p>
+            <input type="text" id="u" placeholder="Username (admin/staff)">
+            <input type="password" id="p" placeholder="Password (1234)">
+            <button class="btn btn-main" onclick="doLogin()">Login</button>
         </div>
     </div>
 
-    <nav id="main-nav">
+    <nav id="navbar">
         <div class="nav-brand">STOCKPRO</div>
-        <div class="nav-tabs">
-            <div class="tab active" onclick="switchTab('dash', event)">Home</div>
-            <div class="tab" onclick="switchTab('inv', event)">Ledger</div>
-            <div class="tab" onclick="switchTab('rep', event)">Docs</div>
+        <div class="tab-box">
+            <div class="tab active" onclick="tab('dash', event)">Home</div>
+            <div class="tab" onclick="tab('inv', event)">Ledger</div>
+            <div class="tab" onclick="tab('rep', event)">Docs</div>
+            <div onclick="toggleMode()" style="cursor:pointer; color:var(--primary); margin-left:10px;"><i class="fas fa-moon" id="mode-icon"></i></div>
         </div>
     </nav>
 
-    <div class="container" id="app-shell">
+    <div class="container" id="app">
         <section id="p-dash" class="page active">
-            <div id="admin-stats" style="display:none; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div class="card" style="text-align:center;"><small>VALUATION</small><div id="val-num" style="color:var(--primary); font-weight:900;">0</div></div>
-                <div class="card" style="text-align:center;"><small>TOTAL SKUS</small><div id="qty-num" style="font-weight:900;">0</div></div>
+            <div id="adm-row" style="display:none; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                <div class="card" style="text-align:center;"><small>VALUATION</small><div id="stat-v" style="color:var(--primary); font-weight:bold;">0</div></div>
+                <div class="card" style="text-align:center;"><small>TOTAL ITEMS</small><div id="stat-i" style="font-weight:bold;">0</div></div>
             </div>
-            <div id="chart-zone" class="card"><canvas id="stockChart"></canvas></div>
+
+            <div id="chart-card" class="card" style="display:none; height: 200px;"><canvas id="stockChart"></canvas></div>
+
             <div class="card">
-                <div id="scan-box"></div>
-                <button class="btn" style="background:var(--accent); color:var(--text); margin-bottom:10px;" onclick="runScanner()">Scan Barcode</button>
-                <input id="f-name" placeholder="Item Name">
-                <input id="f-qty" type="number" placeholder="Quantity">
-                <div id="adm-price-box" style="display:none;"><input id="f-price" type="number" placeholder="Price (KES)"></div>
-                <select id="f-cat"><option>Hardware</option><option>Software</option><option>Materials</option></select>
-                <button class="btn btn-main" onclick="pushAsset()">Commit Item</button>
+                <div id="qr-view"></div>
+                <button class="btn btn-alt" onclick="scan()"><i class="fas fa-qrcode"></i> Scan Asset</button>
+                <input id="n" placeholder="Item Name">
+                <input id="q" type="number" placeholder="Quantity">
+                <div id="adm-pr" style="display:none;"><input id="pr" type="number" placeholder="Unit Price (KES)"></div>
+                <select id="cat"><option>Hardware</option><option>Software</option><option>Materials</option></select>
+                <button class="btn btn-main" onclick="add()">Commit Asset</button>
             </div>
         </section>
 
         <section id="p-inv" class="page">
             <div class="card">
-                <input placeholder="Search ledger..." onkeyup="refreshUI()" id="search-in">
+                <input placeholder="Search ledger..." onkeyup="draw()" id="find">
                 <table>
-                    <thead><tr><th>Asset</th><th>Qty</th><th class="adm-only" style="display:none">KES</th></tr></thead>
-                    <tbody id="inventory-table"></tbody>
+                    <thead><tr><th>Asset</th><th>Qty</th><th class="adm-only" style="display:none">Price</th></tr></thead>
+                    <tbody id="table-body"></tbody>
                 </table>
             </div>
         </section>
 
         <section id="p-rep" class="page">
-            <div class="card" onclick="doPDF()" style="cursor:pointer">Download Audit PDF <i class="fas fa-file-pdf" style="float:right"></i></div>
-            <div id="adm-csv" class="card" onclick="doCSV()" style="cursor:pointer; display:none;">Download Ledger CSV <i class="fas fa-file-csv" style="float:right"></i></div>
-            <button class="btn" style="background:#25D366; color:white; margin-top:10px;" onclick="doWA()"><i class="fab fa-whatsapp"></i> WhatsApp Sync</button>
+            <div class="card" onclick="pdf()" style="cursor:pointer">
+                Audit Report (PDF) <i class="fas fa-file-pdf" style="float:right; color:var(--danger)"></i>
+            </div>
+            <div id="adm-csv" class="card" onclick="csv()" style="display:none; cursor:pointer">
+                Ledger Export (CSV) <i class="fas fa-file-csv" style="float:right; color:var(--secondary)"></i>
+            </div>
+            <button class="btn" style="background:#25D366; color:white; margin-top:10px;" onclick="wa()"><i class="fab fa-whatsapp"></i> WhatsApp Update</button>
         </section>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        let assets = JSON.parse(localStorage.getItem('milka_db_final')) || [];
-        let userType = 'Guest'; let chartObj = null; let htmlScanner = null;
+        let db = JSON.parse(localStorage.getItem('final_stock_db')) || [];
+        let role = 'Guest'; let chart = null; let scanner = null;
 
-        function attemptLogin() {
-            let u = document.getElementById('user-field').value.trim().toLowerCase();
-            let p = document.getElementById('pass-field').value.trim();
-            if (u === 'admin' && p === '1234') startApp('Admin');
-            else if (u === 'staff' && p === 'staff') startApp('Staff');
-            else alert("Invalid credentials.");
+        function doLogin() {
+            let user = document.getElementById('u').value.trim().toLowerCase();
+            let pass = document.getElementById('p').value.trim();
+            if (user === 'admin' && pass === '1234') launch('Admin');
+            else if (user === 'staff' && pass === 'staff') launch('Staff');
+            else alert("Error: Use admin / 1234");
         }
 
-        function startApp(r) {
-            userType = r;
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('main-nav').style.display = 'flex';
-            document.getElementById('app-shell').style.display = 'block';
+        function launch(r) {
+            role = r;
+            document.getElementById('auth-overlay').style.display='none';
+            document.getElementById('navbar').style.display='flex';
+            document.getElementById('app').style.display='block';
             if(r === 'Admin') {
-                document.getElementById('admin-stats').style.display = 'grid';
-                document.getElementById('adm-price-box').style.display = 'block';
+                document.getElementById('adm-row').style.display = 'grid';
+                document.getElementById('adm-pr').style.display = 'block';
                 document.getElementById('adm-csv').style.display = 'block';
-                document.getElementById('chart-zone').style.display = 'block';
+                document.getElementById('chart-card').style.display = 'block';
                 initChart();
             }
-            refreshUI();
+            draw();
         }
 
-        function pushAsset() {
-            let n = document.getElementById('f-name').value, q = parseInt(document.getElementById('f-qty').value);
-            if(!n || isNaN(q)) return flash("Missing data");
-            assets.push({ id:Date.now(), name:n, qty:q, price:document.getElementById('f-price').value||0, cat:document.getElementById('f-cat').value, time:new Date().toLocaleTimeString() });
-            localStorage.setItem('milka_db_final', JSON.stringify(assets));
-            refreshUI(); flash("Asset Recorded");
-            document.getElementById('f-name').value=''; document.getElementById('f-qty').value='';
+        function toggleMode() {
+            let body = document.body;
+            let icon = document.getElementById('mode-icon');
+            if(body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                icon.className = 'fas fa-sun';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-moon';
+            }
         }
 
-        function refreshUI() {
-            let body = document.getElementById('inventory-table'), s = document.getElementById('search-in').value.toLowerCase();
+        function add() {
+            let name = document.getElementById('n').value, qty = parseInt(document.getElementById('q').value);
+            if(!name || isNaN(qty)) return toast("Fill Name/Qty");
+            db.push({ id:Date.now(), name, qty, price:document.getElementById('pr').value||0, cat:document.getElementById('cat').value, time:new Date().toLocaleTimeString() });
+            localStorage.setItem('final_stock_db', JSON.stringify(db));
+            draw(); toast("Asset Added");
+            document.getElementById('n').value=''; document.getElementById('q').value='';
+        }
+
+        function draw() {
+            let body = document.getElementById('table-body'), s = document.getElementById('find').value.toLowerCase();
             body.innerHTML = '';
-            assets.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
+            db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
                 body.innerHTML += `<tr>
                     <td>${i.name}<br><small style="opacity:0.4">${i.time}</small></td>
-                    <td class="${i.qty < 5 ? 'low' : ''}">${i.qty}</td>
-                    <td class="adm-only" style="display:${userType==='Admin'?'table-cell':'none'}">${i.price}</td>
+                    <td style="color:${i.qty < 5 ? 'var(--danger)' : 'inherit'}">${i.qty}</td>
+                    <td class="adm-only" style="display:${role==='Admin'?'table-cell':'none'}">${i.price}</td>
                 </tr>`;
             });
-            let total = assets.reduce((s,i)=>s+(i.qty*i.price),0);
-            document.getElementById('val-num').innerText = 'KES ' + total.toLocaleString();
-            document.getElementById('qty-num').innerText = assets.length;
-            if(chartObj) {
-                chartObj.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => assets.filter(i=>i.cat===c).length);
-                chartObj.update();
+            let val = db.reduce((s,i)=>s+(i.qty*i.price),0);
+            document.getElementById('stat-v').innerText = 'KES ' + val.toLocaleString();
+            document.getElementById('stat-i').innerText = db.length;
+            if(chart) {
+                chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length);
+                chart.update();
             }
         }
 
         function initChart() {
             const ctx = document.getElementById('stockChart').getContext('2d');
-            chartObj = new Chart(ctx, {
+            chart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: ['H/W', 'S/W', 'Mat'], datasets: [{ data:[0,0,0], backgroundColor:'#d4af37' }] },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{color:'#f0ebff'}},x:{ticks:{color:'#f0ebff'}}} }
+                data: { labels: ['H/W', 'S/W', 'MAT'], datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'] }] },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{color:'gray'}},x:{ticks:{color:'gray'}}} }
             });
         }
 
-        function runScanner() {
-            const box = document.getElementById('scan-box');
-            if(!htmlScanner) {
-                box.style.display = 'block';
-                htmlScanner = new Html5Qrcode("scan-box");
-                htmlScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-                    document.getElementById('f-name').value = text;
-                    runScanner(); // Stop after scan
-                });
+        function scan() {
+            const v = document.getElementById('qr-view');
+            if(!scanner) {
+                v.style.display='block'; scanner = new Html5Qrcode("qr-view");
+                scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (t) => { document.getElementById('n').value=t; scan(); });
             } else {
-                htmlScanner.stop().then(() => { htmlScanner = null; box.style.display = 'none'; });
+                scanner.stop().then(() => { scanner=null; v.style.display='none'; });
             }
         }
 
-        function doPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("StockPro Audit - " + new Date().toLocaleDateString(), 14, 15);
-            doc.autoTable({ head: [['Asset', 'Qty', 'Price']], body: assets.map(i => [i.name, i.qty, i.price]) });
+        function pdf() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.text("Stock Audit", 14, 15);
+            doc.autoTable({ head: [['Item', 'Qty', 'Price']], body: db.map(i => [i.name, i.qty, i.price]) });
             doc.save('Audit.pdf');
         }
 
-        function doCSV() {
-            let row = "Item,Qty,Price\n"; assets.forEach(i=>row+=`${i.name},${i.qty},${i.price}\n`);
-            let blob = new Blob([row], {type:'text/csv'}), a = document.createElement('a');
-            a.href = URL.createObjectURL(blob); a.download = 'Ledger.csv'; a.click();
+        function csv() {
+            let c = "Item,Qty,Price\n"; db.forEach(i=>c+=`${i.name},${i.qty},${i.price}\n`);
+            let b = new Blob([c],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Ledger.csv'; a.click();
         }
 
-        function switchTab(p, e) {
+        function tab(p, e) {
             document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
             document.getElementById('p-'+p).classList.add('active');
             document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
             e.currentTarget.classList.add('active');
         }
 
-        function flash(m) { let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
-        function doWA() { let m = 'Inventory Update:%0A'; assets.forEach(i=>m+=`${i.name}: ${i.qty}%0A`); window.open('https://wa.me/254700000000?text='+m); }
+        function toast(m) { let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+        function wa() { let m = 'Inventory Update:%0A'; db.forEach(i=>m+=`${i.name}: ${i.qty}%0A`); window.open('https://wa.me/254700000000?text='+m); }
     </script>
 </body>
-    </html>
+                                        </html>
