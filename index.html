@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPro | Purple Elite</title>
+    <title>StockPro | Pro Edition</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,57 +12,56 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* COLOR VARIABLES */
+        /* THEME VARIABLES */
         :root { 
             --bg: #120e1a; --card: #1e1a2b; --text: #f0ebff; 
             --primary: #d4af37; --secondary: #9d81ff; --danger: #ff4d4d; --accent: #2d2640;
         }
         /* LIGHT MODE OVERRIDE */
-        [data-theme="light"] { 
-            --bg: #f4f2f9; --card: #ffffff; --text: #1a1625; 
-            --accent: #e5e0f2;
+        body.light-mode { 
+            --bg: #f8f9fa; --card: #ffffff; --text: #212529; 
+            --accent: #e9ecef; --secondary: #6610f2;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: background 0.3s; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: background 0.3s, color 0.3s; }
         
-        /* AUTH OVERLAY */
+        /* LOGIN */
         #auth-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .auth-card { background: var(--card); padding: 30px; border-radius: 15px; width: 85%; max-width: 340px; text-align: center; border: 1px solid var(--primary); }
 
-        /* NAV */
+        /* HEADER */
         nav { background: var(--card); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
-        .nav-brand { font-weight: 900; color: var(--primary); }
-        .tab-box { display: flex; gap: 15px; align-items: center; }
-        .tab { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; }
-        .tab.active { opacity: 1; color: var(--primary); }
+        .nav-brand { font-weight: 900; color: var(--primary); font-size: 1.2rem; }
+        .tab-box { display: flex; gap: 12px; align-items: center; }
+        .tab { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; }
+        .tab.active { opacity: 1; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
         .container { max-width: 500px; margin: 15px auto; padding: 0 15px; display: none; }
         .page { display: none; } .page.active { display: block; }
 
-        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 8px; box-sizing: border-box; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         
-        .btn { padding: 14px; border: none; cursor: pointer; border-radius: 8px; font-weight: 800; width: 100%; text-transform: uppercase; transition: 0.2s; }
-        .btn-main { background: var(--primary); color: #120e1a; }
-        .btn-alt { background: var(--accent); color: var(--text); border: 1px solid var(--secondary); margin-bottom: 10px; }
+        .btn { padding: 15px; border: none; cursor: pointer; border-radius: 8px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 0.9rem; }
+        .btn-main { background: var(--primary); color: #120e1a; margin-top: 10px; }
+        .btn-scan { background: var(--accent); color: var(--text); border: 1px solid var(--secondary); margin-bottom: 12px; }
 
         #qr-view { width: 100%; display: none; border-radius: 10px; overflow: hidden; margin-bottom: 10px; border: 2px solid var(--primary); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { text-align: left; padding: 10px; color: var(--primary); border-bottom: 1px solid var(--accent); }
-        td { padding: 12px 10px; border-bottom: 1px solid var(--accent); }
         
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 10px 20px; border-radius: 50px; display: none; font-weight: bold; z-index: 10001; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; padding: 12px; color: var(--primary); border-bottom: 2px solid var(--accent); text-transform: uppercase; font-size: 0.7rem; }
+        td { padding: 14px 12px; border-bottom: 1px solid var(--accent); }
+        
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 12px 24px; border-radius: 50px; display: none; font-weight: bold; z-index: 10001; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
-<body data-theme="dark">
-
-    <div id="auth-overlay">
+<body class="dark-mode"> <div id="auth-overlay">
         <div class="auth-card">
             <h1 style="color:var(--primary); margin:0;">STOCKPRO</h1>
-            <p style="font-size:0.8rem; opacity:0.5; margin-bottom:20px;">Inventory Management</p>
-            <input type="text" id="u" placeholder="Username (admin/staff)">
-            <input type="password" id="p" placeholder="Password (1234)">
-            <button class="btn btn-main" onclick="doLogin()">Login</button>
+            <p style="font-size:0.8rem; opacity:0.6; margin-bottom:20px;">Inventory Management System</p>
+            <input type="text" id="u" placeholder="Username (admin / staff)">
+            <input type="password" id="p" placeholder="Key (1234)">
+            <button class="btn btn-main" onclick="doLogin()">Unlock System</button>
         </div>
     </div>
 
@@ -72,22 +71,25 @@
             <div class="tab active" onclick="tab('dash', event)">Home</div>
             <div class="tab" onclick="tab('inv', event)">Ledger</div>
             <div class="tab" onclick="tab('rep', event)">Docs</div>
-            <div onclick="toggleMode()" style="cursor:pointer; color:var(--primary); margin-left:10px;"><i class="fas fa-moon" id="mode-icon"></i></div>
+            <div onclick="toggleMode()" style="cursor:pointer; color:var(--primary); font-size: 1.1rem; margin-left:8px;">
+                <i class="fas fa-moon" id="mode-icon"></i>
+            </div>
         </div>
     </nav>
 
     <div class="container" id="app">
         <section id="p-dash" class="page active">
-            <div id="adm-row" style="display:none; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div class="card" style="text-align:center;"><small>VALUATION</small><div id="stat-v" style="color:var(--primary); font-weight:bold;">0</div></div>
-                <div class="card" style="text-align:center;"><small>TOTAL ITEMS</small><div id="stat-i" style="font-weight:bold;">0</div></div>
+            <div id="adm-row" style="display:none; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
+                <div class="card" style="text-align:center;"><small style="opacity:0.6">VALUATION</small><div id="stat-v" style="color:var(--primary); font-weight:900; font-size:1.2rem;">0</div></div>
+                <div class="card" style="text-align:center;"><small style="opacity:0.6">TOTAL ASSETS</small><div id="stat-i" style="font-weight:900; font-size:1.2rem;">0</div></div>
             </div>
 
-            <div id="chart-card" class="card" style="display:none; height: 200px;"><canvas id="stockChart"></canvas></div>
+            <div id="chart-card" class="card" style="display:none; height: 180px;"><canvas id="stockChart"></canvas></div>
 
             <div class="card">
+                <h4 style="margin:0 0 15px 0; color:var(--primary)">Add New Asset</h4>
                 <div id="qr-view"></div>
-                <button class="btn btn-alt" onclick="scan()"><i class="fas fa-qrcode"></i> Scan Asset</button>
+                <button class="btn btn-scan" onclick="scan()"><i class="fas fa-barcode"></i> Scan Barcode</button>
                 <input id="n" placeholder="Item Name">
                 <input id="q" type="number" placeholder="Quantity">
                 <div id="adm-pr" style="display:none;"><input id="pr" type="number" placeholder="Unit Price (KES)"></div>
@@ -98,29 +100,29 @@
 
         <section id="p-inv" class="page">
             <div class="card">
-                <input placeholder="Search ledger..." onkeyup="draw()" id="find">
+                <input placeholder="Quick search..." onkeyup="draw()" id="find">
                 <table>
-                    <thead><tr><th>Asset</th><th>Qty</th><th class="adm-only" style="display:none">Price</th></tr></thead>
+                    <thead><tr><th>Asset</th><th>Stock</th><th class="adm-only" style="display:none">Price</th></tr></thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
         </section>
 
         <section id="p-rep" class="page">
-            <div class="card" onclick="pdf()" style="cursor:pointer">
-                Audit Report (PDF) <i class="fas fa-file-pdf" style="float:right; color:var(--danger)"></i>
+            <div class="card" onclick="pdf()" style="cursor:pointer; display: flex; justify-content: space-between; align-items: center;">
+                <span>Download Audit PDF</span> <i class="fas fa-file-pdf" style="color:var(--danger); font-size: 1.2rem;"></i>
             </div>
-            <div id="adm-csv" class="card" onclick="csv()" style="display:none; cursor:pointer">
-                Ledger Export (CSV) <i class="fas fa-file-csv" style="float:right; color:var(--secondary)"></i>
+            <div id="adm-csv" class="card" onclick="csv()" style="display:none; cursor:pointer; display: flex; justify-content: space-between; align-items: center;">
+                <span>Download Ledger CSV</span> <i class="fas fa-file-csv" style="color:var(--secondary); font-size: 1.2rem;"></i>
             </div>
-            <button class="btn" style="background:#25D366; color:white; margin-top:10px;" onclick="wa()"><i class="fab fa-whatsapp"></i> WhatsApp Update</button>
+            <button class="btn" style="background:#25D366; color:white; margin-top:10px;" onclick="wa()"><i class="fab fa-whatsapp"></i> WhatsApp Sync</button>
         </section>
     </div>
 
     <div id="toast"></div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('final_stock_db')) || [];
+        let db = JSON.parse(localStorage.getItem('final_stock_db_v2')) || [];
         let role = 'Guest'; let chart = null; let scanner = null;
 
         function doLogin() {
@@ -128,7 +130,7 @@
             let pass = document.getElementById('p').value.trim();
             if (user === 'admin' && pass === '1234') launch('Admin');
             else if (user === 'staff' && pass === 'staff') launch('Staff');
-            else alert("Error: Use admin / 1234");
+            else alert("Try: admin / 1234");
         }
 
         function launch(r) {
@@ -139,7 +141,7 @@
             if(r === 'Admin') {
                 document.getElementById('adm-row').style.display = 'grid';
                 document.getElementById('adm-pr').style.display = 'block';
-                document.getElementById('adm-csv').style.display = 'block';
+                document.getElementById('adm-csv').style.display = 'flex';
                 document.getElementById('chart-card').style.display = 'block';
                 initChart();
             }
@@ -147,23 +149,26 @@
         }
 
         function toggleMode() {
-            let body = document.body;
-            let icon = document.getElementById('mode-icon');
-            if(body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('mode-icon');
+            if(document.body.classList.contains('light-mode')) {
                 icon.className = 'fas fa-sun';
             } else {
-                body.setAttribute('data-theme', 'dark');
                 icon.className = 'fas fa-moon';
+            }
+            if(chart) {
+                chart.options.scales.y.ticks.color = getComputedStyle(document.body).getPropertyValue('--text');
+                chart.options.scales.x.ticks.color = getComputedStyle(document.body).getPropertyValue('--text');
+                chart.update();
             }
         }
 
         function add() {
             let name = document.getElementById('n').value, qty = parseInt(document.getElementById('q').value);
-            if(!name || isNaN(qty)) return toast("Fill Name/Qty");
-            db.push({ id:Date.now(), name, qty, price:document.getElementById('pr').value||0, cat:document.getElementById('cat').value, time:new Date().toLocaleTimeString() });
-            localStorage.setItem('final_stock_db', JSON.stringify(db));
-            draw(); toast("Asset Added");
+            if(!name || isNaN(qty)) return toast("Please fill Name and Quantity");
+            db.push({ id:Date.now(), name, qty, price:document.getElementById('pr').value||0, cat:document.getElementById('cat').value, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) });
+            localStorage.setItem('final_stock_db_v2', JSON.stringify(db));
+            draw(); toast("Asset Recorded");
             document.getElementById('n').value=''; document.getElementById('q').value='';
         }
 
@@ -172,49 +177,79 @@
             body.innerHTML = '';
             db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
                 body.innerHTML += `<tr>
-                    <td>${i.name}<br><small style="opacity:0.4">${i.time}</small></td>
-                    <td style="color:${i.qty < 5 ? 'var(--danger)' : 'inherit'}">${i.qty}</td>
+                    <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat} • ${i.time}</small></td>
+                    <td style="color:${i.qty < 5 ? 'var(--danger)' : 'inherit'}; font-weight:bold;">${i.qty}</td>
                     <td class="adm-only" style="display:${role==='Admin'?'table-cell':'none'}">${i.price}</td>
                 </tr>`;
             });
-            let val = db.reduce((s,i)=>s+(i.qty*i.price),0);
-            document.getElementById('stat-v').innerText = 'KES ' + val.toLocaleString();
+            document.getElementById('stat-v').innerText = 'KES ' + db.reduce((s,i)=>s+(i.qty*i.price),0).toLocaleString();
             document.getElementById('stat-i').innerText = db.length;
-            if(chart) {
-                chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length);
-                chart.update();
-            }
+            if(chart) updateChart();
         }
 
         function initChart() {
             const ctx = document.getElementById('stockChart').getContext('2d');
             chart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: ['H/W', 'S/W', 'MAT'], datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'] }] },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{color:'gray'}},x:{ticks:{color:'gray'}}} }
+                data: { 
+                    labels: ['H/W', 'S/W', 'MAT'], 
+                    datasets: [{ 
+                        data: [0,0,0], 
+                        backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], // Distinct Colors: Gold, Blue, Purple
+                        borderRadius: 6
+                    }] 
+                },
+                options: { 
+                    responsive:true, maintainAspectRatio:false, 
+                    plugins:{legend:{display:false}}, 
+                    scales:{
+                        y:{grid:{display:false}, ticks:{color:'#f0ebff', font:{size:10}}},
+                        x:{grid:{display:false}, ticks:{color:'#f0ebff', font:{size:10}}}
+                    } 
+                }
             });
+            updateChart();
+        }
+
+        function updateChart() {
+            chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length);
+            chart.update();
         }
 
         function scan() {
             const v = document.getElementById('qr-view');
             if(!scanner) {
                 v.style.display='block'; scanner = new Html5Qrcode("qr-view");
-                scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (t) => { document.getElementById('n').value=t; scan(); });
+                scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (t) => { 
+                    document.getElementById('n').value=t; 
+                    toast("Scanned: " + t);
+                    scan(); 
+                }).catch(() => alert("Camera blocked or not found."));
             } else {
                 scanner.stop().then(() => { scanner=null; v.style.display='none'; });
             }
         }
 
-        function pdf() {
-            const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            doc.text("Stock Audit", 14, 15);
-            doc.autoTable({ head: [['Item', 'Qty', 'Price']], body: db.map(i => [i.name, i.qty, i.price]) });
-            doc.save('Audit.pdf');
+        function csv() {
+            let content = "Asset Name,Quantity,Price,Category\n";
+            db.forEach(i => content += `"${i.name}",${i.qty},${i.price},"${i.cat}"\n`);
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Stock_Ledger_" + new Date().toLocaleDateString() + ".csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast("Downloading CSV...");
         }
 
-        function csv() {
-            let c = "Item,Qty,Price\n"; db.forEach(i=>c+=`${i.name},${i.qty},${i.price}\n`);
-            let b = new Blob([c],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Ledger.csv'; a.click();
+        function pdf() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.setFontSize(18); doc.text("Inventory Audit Report", 14, 20);
+            doc.setFontSize(10); doc.text("Generated on: " + new Date().toLocaleString(), 14, 28);
+            doc.autoTable({ head: [['Asset', 'Qty', 'Price', 'Category']], body: db.map(i => [i.name, i.qty, i.price, i.cat]), startY: 35 });
+            doc.save('Audit_Report.pdf');
+            toast("Downloading PDF...");
         }
 
         function tab(p, e) {
@@ -224,8 +259,8 @@
             e.currentTarget.classList.add('active');
         }
 
-        function toast(m) { let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
-        function wa() { let m = 'Inventory Update:%0A'; db.forEach(i=>m+=`${i.name}: ${i.qty}%0A`); window.open('https://wa.me/254700000000?text='+m); }
+        function toast(m) { let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+        function wa() { let m = '*Stock Update:*%0A'; db.forEach(i=>m+=`• ${i.name}: ${i.qty}%0A`); window.open('https://wa.me/254700000000?text='+m); }
     </script>
 </body>
-                                        </html>
+    </html>
