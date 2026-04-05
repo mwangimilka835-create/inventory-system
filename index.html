@@ -13,27 +13,28 @@
             --primary: #1e272e; --secondary: #d4af37; --bg: #f4f7f6;
             --card: #ffffff; --text: #2c3e50; --accent: #dcdde1; --danger: #c23616;
         }
+        /* DARK MODE DEFINITION */
         [data-theme="dark"] {
             --bg: #13171a; --card: #1e272e; --text: #f5f6fa; --accent: #353b48;
         }
 
-        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.5s; overflow-x: hidden; }
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.4s; overflow-x: hidden; }
         
         #role-banner { background: var(--secondary); color: var(--primary); text-align: center; padding: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; display: none; }
 
         nav { background: var(--primary); padding: 15px 5%; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--secondary); }
         .nav-brand { font-size: 1.5rem; font-weight: 800; color: var(--secondary); letter-spacing: 2px; }
         .nav-links { display: flex; gap: 15px; }
-        .nav-item { cursor: pointer; color: #fff; opacity: 0.7; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; }
+        .nav-item { cursor: pointer; color: #fff; opacity: 0.7; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; padding: 5px; }
         .nav-item.active { opacity: 1; color: var(--secondary); border-bottom: 2px solid var(--secondary); }
 
         #auth-overlay { position: fixed; inset: 0; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .auth-card { background: var(--card); padding: 40px; border-radius: 4px; width: 90%; max-width: 380px; text-align: center; border-top: 5px solid var(--secondary); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
 
         .container { max-width: 950px; margin: 1.5rem auto; padding: 0 20px; display: none; }
-        .page { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--card); padding: 25px; border-radius: 4px; border-left: 4px solid var(--secondary); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
@@ -43,39 +44,36 @@
         .stat-box { padding: 25px; background: var(--primary); color: var(--secondary); text-align: center; border-radius: 4px; border: 1px solid var(--secondary); }
         .stat-box h2 { font-size: 1.6rem; margin: 5px 0; color: #fff; }
 
-        #reader { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 15px; }
-
-        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 4px; font-size: 1rem; }
-        .btn { padding: 16px; border: none; cursor: pointer; text-transform: uppercase; font-weight: 800; width: 100%; transition: 0.3s; margin-top: 10px; letter-spacing: 1px; }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 4px; box-sizing: border-box; }
+        .btn { padding: 16px; border: none; cursor: pointer; text-transform: uppercase; font-weight: 800; width: 100%; transition: 0.3s; margin-top: 10px; }
         .btn-main { background: var(--secondary); color: var(--primary); }
         .btn-wa { background: #25D366; color: white; margin-top: 20px; }
-        .btn-guest { background: var(--accent); color: var(--primary); margin-top: 25px; }
+        .btn-guest { background: var(--accent); color: var(--primary); margin-top: 20px; }
 
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; color: var(--secondary); border-bottom: 2px solid var(--secondary); font-size: 0.75rem; text-transform: uppercase; }
+        th { text-align: left; padding: 15px; color: var(--secondary); border-bottom: 2px solid var(--secondary); font-size: 0.75rem; }
         td { padding: 15px; border-bottom: 1px solid var(--accent); font-size: 0.9rem; }
         
         .badge { padding: 5px 10px; font-size: 0.65rem; font-weight: 800; border: 1px solid; border-radius: 2px; }
         .badge-low { border-color: var(--danger); color: var(--danger); }
-        .badge-ok { border-color: var(--secondary); color: var(--secondary); }
-
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--secondary); padding: 15px 35px; display: none; border: 1px solid var(--secondary); z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--secondary); padding: 15px 35px; display: none; border: 1px solid var(--secondary); z-index: 10001; }
     </style>
 </head>
 <body data-theme="light">
 
-    <div id="role-banner">SECURE SESSION: <span id="display-role">GUEST</span></div>
+    <div id="role-banner">ACTIVE SESSION: <span id="display-role">GUEST</span></div>
 
     <div id="auth-overlay">
         <div class="auth-card">
-            <h1 style="color:var(--primary); margin:0; letter-spacing:3px;">STOCKPRO</h1>
-            <p style="font-size:0.6rem; letter-spacing:2px; margin-bottom:25px; opacity:0.7;">ENTERPRISE INVENTORY MANAGEMENT</p>
+            <h1 style="color:var(--primary); margin:0;">STOCKPRO</h1>
+            <p style="font-size:0.6rem; letter-spacing:2px; margin-bottom:25px; opacity:0.7;">ENTERPRISE INVENTORY SUITE</p>
             
             <input type="text" id="login-user" placeholder="Username (Admin/Staff)">
             <input type="password" id="login-pass" placeholder="Access Key">
-            <button class="btn btn-main" onclick="handleAuth()">Login to Suite</button>
+            <button class="btn btn-main" onclick="handleAuth()">Login</button>
             
-            <button class="btn btn-guest" onclick="enterAs('Guest')">View as Portfolio Guest</button>
+            <button class="btn btn-guest" onclick="enterAs('Guest')">Continue as Guest</button>
             <p style="font-size:0.6rem; opacity:0.5; margin-top:15px;">Admin: admin / 1234 | Staff: staff / staff</p>
         </div>
     </div>
@@ -86,7 +84,7 @@
             <div class="nav-item active" onclick="nav('dashboard', event)">Overview</div>
             <div class="nav-item" onclick="nav('inventory', event)">Ledger</div>
             <div class="nav-item" onclick="nav('reports', event)">Reports</div>
-            <div class="nav-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></div>
+            <div class="nav-item" onclick="toggleDarkMode()"><i class="fas fa-moon" id="theme-icon"></i></div>
         </div>
     </nav>
 
@@ -94,35 +92,32 @@
         
         <section id="page-dashboard" class="page active">
             <div class="admin-only stats-grid">
-                <div class="stat-box"><small>ASSET CAPITAL</small><h2 id="stat-val">KES 0</h2></div>
-                <div class="stat-box"><small>TOTAL SKUs</small><h2 id="stat-items">0</h2></div>
+                <div class="stat-box"><small>CAPITAL</small><h2 id="stat-val">KES 0</h2></div>
+                <div class="stat-box"><small>SKUs</small><h2 id="stat-items">0</h2></div>
             </div>
 
             <div class="admin-only card">
-                <h3 style="margin:0 0 15px 0; font-size:0.9rem;">Financial Allocation (By Category)</h3>
+                <h3 style="margin:0 0 15px 0; font-size:0.9rem;">Distribution Analytics</h3>
                 <div style="height: 250px;"><canvas id="categoryChart"></canvas></div>
             </div>
 
             <div class="staff-only card">
-                <h3 style="margin-top:0">Asset Intake</h3>
-                <div id="reader" style="display:none;"></div>
+                <h3>Asset Entry</h3>
+                <div id="reader" style="display:none; margin-bottom:10px;"></div>
                 <button class="btn" style="background:var(--primary); color:var(--secondary); border:1px solid var(--secondary);" onclick="toggleScanner()">
-                    <i class="fas fa-barcode"></i> Launch Scanner
+                    <i class="fas fa-camera"></i> Scan Barcode
                 </button>
-                
-                <input type="text" id="p-name" placeholder="Item Name / Code">
+                <input type="text" id="p-name" placeholder="Item Name">
                 <div style="display: flex; gap: 10px;">
-                    <input type="number" id="p-qty" placeholder="Units">
-                    <input type="number" id="p-price" placeholder="Unit Price" class="admin-only">
+                    <input type="number" id="p-qty" placeholder="Qty">
+                    <input type="number" id="p-price" placeholder="Price" class="admin-only">
                 </div>
                 <select id="p-cat">
                     <option value="Hardware">Hardware</option>
                     <option value="Software">Software</option>
                     <option value="Materials">Materials</option>
-                    <option value="Groceries">Groceries</option>
-                    <option value="Fashion">Fashion</option>
                 </select>
-                <button class="btn btn-main" onclick="addItem()">Commit to Database</button>
+                <button class="btn btn-main" onclick="addItem()">Commit to Ledger</button>
             </div>
         </section>
 
@@ -131,7 +126,7 @@
                 <input type="text" id="search" placeholder="Search by name or category..." onkeyup="renderTable()">
                 <div style="overflow-x:auto;">
                     <table>
-                        <thead><tr><th>Description</th><th>Stock Level</th><th class="admin-only">Valuation</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Description</th><th>Stock</th><th class="admin-only">Value</th><th>Action</th></tr></thead>
                         <tbody id="stock-table"></tbody>
                     </table>
                 </div>
@@ -139,13 +134,15 @@
         </section>
 
         <section id="page-reports" class="page">
-            <div class="card" onclick="exportPDF('audit')" style="cursor:pointer">
-                <h4><i class="fas fa-file-pdf"></i> Generate Full Audit PDF</h4>
+            <div class="card" onclick="exportPDF()" style="cursor:pointer">
+                <h4><i class="fas fa-file-pdf"></i> Generate Master Audit (PDF)</h4>
             </div>
+            
             <div class="admin-only card" onclick="exportCSV()" style="cursor:pointer">
-                <h4><i class="fas fa-file-csv"></i> Sync Master Spreadsheet (CSV)</h4>
+                <h4><i class="fas fa-file-csv"></i> Export Spreadsheet (CSV)</h4>
             </div>
-            <button class="btn btn-wa" onclick="sendWA()"><i class="fab fa-whatsapp"></i> Broadcast Stock Levels</button>
+            
+            <button class="btn btn-wa" onclick="sendWA()"><i class="fab fa-whatsapp"></i> Broadcast to Manager</button>
         </section>
     </div>
 
@@ -155,7 +152,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
     <script>
-        let inventory = JSON.parse(localStorage.getItem('sp_master_data')) || [];
+        let inventory = JSON.parse(localStorage.getItem('sp_final_vault')) || [];
         let currentUser = 'Guest';
         let myChart = null;
         let html5QrCode = null;
@@ -165,7 +162,7 @@
             const p = document.getElementById('login-pass').value;
             if (u === 'admin' && p === '1234') enterAs('Admin');
             else if (u === 'staff' && p === 'staff') enterAs('Staff');
-            else alert("Invalid Credentials");
+            else alert("Denied");
         }
 
         function enterAs(role) {
@@ -188,18 +185,56 @@
             refresh();
         }
 
-        function toggleScanner() {
-            const r = document.getElementById('reader');
-            if (!html5QrCode) {
-                r.style.display = 'block';
-                html5QrCode = new Html5Qrcode("reader");
-                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
-                (text) => { document.getElementById('p-name').value = text; toggleScanner(); toast("Code Scanned"); });
-            } else {
-                html5QrCode.stop().then(() => { html5QrCode = null; r.style.display = 'none'; });
+        /* --- THEME TOGGLE (DARK MODE) --- */
+        function toggleDarkMode() {
+            const b = document.body;
+            const icon = document.getElementById('theme-icon');
+            const isDark = b.getAttribute('data-theme') === 'dark';
+            
+            b.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            icon.classList.toggle('fa-moon', !isDark);
+            icon.classList.toggle('fa-sun', isDark);
+            
+            if(myChart) {
+                myChart.options.plugins.legend.labels.color = isDark ? '#2c3e50' : '#ffffff';
+                myChart.update();
             }
         }
 
+        /* --- CSV EXPORT --- */
+        function exportCSV() {
+            if(inventory.length === 0) return toast("No data to export");
+            let csv = "Asset,Category,Quantity,UnitPrice,Timestamp\n";
+            inventory.forEach(i => {
+                csv += `${i.name},${i.cat},${i.qty},${i.price},${i.time}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'StockPro_MasterLedger.csv'; a.click();
+            toast("CSV Sync Complete");
+        }
+
+        /* --- PDF EXPORT --- */
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("StockPro Enterprise Audit", 14, 15);
+            doc.autoTable({ 
+                head: [['Item', 'Cat', 'Qty', 'Price']], 
+                body: inventory.map(i => [i.name, i.cat, i.qty, i.price]) 
+            });
+            doc.save('Audit_Report.pdf');
+        }
+
+        /* --- WHATSAPP --- */
+        function sendWA() {
+            let msg = `*STOCKPRO SUMMARY*%0AInventory Update:%0A`;
+            inventory.forEach(i => msg += `• ${i.name}: ${i.qty}%0A`);
+            window.open(`https://wa.me/254112873218?text=${msg}`);
+        }
+
+        /* --- CORE LOGIC --- */
         function addItem() {
             const n = document.getElementById('p-name').value;
             const q = parseInt(document.getElementById('p-qty').value);
@@ -207,7 +242,7 @@
             if(!n || isNaN(q)) return toast("Check Inputs");
 
             inventory.push({ id: Date.now(), name: n, qty: q, price: p, cat: document.getElementById('p-cat').value, time: new Date().toLocaleString() });
-            localStorage.setItem('sp_master_data', JSON.stringify(inventory));
+            localStorage.setItem('sp_final_vault', JSON.stringify(inventory));
             refresh(); updateChart();
             ['p-name','p-qty','p-price'].forEach(id => document.getElementById(id).value = '');
         }
@@ -220,11 +255,11 @@
             inventory.filter(i => i.name.toLowerCase().includes(query) || i.cat.toLowerCase().includes(query)).forEach(i => {
                 body.innerHTML += `
                     <tr>
-                        <td><strong>${i.name.toUpperCase()}</strong><br><small style="opacity:0.6">${i.cat} | ${i.time}</small></td>
-                        <td><span class="badge ${i.qty < 5 ? 'badge-low' : 'badge-ok'}">${i.qty} UNITS</span></td>
+                        <td><strong>${i.name.toUpperCase()}</strong><br><small>${i.time}</small></td>
+                        <td><span class="badge ${i.qty < 5 ? 'badge-low' : ''}">${i.qty} UNITS</span></td>
                         <td class="admin-only">KES ${i.price.toLocaleString()}</td>
                         <td>
-                            ${currentUser === 'Admin' ? `<i class="fas fa-trash-alt" style="color:var(--danger); cursor:pointer" onclick="deleteItem(${i.id})"></i>` : `<i class="fas fa-lock" style="opacity:0.2"></i>`}
+                            ${currentUser === 'Admin' ? `<i class="fas fa-trash" style="color:var(--danger); cursor:pointer" onclick="deleteItem(${i.id})"></i>` : `<i class="fas fa-lock" style="opacity:0.2"></i>`}
                         </td>
                     </tr>`;
             });
@@ -232,9 +267,9 @@
         }
 
         function deleteItem(id) {
-            if(confirm("Purge asset from database?")) {
+            if(confirm("Confirm deletion?")) {
                 inventory = inventory.filter(i => i.id !== id);
-                localStorage.setItem('sp_master_data', JSON.stringify(inventory));
+                localStorage.setItem('sp_final_vault', JSON.stringify(inventory));
                 refresh(); updateChart();
             }
         }
@@ -247,11 +282,10 @@
         }
 
         function initChart() {
-            if(!document.getElementById('categoryChart')) return;
             const ctx = document.getElementById('categoryChart').getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: ['Hardware', 'Software', 'Materials', 'Groceries', 'Fashion'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#d4af37', '#1e272e', '#2c3e50', '#c23616', '#353b48'] }] },
+                data: { labels: ['Hardware', 'Software', 'Materials'], datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#1e272e', '#353b48'] }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
             updateChart();
@@ -259,36 +293,9 @@
 
         function updateChart() {
             if(!myChart) return;
-            const cats = ['Hardware', 'Software', 'Materials', 'Groceries', 'Fashion'];
-            myChart.data.datasets[0].data = cats.map(c => inventory.filter(i => i.cat === c).reduce((s, x) => s + (x.qty * x.price), 0));
+            const cats = ['Hardware', 'Software', 'Materials'];
+            myChart.data.datasets[0].data = cats.map(c => inventory.filter(i => i.cat === c).length);
             myChart.update();
-        }
-
-        function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFont("helvetica", "bold");
-            doc.text("STOCKPRO EXECUTIVE AUDIT", 105, 20, null, null, "center");
-            doc.autoTable({ head:[['Asset','Category','Qty','Price']], body: inventory.map(i=>[i.name, i.cat, i.qty, i.price]), startY: 30 });
-            doc.save('StockPro_Audit.pdf');
-        }
-
-        function exportCSV() {
-            let csv = "Asset,Category,Qty,Price,Timestamp\n";
-            inventory.forEach(i => csv += `${i.name},${i.cat},${i.qty},${i.price},${i.time}\n`);
-            const b = new Blob([csv], {type: 'text/csv'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'MasterLedger.csv'; a.click();
-        }
-
-        function sendWA() {
-            let msg = `*STOCKPRO SUMMARY*%0A*Role:* ${currentUser}%0A%0A`;
-            inventory.forEach(i => msg += `• ${i.name}: ${i.qty}%0A`);
-            window.open(`https://wa.me/254700000000?text=${msg}`);
-        }
-
-        function toggleDarkMode() {
-            const b = document.body;
-            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
         }
 
         function nav(p, e) {
@@ -298,10 +305,22 @@
             e.target.classList.add('active');
         }
 
+        function toggleScanner() {
+            const r = document.getElementById('reader');
+            if (!html5QrCode) {
+                r.style.display = 'block';
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
+                (text) => { document.getElementById('p-name').value = text; toggleScanner(); });
+            } else {
+                html5QrCode.stop().then(() => { html5QrCode = null; r.style.display = 'none'; });
+            }
+        }
+
         function toast(m) {
             const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2500);
+            setTimeout(() => t.style.display = 'none', 2000);
         }
     </script>
 </body>
-    </html>
+            </html>
