@@ -59,9 +59,15 @@
         <div style="background:var(--card); padding:30px; border-radius:20px; width:85%; max-width:340px; text-align:center; border:1px solid var(--primary);">
             <h2 style="color:var(--primary); margin:0;">STOCKPRO</h2>
             <p style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 20px;">Secure Inventory Management</p>
-            <input type="text" id="u" placeholder="e.g. admin milka">
-            <input type="password" id="p" placeholder="Password">
-            <button class="btn btn-main" onclick="doLogin()">Unlock System</button>
+          <input type="text" id="u" placeholder="Enter Your Name">
+<input type="password" id="p" placeholder="Set Password">
+<select id="r_select" style="margin-bottom: 15px;">
+    <option value="" disabled selected>Select Role</option>
+    <option value="Admin">Admin</option>
+    <option value="Staff">Staff</option>
+</select>
+<button class="btn btn-main" onclick="doLogin()">Unlock System</button>
+            
         </div>
     </div>
 
@@ -134,12 +140,18 @@
 
         // --- LOGIN & AUTH ---
         function doLogin() {
-            let u = document.getElementById('u').value.trim().toLowerCase();
-            let p = document.getElementById('p').value.trim();
-            if (u.startsWith('admin ')) { userName = u.replace('admin ', ''); launch('Admin'); }
-            else if (u.startsWith('staff ')) { userName = u.replace('staff ', ''); launch('Staff'); }
-            else { alert("Login format: 'admin [name]' or 'staff [name]'"); }
-        }
+    let nameInput = document.getElementById('u').value.trim();
+    let passInput = document.getElementById('p').value.trim();
+    let roleSelect = document.getElementById('r_select').value;
+
+    if (!nameInput || !passInput || !roleSelect) {
+        alert("Please fill in your name, password, and select a role!");
+        return;
+    }
+
+    userName = nameInput; // Sets the global userName variable
+    launch(roleSelect);   // Passes 'Admin' or 'Staff' to your launch function
+    }
 
         function launch(r) {
             role = r;
