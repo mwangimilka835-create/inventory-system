@@ -122,9 +122,15 @@
 
     <div id="toast"></div>
 
-    <script>
+<script>
         let db = JSON.parse(localStorage.getItem('stock_final_v10')) || [];
         let role = ''; let userName = ''; let chart = null; let html5QrCode = null;
+
+        // --- ITEM DATABASE (MAP BARCODE TO NAME) ---
+        const itemDatabase = {
+            "6161106610044": "Hardware Item A",
+            "1234567890123": "Sample Tool"
+        };
 
         // --- LOGIN & AUTH ---
         function doLogin() {
@@ -179,7 +185,7 @@
 
         function updateChart() { if(chart) { chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length); chart.update(); } }
 
-        // --- OPERATIONS & CONFIRMATIONS ---
+        // --- OPERATIONS ---
         function add() {
             let n = document.getElementById('n').value.trim(), q = parseInt(document.getElementById('q').value);
             if(!n || isNaN(q)) return alert("Check inputs!");
@@ -208,7 +214,7 @@
             updateChart();
         }
 
-        // --- SCANNER KILL-SWITCH ---
+        // --- SCANNER LOGIC (FIXED) ---
         async function toggleScanner() {
             const qrBox = document.getElementById('qr-view');
             const btnText = document.getElementById('scan-text');
@@ -219,53 +225,28 @@
                 toast("📷 Opening Camera...");
                 try {
                     await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => { 
-                        document.getElementById('n').value = t; toast("🔍 Scanned: " + t); stopScanner(); 
+                        // Auto-fill Name from Database OR use Barcode if not found
+                        const foundName = itemDatabase[t] || t;
+                        document.getElementById('n').value = foundName; 
+                        
+                        // Auto-set Quantity to 1
+                        document.getElementById('q').value = "1";
+                        
+                        toast("🔍 Scanned: " + foundName); 
+                        stopScanner(); 
                     });
                 } catch (err) { alert("Enable Camera Permissions!"); stopScanner(); }
             } else { stopScanner(); }
         }
-// Add this list at the very top of your script (outside any functions)
-// Add your own barcodes and names here!
-const itemDatabase = {
-    "6161106610044": "Hardware Item A",
-    "1234567890123": "Sample Tool",
-    "0000000000000": "New Asset"
-};
 
-async function toggleScanner() {
-    const qrBox = document.getElementById('qr-view');
-    const btnText = document.getElementById('scan-text');
-    
-    if (!html5QrCode) {
-        qrBox.style.display = 'block';
-        html5QrCode = new Html5Qrcode("qr-view");
-        btnText.innerText = "Kill Scanner";
-        toast("📸 Opening Camera...");
-        try {
-            await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => {
-                // 1. Set the Barcode/ID
-                document.getElementById('n').value = t;
-
-                // 2. Look up the name from our database
-                // If it's not in the list, it will just say "Unknown Item"
-                const itemName = itemDatabase[t] || "Unknown Item";
-                document.getElementById('item-name-input').value = itemName; 
-
-                // 3. Set Quantity to 1
-                document.getElementById('q').value = "1"; 
-
-                toast("🔍 Scanned: " + itemName);
-                stopScanner();
-            });
-        } catch (err) { 
-            alert("Enable Camera Permissions!"); 
-            stopScanner(); 
-        }
-    } else { 
-        stopScanner(); 
-    }
-}
-                }
+        async function stopScanner() {
+            if (html5QrCode) {
+                try { await html5QrCode.stop(); } catch (e) {}
+                html5QrCode = null;
+                document.getElementById('qr-view').style.display = 'none';
+                document.getElementById('qr-view').innerHTML = ''; // Clean up
+                document.getElementById('scan-text').innerText = "Start Scanner";
+                toast("🔒 Camera Stopped");
             }
         }
 
@@ -282,7 +263,8 @@ async function toggleScanner() {
         }
 
         function pdf() {
-            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            const { jsPDF } = window.jspdf; 
+            const doc = new jsPDF();
             doc.text("StockPro Audit", 14, 15);
             doc.autoTable({ head: [['Item', 'Qty', 'Category', 'User']], body: db.map(i => [i.name, i.qty, i.cat, i.addedBy]) });
             doc.save('Audit.pdf');
@@ -307,7 +289,8 @@ async function toggleScanner() {
             db.forEach(i => m += `• ${i.name}: ${i.qty}%0A`); 
             window.open('https://wa.me/254112873218?text=' + m); 
         }
-    </script>
+                </script>
+        
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
     <a href="https://mwangimilka835-create.github.io/identity/" 
        style="background: rgba(128, 128, 128, 0.15); color: #888; text-decoration: none; font-size: 0.75rem; border: 1px solid rgba(128, 128, 128, 0.3); padding: 10px 20px; border-radius: 50px; display: inline-block; font-weight: 600;">
