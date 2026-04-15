@@ -295,12 +295,22 @@
             t.innerText=m; t.style.display='block'; 
             setTimeout(()=>t.style.display='none', 3000); 
         }
-        
         function wa() { 
-            let m = '*STOCKPRO UPDATE*%0A'; 
-            db.forEach(i => m += `• ${i.name}: ${i.qty}%0A`); 
-            window.open('https://wa.me/254112873218?text=' + m); 
-        }
+    let m = '*STOCKPRO UPDATE*%0A';
+    let totalValue = 0;
+
+    db.forEach(i => {
+        let itemTotal = i.qty * (i.price || 0);
+        totalValue += itemTotal;
+        // This line adds the item name, quantity, and its total cost
+        m += `• ${i.name}: ${i.qty} (Est. KES ${itemTotal.toLocaleString()})%0A`;
+    }); 
+
+    m += `%0A*TOTAL LEDGER VALUE: KES ${totalValue.toLocaleString()}*`;
+    
+    window.open('https://wa.me/254112873218?text=' + m); 
+}
+        
                 </script>
         
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
