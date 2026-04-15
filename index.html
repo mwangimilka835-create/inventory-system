@@ -224,16 +224,47 @@
                 } catch (err) { alert("Enable Camera Permissions!"); stopScanner(); }
             } else { stopScanner(); }
         }
+// Add this list at the very top of your script (outside any functions)
+// Add your own barcodes and names here!
+const itemDatabase = {
+    "6161106610044": "Hardware Item A",
+    "1234567890123": "Sample Tool",
+    "0000000000000": "New Asset"
+};
 
-        async function stopScanner() {
-            if (html5QrCode) {
-                try { await html5QrCode.stop(); } catch (e) {} 
-                finally {
-                    html5QrCode = null;
-                    document.getElementById('qr-view').innerHTML = ''; 
-                    document.getElementById('qr-view').style.display = 'none';
-                    document.getElementById('scan-text').innerText = "Start Scanner";
-                    toast("🔒 Camera Stopped");
+async function toggleScanner() {
+    const qrBox = document.getElementById('qr-view');
+    const btnText = document.getElementById('scan-text');
+    
+    if (!html5QrCode) {
+        qrBox.style.display = 'block';
+        html5QrCode = new Html5Qrcode("qr-view");
+        btnText.innerText = "Kill Scanner";
+        toast("📸 Opening Camera...");
+        try {
+            await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => {
+                // 1. Set the Barcode/ID
+                document.getElementById('n').value = t;
+
+                // 2. Look up the name from our database
+                // If it's not in the list, it will just say "Unknown Item"
+                const itemName = itemDatabase[t] || "Unknown Item";
+                document.getElementById('item-name-input').value = itemName; 
+
+                // 3. Set Quantity to 1
+                document.getElementById('q').value = "1"; 
+
+                toast("🔍 Scanned: " + itemName);
+                stopScanner();
+            });
+        } catch (err) { 
+            alert("Enable Camera Permissions!"); 
+            stopScanner(); 
+        }
+    } else { 
+        stopScanner(); 
+    }
+}
                 }
             }
         }
