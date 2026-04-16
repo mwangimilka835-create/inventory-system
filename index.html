@@ -129,9 +129,9 @@
     <div id="toast"></div>
 
 <script type="module">
-    // 1. FIREBASE CORE SETUP
+    // 1. FIREBASE CORE (Cloud Engine)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
@@ -147,12 +147,12 @@
     const fdb = getDatabase(app);
     const inventoryRef = ref(fdb, 'stock_final_v10');
 
-    // --- GLOBAL STATE ---
-    let db = []; 
-    let role = ''; 
-    let userName = ''; 
-    let chart = null; 
-    let html5QrCode = null;
+    // --- GLOBAL VARIABLES ---
+    window.db = []; 
+    window.role = ''; 
+    window.userName = ''; 
+    window.chart = null; 
+    window.html5QrCode = null;
 
     const itemDatabase = {
         "6161106610044": "Hardware Item A",
@@ -164,18 +164,15 @@
         let nameInput = document.getElementById('u').value.trim();
         let passInput = document.getElementById('p').value.trim();
         let roleSelect = document.getElementById('r_select').value;
-
         if (!nameInput || !passInput || !roleSelect) {
-            alert("Please fill in your name, password, and select a role!");
-            return;
+            alert("Please fill all fields!"); return;
         }
-
-        userName = nameInput;
+        window.userName = nameInput;
         launch(roleSelect);
-    }
+    };
 
     function launch(r) {
-        role = r;
+        window.role = r;
         document.getElementById('auth-overlay').style.display='none';
         document.getElementById('navbar').style.display='flex';
         document.getElementById('app').style.display='block';
@@ -183,9 +180,10 @@
             document.getElementById('adm-pr').style.display = 'block';
             document.getElementById('adm-csv').style.display = 'flex';
             document.getElementById('chart-card').style.display = 'block';
-            setTimeout(initChart, 200);
+            setTimeout(initChart, 500);
         }
-        toast(`✅ Access Granted: ${userName.toUpperCase()}`);
+        draw(); 
+        window.toast(`✅ Access Granted: ${window.userName.toUpperCase()}`);
     }
 
     window.tab = function(p, e) {
@@ -193,24 +191,24 @@
         document.getElementById('p-'+p).classList.add('active');
         document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
         e.currentTarget.classList.add('active');
-    }
+    };
 
     // --- THEME ---
     window.toggleMode = function() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
         document.getElementById('mode-icon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-        if(chart) {
-            chart.options.plugins.legend.labels.color = isLight ? '#1a1a1a' : '#f0ebff';
-            chart.update();
+        if(window.chart) {
+            window.chart.options.plugins.legend.labels.color = isLight ? '#1a1a1a' : '#f0ebff';
+            window.chart.update();
         }
-        toast(isLight ? "☀️ Light Mode" : "🌙 Dark Mode");
-    }
+        window.toast(isLight ? "☀️ Light Mode" : "🌙 Dark Mode");
+    };
 
     // --- CHART LOGIC ---
     function initChart() {
         const ctx = document.getElementById('stockPie').getContext('2d');
-        chart = new Chart(ctx, {
+        window.chart = new Chart(ctx, {
             type: 'pie',
             data: { 
                 labels: ['H/W', 'S/W', 'MAT'], 
@@ -224,27 +222,24 @@
     }
 
     function updateChart() { 
-        if(chart && db.length > 0) { 
-            chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => db.filter(i=>i.cat===c).length); 
-            chart.update(); 
+        if(window.chart && window.db.length > 0) { 
+            window.chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => window.db.filter(i=>i.cat===c).length); 
+            window.chart.update(); 
         } 
     }
 
-    // --- FIREBASE OPERATIONS (The Engine) ---
-    
-    // 1. Real-time Listener: Updates UI whenever Cloud data changes
+    // --- CLOUD OPERATIONS ---
     onValue(inventoryRef, (snapshot) => {
         const data = snapshot.val();
-        db = []; // Reset local array
+        window.db = [];
         if (data) {
             Object.keys(data).forEach(id => {
-                db.push({ ...data[id], firebaseId: id });
+                window.db.push({ ...data[id], firebaseId: id });
             });
         }
-        draw(); 
+        draw();
     });
 
-    // 2. Add Item (Push to Cloud)
     window.add = async function() {
         let n = document.getElementById('n').value.trim();
         let q = parseInt(document.getElementById('q').value);
@@ -253,37 +248,29 @@
         if(confirm(`Commit ${n} to stock?`)) {
             try {
                 await push(inventoryRef, {
-                    name: n,
-                    qty: q,
+                    name: n, qty: q,
                     price: document.getElementById('pr').value || 0,
                     cat: document.getElementById('cat').value,
-                    addedBy: userName,
+                    addedBy: window.userName,
                     timestamp: new Date().toISOString()
                 });
-                toast("📦 Asset Synced to Cloud");
-                document.getElementById('n').value = ''; 
-                document.getElementById('q').value = '';
-            } catch (err) {
-                alert("Cloud Sync Failed! Check your data bundles.");
-            }
+                window.toast("📦 Asset Synced to Cloud");
+                document.getElementById('n').value = ''; document.getElementById('q').value = '';
+            } catch (err) { alert("Cloud Sync Failed!"); }
         }
-    }
+    };
 
-    // 3. Delete Item (Remove from Cloud)
     window.del = function(id) {
-        if(confirm("Permanently delete this entry from Cloud?")) {
-            const itemRef = ref(fdb, `stock_final_v10/${id}`);
-            remove(itemRef).then(() => {
-                toast("🗑️ Entry Removed");
-            });
+        if(confirm("Permanently delete from Cloud?")) {
+            remove(ref(fdb, `stock_final_v10/${id}`));
+            window.toast("🗑️ Entry Removed");
         }
-    }
+    };
 
-    // 4. Draw Table
     window.draw = function() {
         let b = document.getElementById('table-body'), s = document.getElementById('find').value.toLowerCase();
         b.innerHTML = '';
-        db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
+        window.db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
             b.innerHTML += `<tr>
                 <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small></td>
                 <td>${i.qty}</td>
@@ -291,84 +278,78 @@
             </tr>`;
         });
         updateChart();
-    }
+    };
 
-    // --- SCANNER LOGIC ---
+    // --- SCANNER (RESTORED) ---
     window.toggleScanner = async function() {
         const qrBox = document.getElementById('qr-view');
         const btnText = document.getElementById('scan-text');
-        if (!html5QrCode) {
+        if (!window.html5QrCode) {
             qrBox.style.display = 'block';
-            html5QrCode = new Html5Qrcode("qr-view");
+            window.html5QrCode = new Html5Qrcode("qr-view");
             btnText.innerText = "Kill Scanner";
-            toast("📷 Opening Camera...");
+            window.toast("📷 Opening Camera...");
             try {
-                await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => { 
+                await window.html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => { 
                     const foundName = itemDatabase[t] || t;
                     document.getElementById('n').value = foundName; 
                     document.getElementById('q').value = "1";
-                    toast("🔍 Scanned: " + foundName); 
-                    stopScanner(); 
+                    window.toast("🔍 Scanned: " + foundName); 
+                    window.stopScanner(); 
                 });
-            } catch (err) { alert("Enable Camera Permissions!"); stopScanner(); }
-        } else { stopScanner(); }
-    }
+            } catch (err) { alert("Enable Camera Permissions!"); window.stopScanner(); }
+        } else { window.stopScanner(); }
+    };
 
-    async function stopScanner() {
-        if (html5QrCode) {
-            try { await html5QrCode.stop(); } catch (e) {}
-            html5QrCode = null;
+    window.stopScanner = async function() {
+        if (window.html5QrCode) {
+            try { await window.html5QrCode.stop(); } catch (e) {}
+            window.html5QrCode = null;
             document.getElementById('qr-view').style.display = 'none';
             document.getElementById('qr-view').innerHTML = ''; 
             document.getElementById('scan-text').innerText = "Start Scanner";
-            toast("🔒 Camera Stopped");
         }
-    }
+    };
 
-    // --- EXPORTS & WHATSAPP ---
+    // --- EXPORTS & WHATSAPP (RESTORED) ---
     window.csv = function() {
         let c = "Item,Qty,Price,Category,User\n";
-        db.forEach(i => c += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.addedBy}"\n`);
+        window.db.forEach(i => c += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.addedBy}"\n`);
         const blob = new Blob([c], { type: 'text/csv' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "Inventory.csv";
         link.click();
-        toast("📄 CSV Downloaded");
-    }
+        window.toast("📄 CSV Downloaded");
+    };
 
     window.pdf = function() {
         const { jsPDF } = window.jspdf; 
         const doc = new jsPDF();
         doc.text("StockPro Cloud Audit", 14, 15);
-        doc.autoTable({ 
-            head: [['Item', 'Qty', 'Category', 'User']], 
-            body: db.map(i => [i.name, i.qty, i.cat, i.addedBy]) 
-        });
+        doc.autoTable({ head: [['Item', 'Qty', 'Category', 'User']], body: window.db.map(i => [i.name, i.qty, i.cat, i.addedBy]) });
         doc.save('Audit.pdf');
-        toast("📕 PDF Downloaded");
-    }
+        window.toast("📕 PDF Downloaded");
+    };
 
     window.wa = function() { 
         let m = '*STOCKPRO CLOUD UPDATE*%0A';
         let totalValue = 0;
-        db.forEach(i => {
+        window.db.forEach(i => {
             let itemTotal = i.qty * (i.price || 0);
             totalValue += itemTotal;
             m += `• ${i.name}: ${i.qty} (KES ${itemTotal.toLocaleString()})%0A`;
         }); 
         m += `%0A*TOTAL VALUE: KES ${totalValue.toLocaleString()}*`;
         window.open('https://wa.me/254112873218?text=' + m); 
-    }
+    };
 
     window.toast = function(m) { 
         let t=document.getElementById('toast'); 
         t.innerText=m; t.style.display='block'; 
         setTimeout(()=>t.style.display='none', 3000); 
-    }
+    };
 </script>
-                </script>
-        
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
     <a href="https://mwangimilka835-create.github.io/identity/" 
        style="background: rgba(128, 128, 128, 0.15); color: #888; text-decoration: none; font-size: 0.75rem; border: 1px solid rgba(128, 128, 128, 0.3); padding: 10px 20px; border-radius: 50px; display: inline-block; font-weight: 600;">
