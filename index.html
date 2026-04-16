@@ -1,4 +1,10 @@
-<!DOCTYPE html>
+function wa() { 
+    if (db.length === 0) return toast("⚠️ No assets to sync!");
+    let m = '*STOCKPRO UPDATE*%0A'; 
+    db.forEach(i => m += `• ${i.name}: ${i.qty}%0A`); 
+    // Make sure this URL is correct
+    window.open('https://wa.me/254112873218?text=' + m); 
+}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -332,18 +338,27 @@
         window.toast("📕 PDF Downloaded");
     };
 
-    window.wa = function() { 
-        let m = '*STOCKPRO CLOUD UPDATE*%0A';
-        let totalValue = 0;
-        window.db.forEach(i => {
-            let itemTotal = i.qty * (i.price || 0);
-            totalValue += itemTotal;
-            m += `• ${i.name}: ${i.qty} (KES ${itemTotal.toLocaleString()})%0A`;
-        }); 
-        m += `%0A*TOTAL VALUE: KES ${totalValue.toLocaleString()}*`;
-        window.open('https://wa.me/254112873218?text=' + m); 
-    };
+    window.wa = function() {
+    // We use 'db' because that's what your main script uses
+    if (!db || db.length === 0) {
+        window.toast("⚠️ Nothing to sync! Add items first.");
+        return;
+    }
 
+    let m = '*STOCKPRO CLOUD UPDATE*%0A';
+    let totalValue = 0;
+
+    db.forEach(i => {
+        let itemTotal = i.qty * (i.price || 0);
+        totalValue += itemTotal;
+        m += `• ${i.name}: ${i.qty} (KES ${itemTotal.toLocaleString()})%0A`;
+    });
+
+    m += `%0A*TOTAL VALUE: KES ${totalValue.toLocaleString()}*`;
+    
+    // This opens WhatsApp with your report
+    window.open('https://wa.me/254112873218?text=' + m);
+};
     window.toast = function(m) { 
         let t=document.getElementById('toast'); 
         t.innerText=m; t.style.display='block'; 
