@@ -131,7 +131,7 @@
 <script type="module">
     // 1. FIREBASE CORE (Cloud Engine)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
@@ -238,8 +238,8 @@
             });
         }
         draw();
+        updateChart();
     });
-    
 
     window.add = async function() {
         let n = document.getElementById('n').value.trim();
@@ -249,49 +249,56 @@
         if(confirm(`Commit ${n} to stock?`)) {
             try {
                 await push(inventoryRef, {
-            name: n, 
-            qty: q,
-            price: document.getElementById('pr').value || 0,
-            cat: document.getElementById('cat').value,
-            status: "pending", // <--- ADD THIS LINE
-            addedBy: window.userName,
-            timestamp: new Date().toISOString()
-        });
+                    name: n, 
+                    qty: q,
+                    price: document.getElementById('pr').value || 0,
+                    cat: document.getElementById('cat').value,
+                    status: "pending", 
+                    addedBy: window.userName,
+                    timestamp: new Date().toISOString()
+                });
+                window.toast("📦 Asset Synced to Cloud");
+                document.getElementById('n').value = ''; 
+                document.getElementById('q').value = '';
+            } catch (err) { alert("Cloud Sync Failed!"); }
         }
     };
 
     window.del = function(id) {
-    if(confirm("Permanently delete from Cloud?")) {
-        remove(ref(fdb, `stock_final_v10/${id}`))
-        .then(() => {
-            window.toast("🗑️ Entry Removed");
-        })
-        .catch((error) => {
-            window.toast("❌ Permission Denied by Cloud");
-            console.error("Delete failed:", error);
-        });
-    }
-};
-window.draw = function() {
-    let b = document.getElementById('table-body');
-    // ... existing filter logic ...
-    
-    window.db.forEach(i => {
-        // Create the status badge
-        const statusBadge = i.status === "pending" 
-            ? '<br><span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>' 
-            : '<br><span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>';
+        if(window.role !== 'Admin') {
+            return window.toast("❌ Access Denied: Only Admin can delete.");
+        }
+        if(confirm("Permanently delete from Cloud?")) {
+            remove(ref(fdb, `stock_final_v10/${id}`))
+            .then(() => { window.toast("🗑️ Entry Removed"); })
+            .catch(() => { window.toast("🔒 Permission Denied by Cloud"); });
+        }
+    };
 
-       b.innerHTML += `<tr>
-    <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small>${statusBadge}</td>
-    <td ${lowStyle}>${i.qty}${alertTag}</td>
-    <td><button class="btn-danger" onclick="del('${i.firebaseId}')"><i class="fas fa-trash"></i></button></td>
-</tr>`;
+    window.draw = function() {
+        let b = document.getElementById('table-body');
+        let searchTerm = document.getElementById('find').value.toLowerCase();
+        b.innerHTML = '';
         
-    });
-};
+        window.db.forEach(i => {
+            if(!i.name.toLowerCase().includes(searchTerm)) return;
 
-    // --- SCANNER (RESTORED) ---
+            const statusBadge = i.status === "pending" 
+                ? '<br><span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>' 
+                : '<br><span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>';
+
+            let lowStyle = i.qty <= 5 ? 'style="color:#ff4d4d; font-weight:bold"' : '';
+            let alertTag = i.qty <= 5 ? ' <br><small>⚠️ LOW STOCK</small>' : '';
+
+            b.innerHTML += `<tr>
+                <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small>${statusBadge}</td>
+                <td ${lowStyle}>${i.qty}${alertTag}</td>
+                <td><button class="btn-danger" onclick="del('${i.firebaseId}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        });
+    };
+
+    // --- SCANNER ---
     window.toggleScanner = async function() {
         const qrBox = document.getElementById('qr-view');
         const btnText = document.getElementById('scan-text');
@@ -322,10 +329,10 @@ window.draw = function() {
         }
     };
 
-    // --- EXPORTS & WHATSAPP (RESTORED) ---
+    // --- EXPORTS & WHATSAPP ---
     window.csv = function() {
-        let c = "Item,Qty,Price,Category,User\n";
-        window.db.forEach(i => c += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.addedBy}"\n`);
+        let c = "Item,Qty,Price,Category,User,Status\n";
+        window.db.forEach(i => c += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.addedBy}","${i.status}"\n`);
         const blob = new Blob([c], { type: 'text/csv' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -338,32 +345,21 @@ window.draw = function() {
         const { jsPDF } = window.jspdf; 
         const doc = new jsPDF();
         doc.text("StockPro Cloud Audit", 14, 15);
-        doc.autoTable({ head: [['Item', 'Qty', 'Category', 'User']], body: window.db.map(i => [i.name, i.qty, i.cat, i.addedBy]) });
+        doc.autoTable({ head: [['Item', 'Qty', 'Category', 'Status']], body: window.db.map(i => [i.name, i.qty, i.cat, i.status]) });
         doc.save('Audit.pdf');
         window.toast("📕 PDF Downloaded");
     };
 
     window.wa = function() {
-    // We use 'db' because that's what your main script uses
-    if (!db || db.length === 0) {
-        window.toast("⚠️ Nothing to sync! Add items first.");
-        return;
-    }
+        if (!window.db || window.db.length === 0) {
+            window.toast("⚠️ Nothing to sync!");
+            return;
+        }
+        let m = '*STOCKPRO CLOUD UPDATE*%0A';
+        window.db.forEach(i => m += `• ${i.name}: ${i.qty} (${i.status})%0A`);
+        window.open('https://wa.me/254112873218?text=' + m);
+    };
 
-    let m = '*STOCKPRO CLOUD UPDATE*%0A';
-    let totalValue = 0;
-
-    db.forEach(i => {
-        let itemTotal = i.qty * (i.price || 0);
-        totalValue += itemTotal;
-        m += `• ${i.name}: ${i.qty} (KES ${itemTotal.toLocaleString()})%0A`;
-    });
-
-    m += `%0A*TOTAL VALUE: KES ${totalValue.toLocaleString()}*`;
-    
-    // This opens WhatsApp with your report
-    window.open('https://wa.me/254112873218?text=' + m);
-};
     window.toast = function(m) { 
         let t=document.getElementById('toast'); 
         t.innerText=m; t.style.display='block'; 
