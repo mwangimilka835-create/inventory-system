@@ -301,10 +301,9 @@
     let searchTerm = document.getElementById('find').value.toLowerCase();
     b.innerHTML = '';
     window.db.forEach(i => {
-    // Inventory Status Badge
-    const invBadge = i.status === "Verified" 
-        ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
-        : '<span style="color: #ffa500; font-size: 11px;">⏳ Stock Pending</span>';
+    // Inventory Status Badgeconst invBadge = i.status === "Verified" 
+    ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
+    : '<span style="color: #ffa500; font-size: 11px;">⏳ Stock Pending</span>';
 
     // Payment Status Badge
     let payBadge = '';
@@ -342,8 +341,9 @@
             </button>
         </div>
     </div>`;
-    }
-});
+    };
+    };
+
     
     // --- SCANNER ---
     window.toggleScanner = async function() {
