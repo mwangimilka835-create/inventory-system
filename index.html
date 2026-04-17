@@ -284,6 +284,7 @@
             } catch (err) { alert("Cloud Sync Failed!"); }
         }
     };
+    
 
     window.del = function(id) {
         if(window.role !== 'Admin') {
@@ -295,29 +296,38 @@
             .catch(() => { window.toast("🔒 Permission Denied by Cloud"); });
         }
     };
+window.draw = function() {
+    let b = document.getElementById('table-body');
+    let searchTerm = document.getElementById('find').value.toLowerCase();
+    b.innerHTML = '';
+    
+    window.db.forEach(i => {
+        if(!i.name.toLowerCase().includes(searchTerm)) return;
 
-    window.draw = function() {
-        let b = document.getElementById('table-body');
-        let searchTerm = document.getElementById('find').value.toLowerCase();
-        b.innerHTML = '';
-        
-        window.db.forEach(i => {
-            if(!i.name.toLowerCase().includes(searchTerm)) return;
+        // Use 'Paid' status if it exists, otherwise use 'pending' logic
+        let statusText = i.status === "Paid" ? '✅ PAID' : '⏳ Pending';
+        let statusColor = i.status === "Paid" ? '#4CAF50' : '#ffa500';
 
-            const statusBadge = i.status === "pending" 
-                ? '<br><span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>' 
-                : '<br><span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>';
+        const statusBadge = `<br><span style="color: ${statusColor}; font-size: 11px;">${statusText}</span>`;
+        let lowStyle = i.qty <= 5 ? 'style="color:#ff4d4d; font-weight:bold"' : '';
 
-            let lowStyle = i.qty <= 5 ? 'style="color:#ff4d4d; font-weight:bold"' : '';
-            let alertTag = i.qty <= 5 ? ' <br><small>⚠️ LOW STOCK</small>' : '';
-
-            b.innerHTML += `<tr>
-                <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small>${statusBadge}</td>
-                <td ${lowStyle}>${i.qty}${alertTag}</td>
-                <td><button class="btn-danger" onclick="del('${i.firebaseId}')"><i class="fas fa-trash"></i></button></td>
-            </tr>`;
-        });
-    };
+        b.innerHTML += `<tr>
+            <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small>${statusBadge}</td>
+            <td ${lowStyle}>${i.qty}</td>
+            <td style="display: flex; gap: 5px;">
+                <button class="btn-main" style="width: 42px; height: 42px; border-radius: 8px; background: #25D366; color: white; border: none;" 
+                    onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
+                    <i class="fas fa-coins"></i>
+                </button>
+                
+                <button class="btn-danger" onclick="window.del('${i.firebaseId}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
+};
+    
 
     // --- SCANNER ---
     window.toggleScanner = async function() {
@@ -403,16 +413,25 @@ window.initPay = function(id, price, name) {
         </div>`;
     document.body.appendChild(modal);
 };
-
 window.confirmPaid = async function(id, name) {
-    window.toast("⌛ Verifying with Till 5637180...");
+    window.toast("⌛ Recording Payment...");
     try {
-        const itemRef = window.doc(window.db_ref, "assets", id);
-        await window.updateDoc(itemRef, { status: "Paid", paidAt: new Date().toISOString() });
+        // Use the 'fdb' and 'update' from your Realtime Database imports
+        const { update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+        
+        const itemRef = ref(fdb, `stock_final_v10/${id}`);
+        await update(itemRef, { 
+            status: "Paid", 
+            paidAt: new Date().toISOString() 
+        });
+
         window.toast(`✅ ${name} marked as PAID`);
         document.getElementById('pay-modal-overlay').remove();
-        if(window.loadData) window.loadData(); 
-    } catch (e) { alert("Sync error. Please check your internet."); }
+        // The onValue listener will automatically refresh the table
+    } catch (e) { 
+        console.error(e);
+        alert("Sync error. Please check your internet."); 
+    }
 };
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
