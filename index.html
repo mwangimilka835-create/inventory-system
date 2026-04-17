@@ -435,30 +435,37 @@ window.initPay = function(id, price, name) {
         </div>`;
     document.body.appendChild(modal);
 };
-window.confirmPaid = async function(id, name) {
-    const code = prompt(`Enter M-PESA Transaction Code for ${name}:`);
-    
+
+    window.confirmPaid = async function(id, name) {
+    const code = prompt(`Enter M-PESA Code for ${name}:`);
     if (!code || code.length < 5) {
-        window.toast("❌ Invalid or missing M-PESA code");
+        window.toast("❌ Invalid Code");
         return;
     }
 
-    window.toast("⌛ Saving Payment Reference...");
+    window.toast("⌛ Saving to Cloud...");
     try {
-        const { update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
-        const itemRef = ref(fdb, `stock_final_v10/${id}`);
+        // 1. Import the 'update' and 'ref' functions correctly
+        const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
         
-        // We only add the mpesaCode and a timestamp
-        // We DO NOT change i.status so it stays 'Pending' for you to verify
+        // 2. Use 'window.fdb' which you already defined at the top
+        const itemRef = ref(window.fdb, `stock_final_v10/${id}`);
+        
+        // 3. Update the database
         await update(itemRef, { 
             mpesaCode: code.toUpperCase(),
             paidAt: new Date().toISOString() 
         });
 
-        window.toast(`✅ Code ${code.toUpperCase()} linked to ${name}`);
-        document.getElementById('pay-modal-overlay').remove();
+        window.toast("✅ Payment Synced Successfully!");
+        
+        // Remove the payment card popup if it's open
+        const modal = document.getElementById('pay-modal-overlay');
+        if(modal) modal.remove();
+
     } catch (e) { 
-        alert("Sync error. Please check your connection."); 
+        console.error("Firebase Error:", e);
+        alert("System Error: " + e.message); 
     }
 };
 </script>
