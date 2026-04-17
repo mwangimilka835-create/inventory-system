@@ -404,33 +404,49 @@ window.initPay = function(id, price, name) {
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" class="mpesa-logo">
             <p style="color:#aaa; margin-bottom:5px;">Payment for ${name}</p>
             <div class="pay-amount">KES ${price}</div>
+            
             <div class="till-box">
                 <small style="color:#888; display:block;">LIPA NA M-PESA TILL</small>
                 <strong style="color:#fff; font-size:26px; letter-spacing:1px;">5637180</strong>
             </div>
-            <button class="btn-confirm" onclick="window.confirmPaid('${id}', '${name}')">I HAVE PAID</button>
-            <button onclick="document.getElementById('pay-modal-overlay').remove()" style="width:100%; margin-top:15px; background:transparent; color:#666; border:none; cursor:pointer;">CLOSE</button>
+
+            <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. SDE45FG67)" 
+                style="text-transform: uppercase; text-align: center; margin-bottom: 15px; border: 1px solid #25D366;">
+
+            <button class="btn-confirm" onclick="window.confirmPaid('${id}', '${name}')">
+                CONFIRM & VERIFY
+            </button>
+            
+            <button onclick="document.getElementById('pay-modal-overlay').remove()" 
+                style="width:100%; margin-top:15px; background:transparent; color:#666; border:none; cursor:pointer;">
+                CANCEL
+            </button>
         </div>`;
     document.body.appendChild(modal);
 };
 window.confirmPaid = async function(id, name) {
-    window.toast("⌛ Recording Payment...");
+    const code = document.getElementById('mpesa-code').value.trim();
+    
+    if (code.length < 6) {
+        alert("Please enter a valid M-PESA Transaction Code.");
+        return;
+    }
+
+    window.toast("⌛ Saving Transaction...");
     try {
-        // Use the 'fdb' and 'update' from your Realtime Database imports
         const { update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
-        
         const itemRef = ref(fdb, `stock_final_v10/${id}`);
+        
         await update(itemRef, { 
             status: "Paid", 
+            mpesaCode: code.toUpperCase(),
             paidAt: new Date().toISOString() 
         });
 
-        window.toast(`✅ ${name} marked as PAID`);
+        window.toast(`✅ Payment for ${name} Recorded!`);
         document.getElementById('pay-modal-overlay').remove();
-        // The onValue listener will automatically refresh the table
     } catch (e) { 
-        console.error(e);
-        alert("Sync error. Please check your internet."); 
+        alert("Sync error. Please check your internet connection."); 
     }
 };
 </script>
