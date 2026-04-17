@@ -435,10 +435,9 @@ window.initPay = function(id, price, name) {
         </div>`;
     document.body.appendChild(modal);
 };
-    window.confirmPaid = async function(id, name) {
+    window.confirmPaid = function(id, name) {
     const code = prompt(`Enter M-PESA Code for ${name}:`);
     
-    // 1. Validation
     if (!code || code.length < 5) {
         window.toast("❌ Transaction code required");
         return;
@@ -446,34 +445,25 @@ window.initPay = function(id, price, name) {
 
     window.toast("⌛ Syncing to StockPro Cloud...");
 
-    try {
-        // 2. Use the global 'inventoryRef' path and 'fdb' you already have
-        // We import 'ref' and 'update' directly to ensure they are fresh
-        const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
-        
-        // 3. Create the exact reference to that specific item
-        const itemPath = `stock_final_v10/${id}`;
-        const itemRef = ref(window.fdb, itemPath);
+    // 1. Get a direct reference to the specific item in your 'stock_final_v10'
+    // We use the 'fdb' variable you defined at the top of your script
+    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((dbModule) => {
+        const itemRef = dbModule.ref(window.fdb, 'stock_final_v10/' + id);
 
-        // 4. Perform the update
-        await update(itemRef, {
+        // 2. Perform the update using the module's update function
+        dbModule.update(itemRef, {
             mpesaCode: code.toUpperCase(),
             paidAt: new Date().toISOString()
+        }).then(() => {
+            window.toast("✅ Payment recorded successfully!");
+            const modal = document.getElementById('pay-modal-overlay');
+            if (modal) modal.remove();
+        }).catch((e) => {
+            console.error("Firebase Error:", e);
+            alert("System Error: " + e.message);
         });
-
-        window.toast("✅ Payment recorded successfully!");
-        
-        // 5. Close the UI
-        const modal = document.getElementById('pay-modal-overlay');
-        if (modal) modal.remove();
-
-    } catch (e) {
-        console.error("Firebase Error:", e);
-        // This will now show the actual error if it fails
-        alert("System Error: " + e.message);
-    }
+    });
 };
-
     
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
