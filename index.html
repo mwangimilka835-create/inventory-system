@@ -296,7 +296,7 @@
             .catch(() => { window.toast("🔒 Permission Denied by Cloud"); });
         }
     };
-window.draw = function() {
+    window.draw = function() {
     let b = document.getElementById('table-body');
     let searchTerm = document.getElementById('find').value.toLowerCase();
     b.innerHTML = '';
@@ -304,30 +304,41 @@ window.draw = function() {
     window.db.forEach(i => {
         if(!i.name.toLowerCase().includes(searchTerm)) return;
 
-        // Use 'Paid' status if it exists, otherwise use 'pending' logic
-        let statusText = i.status === "Paid" ? '✅ PAID' : '⏳ Pending';
-        let statusColor = i.status === "Paid" ? '#4CAF50' : '#ffa500';
+        // 1. Keep your original logic for Pending/Verified
+        const statusBadge = i.status === "Pending" 
+            ? '<br><span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>' 
+            : '<br><span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>';
 
-        const statusBadge = `<br><span style="color: ${statusColor}; font-size: 11px;">${statusText}</span>`;
+        // 2. Add a badge if an M-PESA code was submitted
+        const paymentBadge = i.mpesaCode 
+            ? `<br><span style="color: #38bdf8; font-size: 10px; font-weight: bold;">💳 CODE: ${i.mpesaCode}</span>` 
+            : '';
+
         let lowStyle = i.qty <= 5 ? 'style="color:#ff4d4d; font-weight:bold"' : '';
+        let alertTag = i.qty <= 5 ? ' <br><small>⚠️ LOW STOCK</small>' : '';
 
+        // 3. Update the table row HTML
         b.innerHTML += `<tr>
-            <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small>${statusBadge}</td>
-            <td ${lowStyle}>${i.qty}</td>
+            <td>
+                <strong>${i.name}</strong><br>
+                <small style="opacity:0.5">${i.cat}</small>
+                ${statusBadge}
+                ${paymentBadge}
+            </td>
+            <td ${lowStyle}>${i.qty}${alertTag}</td>
             <td style="display: flex; gap: 5px;">
-                <button class="btn-main" style="width: 42px; height: 42px; border-radius: 8px; background: #25D366; color: white; border: none;" 
+                <button class="btn-main" style="width: 42px; height: 42px; border-radius: 8px; background: #25D366; color: white; border: none; cursor: pointer;" 
                     onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
                     <i class="fas fa-coins"></i>
                 </button>
-                
-                <button class="btn-danger" onclick="window.del('${i.firebaseId}')">
+
+                <button class="btn-danger" onclick="del('${i.firebaseId}')">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
         </tr>`;
     });
 };
-    
 
     // --- SCANNER ---
     window.toggleScanner = async function() {
@@ -425,28 +436,29 @@ window.initPay = function(id, price, name) {
     document.body.appendChild(modal);
 };
 window.confirmPaid = async function(id, name) {
-    const code = document.getElementById('mpesa-code').value.trim();
+    const code = prompt(`Enter M-PESA Transaction Code for ${name}:`);
     
-    if (code.length < 6) {
-        alert("Please enter a valid M-PESA Transaction Code.");
+    if (!code || code.length < 5) {
+        window.toast("❌ Invalid or missing M-PESA code");
         return;
     }
 
-    window.toast("⌛ Saving Transaction...");
+    window.toast("⌛ Saving Payment Reference...");
     try {
         const { update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
         const itemRef = ref(fdb, `stock_final_v10/${id}`);
         
+        // We only add the mpesaCode and a timestamp
+        // We DO NOT change i.status so it stays 'Pending' for you to verify
         await update(itemRef, { 
-            status: "Paid", 
             mpesaCode: code.toUpperCase(),
             paidAt: new Date().toISOString() 
         });
 
-        window.toast(`✅ Payment for ${name} Recorded!`);
+        window.toast(`✅ Code ${code.toUpperCase()} linked to ${name}`);
         document.getElementById('pay-modal-overlay').remove();
     } catch (e) { 
-        alert("Sync error. Please check your internet connection."); 
+        alert("Sync error. Please check your connection."); 
     }
 };
 </script>
