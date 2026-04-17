@@ -436,34 +436,42 @@ window.initPay = function(id, price, name) {
     document.body.appendChild(modal);
 };
     window.confirmPaid = function(id, name) {
-    const code = prompt(`Enter M-PESA Code for ${name}:`);
-    
+    // 1. Get the code from the input field inside the card
+    const codeInput = document.getElementById('mpesa-code');
+    const code = codeInput ? codeInput.value.trim() : "";
+
     if (!code || code.length < 5) {
-        window.toast("❌ Transaction code required");
+        window.toast("❌ Please enter the M-PESA code in the box.");
         return;
     }
 
     window.toast("⌛ Syncing to StockPro Cloud...");
 
-    // 1. Get a direct reference to the specific item in your 'stock_final_v10'
-    // We use the 'fdb' variable you defined at the top of your script
+    // 2. Use the existing Firebase connection
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((dbModule) => {
         const itemRef = dbModule.ref(window.fdb, 'stock_final_v10/' + id);
 
-        // 2. Perform the update using the module's update function
+        // 3. Update the database WITHOUT changing the verification status
         dbModule.update(itemRef, {
             mpesaCode: code.toUpperCase(),
             paidAt: new Date().toISOString()
         }).then(() => {
-            window.toast("✅ Payment recorded successfully!");
+            window.toast("✅ Payment details saved!");
+            
+            // 4. Close the modal
             const modal = document.getElementById('pay-modal-overlay');
             if (modal) modal.remove();
+            
+            // 5. Refresh the list so the blue code appears
+            if(window.loadData) window.loadData(); 
+
         }).catch((e) => {
             console.error("Firebase Error:", e);
             alert("System Error: " + e.message);
         });
     });
 };
+    
     
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
