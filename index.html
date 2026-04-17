@@ -435,39 +435,46 @@ window.initPay = function(id, price, name) {
         </div>`;
     document.body.appendChild(modal);
 };
-
     window.confirmPaid = async function(id, name) {
     const code = prompt(`Enter M-PESA Code for ${name}:`);
+    
+    // 1. Validation
     if (!code || code.length < 5) {
-        window.toast("❌ Invalid Code");
+        window.toast("❌ Transaction code required");
         return;
     }
 
-    window.toast("⌛ Saving to Cloud...");
+    window.toast("⌛ Syncing to StockPro Cloud...");
+
     try {
-        // 1. Import the 'update' and 'ref' functions correctly
+        // 2. Use the global 'inventoryRef' path and 'fdb' you already have
+        // We import 'ref' and 'update' directly to ensure they are fresh
         const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
         
-        // 2. Use 'window.fdb' which you already defined at the top
-        const itemRef = ref(window.fdb, `stock_final_v10/${id}`);
-        
-        // 3. Update the database
-        await update(itemRef, { 
+        // 3. Create the exact reference to that specific item
+        const itemPath = `stock_final_v10/${id}`;
+        const itemRef = ref(window.fdb, itemPath);
+
+        // 4. Perform the update
+        await update(itemRef, {
             mpesaCode: code.toUpperCase(),
-            paidAt: new Date().toISOString() 
+            paidAt: new Date().toISOString()
         });
 
-        window.toast("✅ Payment Synced Successfully!");
+        window.toast("✅ Payment recorded successfully!");
         
-        // Remove the payment card popup if it's open
+        // 5. Close the UI
         const modal = document.getElementById('pay-modal-overlay');
-        if(modal) modal.remove();
+        if (modal) modal.remove();
 
-    } catch (e) { 
+    } catch (e) {
         console.error("Firebase Error:", e);
-        alert("System Error: " + e.message); 
+        // This will now show the actual error if it fails
+        alert("System Error: " + e.message);
     }
 };
+
+    
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
     <a href="https://mwangimilka835-create.github.io/identity/" 
