@@ -261,11 +261,17 @@
     };
 
     window.del = function(id) {
-        if(confirm("Permanently delete from Cloud?")) {
-            remove(ref(fdb, `stock_final_v10/${id}`));
+    if(confirm("Permanently delete from Cloud?")) {
+        remove(ref(fdb, `stock_final_v10/${id}`))
+        .then(() => {
             window.toast("🗑️ Entry Removed");
-        }
-    };
+        })
+        .catch((error) => {
+            window.toast("❌ Permission Denied by Cloud");
+            console.error("Delete failed:", error);
+        });
+    }
+};
 
 window.draw = function() {
     let b = document.getElementById('table-body'), s = document.getElementById('find').value.toLowerCase();
