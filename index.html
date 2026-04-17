@@ -239,6 +239,7 @@
         }
         draw();
     });
+    
 
     window.add = async function() {
         let n = document.getElementById('n').value.trim();
@@ -248,15 +249,14 @@
         if(confirm(`Commit ${n} to stock?`)) {
             try {
                 await push(inventoryRef, {
-                    name: n, qty: q,
-                    price: document.getElementById('pr').value || 0,
-                    cat: document.getElementById('cat').value,
-                    addedBy: window.userName,
-                    timestamp: new Date().toISOString()
-                });
-                window.toast("📦 Asset Synced to Cloud");
-                document.getElementById('n').value = ''; document.getElementById('q').value = '';
-            } catch (err) { alert("Cloud Sync Failed!"); }
+            name: n, 
+            qty: q,
+            price: document.getElementById('pr').value || 0,
+            cat: document.getElementById('cat').value,
+            status: "pending", // <--- ADD THIS LINE
+            addedBy: window.userName,
+            timestamp: new Date().toISOString()
+        });
         }
     };
 
@@ -272,26 +272,25 @@
         });
     }
 };
-
 window.draw = function() {
-    let b = document.getElementById('table-body'), s = document.getElementById('find').value.toLowerCase();
-    b.innerHTML = '';
+    let b = document.getElementById('table-body');
+    // ... existing filter logic ...
     
-    if(!window.db) return; 
-    window.db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
-        // Logic for Low Stock Alert
-        const isLow = Number(i.qty) <= 5;
-        const lowStyle = isLow ? 'style="color: #ff4d4d; font-weight: bold;"' : '';
-        const alertTag = isLow ? '<br><small style="color: #ff4d4d; font-size: 10px;">⚠️ LOW STOCK</small>' : '';
+    window.db.forEach(i => {
+        // Create the status badge
+        const statusBadge = i.status === "pending" 
+            ? '<br><span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>' 
+            : '<br><span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>';
 
-        b.innerHTML += `<tr>
-            <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small></td>
-            <td ${lowStyle}>${i.qty}${alertTag}</td>
-            <td><button class="btn-danger" onclick="del('${i.firebaseId}')"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
+       b.innerHTML += `<tr>
+    <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small>${statusBadge}</td>
+    <td ${lowStyle}>${i.qty}${alertTag}</td>
+    <td><button class="btn-danger" onclick="del('${i.firebaseId}')"><i class="fas fa-trash"></i></button></td>
+</tr>`;
+        
     });
-    updateChart(); 
 };
+
     // --- SCANNER (RESTORED) ---
     window.toggleScanner = async function() {
         const qrBox = document.getElementById('qr-view');
