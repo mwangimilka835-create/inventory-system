@@ -268,19 +268,24 @@
     };
 
     window.draw = function() {
-        let b = document.getElementById('table-body'), s = document.getElementById('find').value.toLowerCase();
-        b.innerHTML = '';
-        window.db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
-    // Check if stock is 5 or less
-    const lowStockStyle = i.qty <= 5 ? 'style="color: #ff4d4d; font-weight: bold;"' : '';
-    const alertLabel = i.qty <= 5 ? ' <small style="display:block; font-size:10px;">⚠️ LOW</small>' : '';
+    let b = document.getElementById('table-body'), s = document.getElementById('find').value.toLowerCase();
+    b.innerHTML = '';
+    
+    if(!window.db) return; // Prevents error if database hasn't loaded yet
 
-    b.innerHTML += `<tr>
-        <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small></td>
-        <td ${lowStockStyle}>${i.qty}${alertLabel}</td>
-        <td><button class="btn-danger" onclick="del('${i.firebaseId}')"><i class="fas fa-trash"></i></button></td>
-    </tr>`;
-});
+    window.db.filter(i => i.name.toLowerCase().includes(s)).forEach(i => {
+        // Logic for Low Stock Alert
+        const isLow = Number(i.qty) <= 5;
+        const lowStyle = isLow ? 'style="color: #ff4d4d; font-weight: bold;"' : '';
+        const alertTag = isLow ? '<br><small style="color: #ff4d4d; font-size: 10px;">⚠️ LOW STOCK</small>' : '';
+
+        b.innerHTML += `<tr>
+            <td><strong>${i.name}</strong><br><small style="opacity:0.5">${i.cat}</small></td>
+            <td ${lowStyle}>${i.qty}${alertTag}</td>
+            <td><button class="btn-danger" onclick="del('${i.firebaseId}')"><i class="fas fa-trash"></i></button></td>
+        </tr>`;
+    });
+};
         updateChart();
     };
 
