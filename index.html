@@ -300,46 +300,50 @@
     let b = document.getElementById('table-body');
     let searchTerm = document.getElementById('find').value.toLowerCase();
     b.innerHTML = '';
-    
     window.db.forEach(i => {
-        if(!i.name.toLowerCase().includes(searchTerm)) return;
+    // Inventory Status Badge
+    const invBadge = i.status === "Verified" 
+        ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
+        : '<span style="color: #ffa500; font-size: 11px;">⏳ Stock Pending</span>';
 
-        // 1. Keep your original logic for Pending/Verified
-        const statusBadge = i.status === "Pending" 
-            ? '<br><span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>' 
-            : '<br><span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>';
+    // Payment Status Badge
+    let payBadge = '';
+    if (i.mpesaCode) {
+        payBadge = `<br><span style="color: #38bdf8; font-size: 11px;">💳 Paid (Code: ${i.mpesaCode})</span>`;
+    } else {
+        payBadge = `<br><span style="color: #ff4d4d; font-size: 11px;">❌ Unpaid</span>`;
+    }
 
-        // 2. Add a badge if an M-PESA code was submitted
-        const paymentBadge = i.mpesaCode 
-            ? `<br><span style="color: #38bdf8; font-size: 10px; font-weight: bold;">💳 CODE: ${i.mpesaCode}</span>` 
-            : '';
+    b.innerHTML += `
+    <div class="card" style="margin-bottom: 10px; border-left: 5px solid ${i.status === 'Verified' ? '#4CAF50' : '#ffa500'}">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <strong>${i.name}</strong> <small style="opacity:0.6">(${i.cat})</small><br>
+                ${invBadge}
+                ${payBadge}
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 1.2rem; font-weight: bold;">${i.qty}</span><br>
+                <small>Items</small>
+            </div>
+        </div>
+        
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button class="btn-main" style="flex: 1; background: #25D366;" onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
+                <i class="fas fa-money-bill-wave"></i> Pay
+            </button>
+            
+            <button class="btn-main" style="flex: 1; background: #38bdf8;" onclick="verifyStock('${i.firebaseId}')">
+                <i class="fas fa-check-double"></i> Verify
+            </button>
 
-        let lowStyle = i.qty <= 5 ? 'style="color:#ff4d4d; font-weight:bold"' : '';
-        let alertTag = i.qty <= 5 ? ' <br><small>⚠️ LOW STOCK</small>' : '';
-
-        // 3. Update the table row HTML
-        b.innerHTML += `<tr>
-            <td>
-                <strong>${i.name}</strong><br>
-                <small style="opacity:0.5">${i.cat}</small>
-                ${statusBadge}
-                ${paymentBadge}
-            </td>
-            <td ${lowStyle}>${i.qty}${alertTag}</td>
-            <td style="display: flex; gap: 5px;">
-                <button class="btn-main" style="width: 42px; height: 42px; border-radius: 8px; background: #25D366; color: white; border: none; cursor: pointer;" 
-                    onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
-                    <i class="fas fa-coins"></i>
-                </button>
-
-                <button class="btn-danger" onclick="del('${i.firebaseId}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>`;
-    });
-};
-
+            <button class="btn-danger" style="width: 45px;" onclick="del('${i.firebaseId}')">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>`;
+});
+    
     // --- SCANNER ---
     window.toggleScanner = async function() {
         const qrBox = document.getElementById('qr-view');
