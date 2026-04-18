@@ -435,35 +435,35 @@ window.initPay = function(id, price, name) {
     document.body.appendChild(modal);
 };
     window.confirmPaid = function(id, name) {
-    // 1. Grab the code you typed
-    const code = document.getElementById('mpesa-code').value.trim();
+    // 1. Get the code specifically from the box we just created
+    const codeInput = document.getElementById('mpesa-code');
+    const codeValue = codeInput ? codeInput.value.trim() : "";
 
-    if (!code || code.length < 5) {
-        return window.toast("❌ Enter valid M-Pesa code!");
+    if (!codeValue || codeValue.length < 5) {
+        return window.toast("❌ Please enter the M-PESA code.");
     }
 
     window.toast("⏳ Syncing to StockPro Cloud...");
 
-    // 2. Point exactly to the item in your screenshot
+    // 2. Connect and update the EXACT path shown in your Firebase screenshot
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((db) => {
-        const itemPath = 'stock_final_v10/' + id;
-        const itemRef = db.ref(window.fdb, itemPath);
-
-        // 3. THIS is the command that makes the code appear in Firebase
+        const itemRef = db.ref(window.fdb, 'stock_final_v10/' + id);
+        
         db.update(itemRef, {
-            mpesaCode: code.toUpperCase(),
-            paymentStatus: "Completed"
+            mpesaCode: codeValue.toUpperCase(),
+            paidAt: new Date().toISOString()
         }).then(() => {
-            window.toast("✅ Payment Saved!");
-            document.getElementById('pay-modal-overlay').remove();
-            if(window.loadData) window.loadData(); 
-        }).catch((e) => {
-            alert("Database Error: " + e.message);
+            window.toast("✅ Payment details saved!");
+            // Close the window
+            const modal = document.getElementById('pay-modal-overlay');
+            if (modal) modal.remove();
+            // Refresh the screen
+            if(window.loadData) window.loadData();
+        }).catch((err) => {
+            alert("Firebase Error: " + err.message);
         });
     });
 };
-
-    
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
     <a href="https://mwangimilka835-create.github.io/identity/" 
