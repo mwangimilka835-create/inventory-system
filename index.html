@@ -434,8 +434,8 @@ window.initPay = function(id, price, name) {
         </div>`;
     document.body.appendChild(modal);
 };
-    window.confirmPaid = function(id, name) {
-    // 1. Get the code from the input field inside the card
+window.confirmPaid = function(id, name) {
+    // 1. Get the code from the input field
     const codeInput = document.getElementById('mpesa-code');
     const code = codeInput ? codeInput.value.trim() : "";
 
@@ -444,13 +444,13 @@ window.initPay = function(id, price, name) {
         return;
     }
 
-    window.toast("⌛ Syncing to StockPro Cloud...");
+    window.toast("⏳ Syncing to StockPro Cloud...");
 
-    // 2. Use the existing Firebase connection
+    // 2. Use the existing Firebase connection to save the data
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((dbModule) => {
         const itemRef = dbModule.ref(window.fdb, 'stock_final_v10/' + id);
 
-        // 3. Update the database WITHOUT changing the verification status
+        // 3. This physically writes the code to your Firebase entry
         dbModule.update(itemRef, {
             mpesaCode: code.toUpperCase(),
             paidAt: new Date().toISOString()
@@ -460,17 +460,16 @@ window.initPay = function(id, price, name) {
             // 4. Close the modal
             const modal = document.getElementById('pay-modal-overlay');
             if (modal) modal.remove();
-            
-            // 5. Refresh the list so the blue code appears
-            if(window.loadData) window.loadData(); 
 
+            // 5. Refresh the list so the blue code appears
+            if(window.loadData) window.loadData();
+            else location.reload(); // Fallback to refresh the whole page
         }).catch((e) => {
             console.error("Firebase Error:", e);
             alert("System Error: " + e.message);
         });
     });
 };
-    
     
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
