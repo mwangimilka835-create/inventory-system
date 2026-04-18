@@ -422,10 +422,9 @@ window.initPay = function(id, price, name) {
 
             <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. SDE45FG67)" 
                 style="text-transform: uppercase; text-align: center; margin-bottom: 15px; border: 1px solid #25D366;">
-
-            <button class="btn-confirm" onclick="window.confirmPaid('${id}', '${name}')">
-                CONFIRM & VERIFY
-            </button>
+              <button class="btn-confirm" onclick="window.confirmPaid('${id}')">
+    CONFIRM & VERIFY
+</button>
             
             <button onclick="document.getElementById('pay-modal-overlay').remove()" 
                 style="width:100%; margin-top:15px; background:transparent; color:#666; border:none; cursor:pointer;">
@@ -434,33 +433,32 @@ window.initPay = function(id, price, name) {
         </div>`;
     document.body.appendChild(modal);
 };
-    window.confirmPaid = function(id, name) {
-    // 1. Get the code specifically from the box we just created
-    const codeInput = document.getElementById('mpesa-code');
-    const codeValue = codeInput ? codeInput.value.trim() : "";
+    window.confirmPaid = function(id) {
+    // 1. Get the code from the box
+    const codeVal = document.getElementById('mpesa-code').value.trim();
 
-    if (!codeValue || codeValue.length < 5) {
-        return window.toast("❌ Please enter the M-PESA code.");
+    if (!codeVal || codeVal.length < 5) {
+        return window.toast("❌ Enter M-Pesa Code!");
     }
 
-    window.toast("⏳ Syncing to StockPro Cloud...");
+    window.toast("⏳ Syncing...");
 
-    // 2. Connect and update the EXACT path shown in your Firebase screenshot
+    // 2. The Direct Save Logic
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((db) => {
+        // Use the exact path from your Firebase screenshot
         const itemRef = db.ref(window.fdb, 'stock_final_v10/' + id);
-        
+
         db.update(itemRef, {
-            mpesaCode: codeValue.toUpperCase(),
-            paidAt: new Date().toISOString()
+            mpesaCode: codeVal.toUpperCase(),
+            status: "Verified" // This turns the yellow hourglass into a green check!
         }).then(() => {
-            window.toast("✅ Payment details saved!");
-            // Close the window
-            const modal = document.getElementById('pay-modal-overlay');
-            if (modal) modal.remove();
-            // Refresh the screen
+            window.toast("✅ Saved to Cloud!");
+            document.getElementById('pay-modal-overlay').remove();
+            // This forces the system to show the new data
             if(window.loadData) window.loadData();
-        }).catch((err) => {
-            alert("Firebase Error: " + err.message);
+            else location.reload(); 
+        }).catch((e) => {
+            alert("Sync Error: " + e.message);
         });
     });
 };
