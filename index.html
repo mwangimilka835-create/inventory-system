@@ -305,11 +305,19 @@
             <span>Showing ${filteredData.length} entries</span>
             <span style="color: #38bdf8;">StockPro Ledger</span>
         </div>   
-    `;
-      filteredData.forEach(i => {
-          const invBadge = i.status === "Verified" 
+    `;// 1. Create a variable to hold the status safely
+let s = (i.status || "Pending").toLowerCase(); 
+
+                // Get the status and handle capitals/lowercase at the same time
+let s = (i.status || "Pending").toLowerCase();
+
+const invBadge = s === "verified" 
     ? '<span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>' 
     : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
+
+// Also update your border color logic a few lines down:
+const borderColor = s === 'verified' ? '#4CAF50' : '#ffa500';
+          
 
         let payBadge = i.mpesaCode 
             ? `<br><span style="color: #38bdf8; font-size: 11px;">💳 Paid (Code: ${i.mpesaCode})</span>` 
