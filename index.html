@@ -434,23 +434,7 @@ window.draw = function() {
     `;
     document.body.appendChild(modal);
 };
-                        <strong style="font-size:20px; color:#fff;">5637180</strong>
-                </div>
-                
-                <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. RG8Q1X2Y3Z)" 
-                       style="width:100%; padding:14px; margin:10px 0; background:#333; border:none; border-radius:10px; color:#fff; box-sizing:border-box; text-align:center; text-transform:uppercase;">
-                
-                <button class="btn-confirm" onclick="window.confirmPaid('${id}')" 
-                        style="width:100%; padding:16px; background:#25D366; color:white; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;">
-                    CONFIRM & VERIFY
-                </button>
-                
-                <p onclick="document.getElementById('pay-modal-overlay').remove()" 
-                   style="color:#ff4d4d; margin-top:15px; cursor:pointer; font-size:14px; text-align:center;">Cancel</p>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
+                        
 
     window.confirmPaid = function(id) {
         const mpesaInput = document.getElementById('mpesa-code').value.trim().toUpperCase();
