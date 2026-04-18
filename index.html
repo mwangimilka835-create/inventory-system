@@ -308,8 +308,8 @@
     `;
       filteredData.forEach(i => {
         const invBadge = i.status === "Verified" 
-            ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
-            : '<span style="color: #ffa500; font-size: 11px;">⏳ Stock Pending</span>';
+    ? '<span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>' 
+    : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
 
         let payBadge = i.mpesaCode 
             ? `<br><span style="color: #38bdf8; font-size: 11px;">💳 Paid (Code: ${i.mpesaCode})</span>` 
