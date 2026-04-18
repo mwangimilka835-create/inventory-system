@@ -422,10 +422,9 @@ window.initPay = function(id, price, name) {
 
             <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. SDE45FG67)" 
                 style="text-transform: uppercase; text-align: center; margin-bottom: 15px; border: 1px solid #25D366;">
-              <button class="btn-confirm" onclick="window.confirmPaid('${id}')">
+            <button class="btn-confirm" onclick="window.confirmPaid('${id}')">
     CONFIRM & VERIFY
 </button>
-            
             <button onclick="document.getElementById('pay-modal-overlay').remove()" 
                 style="width:100%; margin-top:15px; background:transparent; color:#666; border:none; cursor:pointer;">
                 CANCEL
@@ -434,34 +433,41 @@ window.initPay = function(id, price, name) {
     document.body.appendChild(modal);
 };
     window.confirmPaid = function(id) {
-    // 1. Get the code from the box
-    const codeVal = document.getElementById('mpesa-code').value.trim();
+    // 1. Get the code from the input box
+    const codeInput = document.getElementById('mpesa-code');
+    const code = codeInput ? codeInput.value.trim() : "";
 
-    if (!codeVal || codeVal.length < 5) {
-        return window.toast("❌ Enter M-Pesa Code!");
+    if (!code || code.length < 5) {
+        window.toast("❌ Please enter a valid M-PESA code.");
+        return;
     }
 
-    window.toast("⏳ Syncing...");
+    window.toast("⏳ Syncing to StockPro Cloud...");
 
-    // 2. The Direct Save Logic
-    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((db) => {
-        // Use the exact path from your Firebase screenshot
-        const itemRef = db.ref(window.fdb, 'stock_final_v10/' + id);
-
-        db.update(itemRef, {
-            mpesaCode: codeVal.toUpperCase(),
-            status: "Verified" // This turns the yellow hourglass into a green check!
+    // 2. Connect to Firebase and save
+    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((dbModule) => {
+        // Use the exact path seen in your Firebase screenshot
+        const itemRef = dbModule.ref(window.fdb, 'stock_final_v10/' + id);
+        
+        dbModule.update(itemRef, {
+            mpesaCode: code.toUpperCase(),
+            paidAt: new Date().toISOString()
         }).then(() => {
-            window.toast("✅ Saved to Cloud!");
-            document.getElementById('pay-modal-overlay').remove();
-            // This forces the system to show the new data
+            window.toast("✅ Payment details saved!");
+            
+            // Close the modal
+            const modal = document.getElementById('pay-modal-overlay');
+            if (modal) modal.remove();
+
+            // Force the list to refresh so the blue code appears
             if(window.loadData) window.loadData();
-            else location.reload(); 
         }).catch((e) => {
-            alert("Sync Error: " + e.message);
+            console.error("Firebase Error:", e);
+            alert("System Error: " + e.message);
         });
     });
 };
+    
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
     <a href="https://mwangimilka835-create.github.io/identity/" 
