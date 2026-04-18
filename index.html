@@ -272,7 +272,7 @@
                     qty: q,
                     price: document.getElementById('pr').value || 0,
                     cat: document.getElementById('cat').value,
-                    status: "pending", 
+                    status: "Pending", 
                     addedBy: window.userName,
                     timestamp: new Date().toISOString()
                 });
@@ -307,9 +307,10 @@
         </div>   
     `;
       filteredData.forEach(i => {
-const invBadge = i.status === "Verified" 
+          const invBadge = i.status === "Verified" 
     ? '<span style="color: #4CAF50; font-size: 11px;">✅ Verified</span>' 
     : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
+
         let payBadge = i.mpesaCode 
             ? `<br><span style="color: #38bdf8; font-size: 11px;">💳 Paid (Code: ${i.mpesaCode})</span>` 
             : '<br><span style="color: #ff4d4d; font-size: 11px;">❌ Unpaid</span>';
