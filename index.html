@@ -329,15 +329,16 @@ window.draw = function() {
                 </div>
             </div>
 
-              <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
-            ${!isVerified ? `
-              <button class="btn-main" style="background: #25D366;" onclick="window.initPay('${i.id}')">Pay</button>
-              <button class="btn-main" style="background: #38bdf8;" onclick="verifyStock('${i.id}')">Verify</button>
-            ` : ''}
+                   <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
+            ${!isVerified ? 
+              '<button class="btn-main" style="background: #25D366;" onclick="window.initPay(\'' + i.id + '\')">Pay</button>' +
+              '<button class="btn-main" style="background: #38bdf8;" onclick="verifyStock(\'' + i.id + '\')">Verify</button>'
+            : ''}
             
             <button class="btn-danger" style="background: #ff4d4d;" onclick="del('${i.id}')">Delete</button>
           </div>
         </div>`;
+            
  
     });
 };
