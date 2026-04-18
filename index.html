@@ -463,38 +463,34 @@ window.draw = function() {
     document.body.appendChild(modal);
 };
 
-window.confirmPaid = function(id) {
-    const code = document.getElementById('mpesa-code').value.trim();
-    if (code.length < 5) return window.toast("❌ Enter valid M-Pesa Code");
+window.confirmPaid = function(itemId) {
+    // Force grab the input directly
+    const inputField = document.getElementById('mpesa-code');
+    const mpesaValue = inputField ? inputField.value.trim() : "";
 
-    window.toast("⏳ Syncing to StockPro Cloud...");
+    if (mpesaValue.length < 5) {
+        return window.toast("❌ Enter M-PESA Code");
+    }
 
-    // IMPORT DATABASE FUNCTIONS
+    window.toast("⏳ Syncing Code...");
+
+    // Using the global Firebase reference you already have
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((db) => {
-        const itemRef = db.ref(window.fdb, 'stock_final_v10/' + id);
+        const itemRef = db.ref(window.fdb, 'stock_final_v10/' + itemId);
         
-        // This is the command that makes it show up in Firebase!
         db.update(itemRef, {
-            mpesaCode: code.toUpperCase(),
-            status: "Verified",
+            mpesaCode: mpesaValue.toUpperCase(),
+            status: "Verified", // Space removed for accuracy
             paidAt: new Date().toISOString()
         }).then(() => {
-            window.toast("✅ Payment & Status Updated!");
-            document.getElementById('pay-modal-overlay').remove();
-            // Data will refresh automatically via the onValue listener
-        }).catch((e) => {
-            alert("Sync Error: " + e.message);
+            window.toast("✅ Code Saved to Cloud!");
+            const modal = document.getElementById('pay-modal-overlay');
+            if (modal) modal.remove();
+        }).catch((err) => {
+            alert("Firebase Error: " + err.message);
         });
     });
 };
-
-window.verifyStock = function(id) {
-    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((db) => {
-        db.update(db.ref(window.fdb, 'stock_final_v10/' + id), { status: "Verified" });
-        window.toast("✅ Asset Verified");
-    });
-};
-
 
     
 </script>
