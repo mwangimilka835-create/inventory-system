@@ -127,10 +127,8 @@
         <section id="p-inv" class="page">
             <div class="card">
                 <input placeholder="Search assets..." onkeyup="draw()" id="find">
-                <table>
-                    <thead><tr><th>Asset</th><th>Qty</th><th>Action</th></tr></thead>
-                    <tbody id="table-body"></tbody>
-                </table>
+                <div id="table-body" style="margin-top: 10px;">
+                </div>
             </div>
         </section>
 
@@ -296,14 +294,19 @@
             .catch(() => { window.toast("🔒 Permission Denied by Cloud"); });
         }
     };
-    
+
             window.draw = function() {
     let b = document.getElementById('table-body');
     let searchTerm = document.getElementById('find').value.toLowerCase();
-    b.innerHTML = '';
-    window.db.forEach(i => {
-        if(!i.name.toLowerCase().includes(searchTerm)) return;
+    const filteredData = window.db.filter(i => i.name.toLowerCase().includes(searchTerm));        
 
+        b.innerHTML = `
+        <div style="padding: 10px; display: flex; justify-content: space-between; align-items: center; opacity: 0.8; font-size: 13px;">
+            <span>Showing ${filteredData.length} entries</span>
+            <span style="color: #38bdf8;">StockPro Ledger</span>
+        </div>   
+    `;
+      filteredData.forEach(i => {
         const invBadge = i.status === "Verified" 
             ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
             : '<span style="color: #ffa500; font-size: 11px;">⏳ Stock Pending</span>';
