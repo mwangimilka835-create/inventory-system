@@ -434,42 +434,35 @@ window.initPay = function(id, price, name) {
         </div>`;
     document.body.appendChild(modal);
 };
-window.confirmPaid = function(id, name) {
-    // 1. Get the code from the input field
-    const codeInput = document.getElementById('mpesa-code');
-    const code = codeInput ? codeInput.value.trim() : "";
+    window.confirmPaid = function(id, name) {
+    // 1. Grab the code you typed
+    const code = document.getElementById('mpesa-code').value.trim();
 
     if (!code || code.length < 5) {
-        window.toast("❌ Please enter the M-PESA code in the box.");
-        return;
+        return window.toast("❌ Enter valid M-Pesa code!");
     }
 
     window.toast("⏳ Syncing to StockPro Cloud...");
 
-    // 2. Use the existing Firebase connection to save the data
-    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((dbModule) => {
-        const itemRef = dbModule.ref(window.fdb, 'stock_final_v10/' + id);
+    // 2. Point exactly to the item in your screenshot
+    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((db) => {
+        const itemPath = 'stock_final_v10/' + id;
+        const itemRef = db.ref(window.fdb, itemPath);
 
-        // 3. This physically writes the code to your Firebase entry
-        dbModule.update(itemRef, {
+        // 3. THIS is the command that makes the code appear in Firebase
+        db.update(itemRef, {
             mpesaCode: code.toUpperCase(),
-            paidAt: new Date().toISOString()
+            paymentStatus: "Completed"
         }).then(() => {
-            window.toast("✅ Payment details saved!");
-            
-            // 4. Close the modal
-            const modal = document.getElementById('pay-modal-overlay');
-            if (modal) modal.remove();
-
-            // 5. Refresh the list so the blue code appears
-            if(window.loadData) window.loadData();
-            else location.reload(); // Fallback to refresh the whole page
+            window.toast("✅ Payment Saved!");
+            document.getElementById('pay-modal-overlay').remove();
+            if(window.loadData) window.loadData(); 
         }).catch((e) => {
-            console.error("Firebase Error:", e);
-            alert("System Error: " + e.message);
+            alert("Database Error: " + e.message);
         });
     });
 };
+
     
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
