@@ -296,54 +296,49 @@
             .catch(() => { window.toast("🔒 Permission Denied by Cloud"); });
         }
     };
-    window.draw = function() {
+    
+            window.draw = function() {
     let b = document.getElementById('table-body');
     let searchTerm = document.getElementById('find').value.toLowerCase();
     b.innerHTML = '';
     window.db.forEach(i => {
-    // Inventory Status Badgeconst invBadge = i.status === "Verified" 
-    ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
-    : '<span style="color: #ffa500; font-size: 11px;">⏳ Stock Pending</span>';
+        if(!i.name.toLowerCase().includes(searchTerm)) return;
 
-    // Payment Status Badge
-    let payBadge = '';
-    if (i.mpesaCode) {
-        payBadge = `<br><span style="color: #38bdf8; font-size: 11px;">💳 Paid (Code: ${i.mpesaCode})</span>`;
-    } else {
-        payBadge = `<br><span style="color: #ff4d4d; font-size: 11px;">❌ Unpaid</span>`;
-    }
+        const invBadge = i.status === "Verified" 
+            ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
+            : '<span style="color: #ffa500; font-size: 11px;">⏳ Stock Pending</span>';
 
-    b.innerHTML += `
-    <div class="card" style="margin-bottom: 10px; border-left: 5px solid ${i.status === 'Verified' ? '#4CAF50' : '#ffa500'}">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <strong>${i.name}</strong> <small style="opacity:0.6">(${i.cat})</small><br>
-                ${invBadge}
-                ${payBadge}
+        let payBadge = i.mpesaCode 
+            ? `<br><span style="color: #38bdf8; font-size: 11px;">💳 Paid (Code: ${i.mpesaCode})</span>` 
+            : '<br><span style="color: #ff4d4d; font-size: 11px;">❌ Unpaid</span>';
+
+        b.innerHTML += `
+        <div class="card" style="margin-bottom: 10px; border-left: 5px solid ${i.status === 'Verified' ? '#4CAF50' : '#ffa500'}">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                    <strong>${i.name}</strong> <small style="opacity:0.6">(${i.cat})</small><br>
+                    ${invBadge}<br>
+                    ${payBadge}
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 1.2rem; font-weight: bold;">${i.qty}</span><br>
+                    <small>Items</small>
+                </div>
             </div>
-            <div style="text-align: right;">
-                <span style="font-size: 1.2rem; font-weight: bold;">${i.qty}</span><br>
-                <small>Items</small>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button class="btn-main" style="flex: 1; background: #25D366;" onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
+                    <i class="fas fa-money-bill-wave"></i> Pay
+                </button>
+                <button class="btn-main" style="flex: 1; background: #38bdf8;" onclick="verifyStock('${i.firebaseId}')">
+                    <i class="fas fa-check-double"></i> Verify
+                </button>
+                <button class="btn-danger" style="width: 45px;" onclick="del('${i.firebaseId}')">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-        </div>
-        
-        <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <button class="btn-main" style="flex: 1; background: #25D366;" onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
-                <i class="fas fa-money-bill-wave"></i> Pay
-            </button>
-            
-            <button class="btn-main" style="flex: 1; background: #38bdf8;" onclick="verifyStock('${i.firebaseId}')">
-                <i class="fas fa-check-double"></i> Verify
-            </button>
-
-            <button class="btn-danger" style="width: 45px;" onclick="del('${i.firebaseId}')">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    </div>`;
-    };
-    };
-
+        </div>`;
+    });
+};
     
     // --- SCANNER ---
     window.toggleScanner = async function() {
