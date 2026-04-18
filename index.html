@@ -408,6 +408,7 @@ window.draw = function() {
         let t=document.getElementById('toast'); 
         t.innerText=m; t.style.display='block'; 
         setTimeout(()=>t.style.display='none', 3000); 
+        
     };window.initPay = function(id, price, name) {
     const modal = document.createElement('div');
     modal.id = 'pay-modal-overlay';
@@ -436,23 +437,22 @@ window.draw = function() {
 };
                         
 
-    window.confirmPaid = function(id) {
-        const mpesaInput = document.getElementById('mpesa-code').value.trim().toUpperCase();
-        
-        if (mpesaInput.length < 8) {
-            return window.toast("❌ Code too short! Min 8 characters");
-        }
-        
-        window.toast("⏳ Sending to Cloud...");
-        
-       set(ref(window.fdb, `stock_final_v10/${id}/status`), 'Verified');
-     set(ref(window.fdb, `stock_final_v10/${id}/mpesaCode`), mpesaInput);
-     set(ref(window.fdb, `stock_final_v10/${id}/verifiedBy`), window.userName);
-   set(ref(window.fdb, `stock_final_v10/${id}/verifiedAt`), new Date().toISOString());
-        
-        window.toast("✅ DATABASE UPDATED!");
-        document.getElementById('pay-modal-overlay').remove();
-                            }
+    window.confirmPaid = function(id) { 
+  const mpesaInput = document.getElementById('mpesa-code').value.trim();
+  if (!mpesaInput) {
+    window.toast('Enter M-PESA code');
+    return;
+  }
+  
+  // Write all 4 fields to Firebase using the id from line 427
+  set(ref(window.fdb, `stock_final_v10/${id}/status`), 'Verified');
+  set(ref(window.fdb, `stock_final_v10/${id}/mpesaCode`), mpesaInput);
+  set(ref(window.fdb, `stock_final_v10/${id}/verifiedBy`), 'Milka');
+  set(ref(window.fdb, `stock_final_v10/${id}/verifiedAt`), new Date().toISOString());
+  
+  window.toast('✅ DATABASE UPDATED!');
+  document.getElementById('pay-modal-overlay').remove();
+    }
     
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
