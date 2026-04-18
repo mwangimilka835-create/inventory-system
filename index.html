@@ -313,30 +313,38 @@
             : '<br><span style="color: #ff4d4d; font-size: 11px;">❌ Unpaid</span>';
 
         b.innerHTML += `
-        <div class="card" style="margin-bottom: 10px; border-left: 5px solid ${i.status === 'Verified' ? '#4CAF50' : '#ffa500'}">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div>
-                    <strong>${i.name}</strong> <small style="opacity:0.6">(${i.cat})</small><br>
-                    ${invBadge}<br>
-                    ${payBadge}
-                </div>
-                <div style="text-align: right;">
-                    <span style="font-size: 1.2rem; font-weight: bold;">${i.qty}</span><br>
-                    <small>Items</small>
-                </div>
-            </div>
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button class="btn-main" style="flex: 1; background: #25D366;" onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
-                    <i class="fas fa-money-bill-wave"></i> Pay
-                </button>
-                <button class="btn-main" style="flex: 1; background: #38bdf8;" onclick="verifyStock('${i.firebaseId}')">
-                    <i class="fas fa-check-double"></i> Verify
-                </button>
-                <button class="btn-danger" style="width: 45px;" onclick="del('${i.firebaseId}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>`;
+<div class="card" style="margin-bottom: 12px; padding: 15px; border-left: 6px solid ${i.status === 'Verified' ? '#4CAF50' : '#ffa500'}; background: #1e1e2d; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+        <div style="flex: 1;">
+            <strong style="font-size: 16px; color: #ffffff;">${i.name}</strong> 
+            <small style="display: block; opacity: 0.6; margin-top: 2px;">${i.cat}</small>
+            <div style="margin-top: 8px;">${invBadge}</div>
+            <div style="margin-top: 4px;">${payBadge}</div>
+        </div>
+        <div style="text-align: right; min-width: 60px;">
+            <span style="font-size: 20px; font-weight: bold; color: #38bdf8;">${i.qty}</span><br>
+            <small style="opacity: 0.5;">Items</small>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 50px; gap: 8px; margin-top: 12px;">
+        <button class="btn-main" style="background: #25D366; padding: 10px; border-radius: 8px; border: none; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;" 
+            onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">
+            <i class="fas fa-money-bill-wave"></i> Pay
+        </button>
+        
+        <button class="btn-main" style="background: #38bdf8; padding: 10px; border-radius: 8px; border: none; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;" 
+            onclick="verifyStock('${i.firebaseId}')">
+            <i class="fas fa-check-double"></i> Verify
+        </button>
+
+        <button class="btn-danger" style="background: #ff4d4d; border-radius: 8px; border: none; color: white; display: flex; align-items: center; justify-content: center;" 
+            onclick="del('${i.firebaseId}')">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+</div>`;
     });
 };
     
