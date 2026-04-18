@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>StockPro | Ultimate 2026</title>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -12,66 +12,66 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root { 
-            --bg: #0f0c15; --card: #1a1625; --text: #f0ebff; 
+        :root {
+            --bg: #0f0c15; --card: #1a1625; --text: #f0ebff;
             --primary: #d4af37; --secondary: #38bdf8; --tertiary: #9d81ff; --danger: #ff4d4d; --accent: #2d2640;
         }
-        body.light-mode { 
+        body.light-mode {
             --bg: #fdfdfd; --card: #ffffff; --text: #1a1a1a; --accent: #f0f0f0;
         }
-        
+
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; overflow-x: hidden; }
-        
+
         /* Navigation */
         nav { background: var(--card); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
-        .tab-box { display: flex; gap: 15px; align-items: center; }
-        .tab { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; padding: 5px 0; }
-        .tab.active { opacity: 1; color: var(--primary); border-bottom: 2px solid var(--primary); }
+       .tab-box { display: flex; gap: 15px; align-items: center; }
+       .tab { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; cursor: pointer; padding: 5px 0; }
+       .tab.active { opacity: 1; color: var(--primary); border-bottom: 2px solid var(--primary); }
 
-        .container { max-width: 500px; margin: 15px auto; padding: 0 15px; display: none; }
-        .page { display: none; animation: fadeIn 0.4s ease; } 
-        .page.active { display: block; }
+       .container { max-width: 500px; margin: 15px auto; padding: 0 15px; display: none; }
+       .page { display: none; animation: fadeIn 0.4s ease; }
+       .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* UI Cards */
-        .card { background: var(--card); padding: 20px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+       .card { background: var(--card); padding: 20px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid var(--accent); background: var(--bg); color: var(--text); border-radius: 10px; box-sizing: border-box; font-size: 16px; }
-        
-        .btn { padding: 16px; border: none; cursor: pointer; border-radius: 10px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-main { background: var(--primary); color: #000; }
-        .btn-danger { background: var(--danger); color: white; border-radius: 8px; width: 42px; height: 42px; border: none; }
+
+       .btn { padding: 16px; border: none; cursor: pointer; border-radius: 10px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+       .btn-main { background: var(--primary); color: #000; }
+       .btn-danger { background: var(--danger); color: white; border-radius: 8px; width: 42px; height: 42px; border: none; }
 
         /* Scanner */
         #qr-view { width: 100%; min-height: 280px; display: none; border-radius: 12px; margin-bottom: 15px; border: 3px solid var(--primary); background: #000; overflow: hidden; }
-        
+
         /* Table */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; padding: 12px 10px; color: var(--primary); border-bottom: 2px solid var(--accent); font-size: 0.75rem; }
         td { padding: 15px 10px; border-bottom: 1px solid var(--accent); font-size: 0.95rem; }
-        
+
         /* POP-UP TOAST */
         #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 14px 28px; border-radius: 50px; display: none; font-weight: 900; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.9rem; }
-/* M-PESA Modal Styles */
-#pay-modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); z-index: 10000;
-    display: flex; align-items: center; justify-content: center; padding: 20px;
-}
-.pay-card {
-    background: #1a1a1a; width: 100%; max-width: 350px;
-    border-radius: 24px; padding: 30px; text-align: center;
-    border: 1px solid #333; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
-.mpesa-logo { width: 120px; margin-bottom: 20px; }
-.pay-amount { color: #25D366; font-size: 32px; margin: 10px 0; font-weight: 800; }
-.till-box {
-    background: #252525; padding: 15px; border-radius: 12px;
-    margin: 20px 0; border: 1px dashed #444;
-}
-.btn-confirm {
-    width: 100%; padding: 16px; background: #25D366; color: white;
-    border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
-                       }
+        /* M-PESA Modal Styles */
+        #pay-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 10000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+       .pay-card {
+            background: #1a1a1a; width: 100%; max-width: 350px;
+            border-radius: 24px; padding: 30px; text-align: center;
+            border: 1px solid #333; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+       .mpesa-logo { width: 120px; margin-bottom: 20px; }
+       .pay-amount { color: #25D366; font-size: 32px; margin: 10px 0; font-weight: 800; }
+       .till-box {
+            background: #252525; padding: 15px; border-radius: 12px;
+            margin: 20px 0; border: 1px dashed #444;
+        }
+       .btn-confirm {
+            width: 100%; padding: 16px; background: #25D366; color: white;
+            border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
+        }
     </style>
 </head>
 <body class="dark-mode">
@@ -80,15 +80,14 @@
         <div style="background:var(--card); padding:30px; border-radius:20px; width:85%; max-width:340px; text-align:center; border:1px solid var(--primary);">
             <h2 style="color:var(--primary); margin:0;">STOCKPRO</h2>
             <p style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 20px;">Secure Inventory Management</p>
-          <input type="text" id="u" placeholder="Enter Your Name">
-<input type="password" id="p" placeholder="Set Password">
-<select id="r_select" style="margin-bottom: 15px;">
-    <option value="" disabled selected>Select Role</option>
-    <option value="Admin">Admin</option>
-    <option value="Staff">Staff</option>
-</select>
-<button class="btn btn-main" onclick="doLogin()">Unlock System</button>
-            
+            <input type="text" id="u" placeholder="Enter Your Name">
+            <input type="password" id="p" placeholder="Set Password">
+            <select id="r_select" style="margin-bottom: 15px;">
+                <option value="" disabled selected>Select Role</option>
+                <option value="Admin">Admin</option>
+                <option value="Staff">Staff</option>
+            </select>
+            <button class="btn btn-main" onclick="doLogin()">Unlock System</button>
         </div>
     </div>
 
@@ -150,7 +149,7 @@
 <script type="module">
     // 1. FIREBASE CORE (Cloud Engine)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
@@ -167,10 +166,10 @@
     const inventoryRef = ref(fdb, 'stock_final_v10');
 
     // --- GLOBAL VARIABLES ---
-    window.db = []; 
-    window.role = ''; 
-    window.userName = ''; 
-    window.chart = null; 
+    window.db = [];
+    window.role = '';
+    window.userName = '';
+    window.chart = null;
     window.html5QrCode = null;
 
     const itemDatabase = {
@@ -183,7 +182,7 @@
         let nameInput = document.getElementById('u').value.trim();
         let passInput = document.getElementById('p').value.trim();
         let roleSelect = document.getElementById('r_select').value;
-        if (!nameInput || !passInput || !roleSelect) {
+        if (!nameInput ||!passInput ||!roleSelect) {
             alert("Please fill all fields!"); return;
         }
         window.userName = nameInput;
@@ -201,7 +200,7 @@
             document.getElementById('chart-card').style.display = 'block';
             setTimeout(initChart, 500);
         }
-        draw(); 
+        draw();
         window.toast(`✅ Access Granted: ${window.userName.toUpperCase()}`);
     }
 
@@ -216,12 +215,12 @@
     window.toggleMode = function() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
-        document.getElementById('mode-icon').className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+        document.getElementById('mode-icon').className = isLight? 'fas fa-sun' : 'fas fa-moon';
         if(window.chart) {
-            window.chart.options.plugins.legend.labels.color = isLight ? '#1a1a1a' : '#f0ebff';
+            window.chart.options.plugins.legend.labels.color = isLight? '#1a1a1a' : '#f0ebff';
             window.chart.update();
         }
-        window.toast(isLight ? "☀️ Light Mode" : "🌙 Dark Mode");
+        window.toast(isLight? "☀️ Light Mode" : "🌙 Dark Mode");
     };
 
     // --- CHART LOGIC ---
@@ -229,22 +228,22 @@
         const ctx = document.getElementById('stockPie').getContext('2d');
         window.chart = new Chart(ctx, {
             type: 'pie',
-            data: { 
-                labels: ['H/W', 'S/W', 'MAT'], 
-                datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], borderWidth: 0 }] 
+            data: {
+                labels: ['H/W', 'S/W', 'MAT'],
+                datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], borderWidth: 0 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, 
-                plugins: { legend: { position: 'bottom', labels: { color: '#f0ebff', font: { weight: 'bold' } } } } 
+            options: { responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { color: '#f0ebff', font: { weight: 'bold' } } } }
             }
         });
         updateChart();
     }
 
-    function updateChart() { 
-        if(window.chart && window.db.length > 0) { 
-            window.chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => window.db.filter(i=>i.cat===c).length); 
-            window.chart.update(); 
-        } 
+    function updateChart() {
+        if(window.chart && window.db.length > 0) {
+            window.chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => window.db.filter(i=>i.cat===c).length);
+            window.chart.update();
+        }
     }
 
     // --- CLOUD OPERATIONS ---
@@ -253,7 +252,7 @@
         window.db = [];
         if (data) {
             Object.keys(data).forEach(id => {
-                window.db.push({ ...data[id], firebaseId: id });
+                window.db.push({...data[id], firebaseId: id });
             });
         }
         draw();
@@ -264,81 +263,85 @@
         let n = document.getElementById('n').value.trim();
         let q = parseInt(document.getElementById('q').value);
         if(!n || isNaN(q)) return alert("Check inputs!");
-        
+
         if(confirm(`Commit ${n} to stock?`)) {
             try {
                 await push(inventoryRef, {
-                    name: n, 
+                    name: n,
                     qty: q,
                     price: document.getElementById('pr').value || 0,
                     cat: document.getElementById('cat').value,
-                    status: "Pending", 
+                    status: "Pending",
                     addedBy: window.userName,
                     timestamp: new Date().toISOString()
                 });
                 window.toast("📦 Asset Synced to Cloud");
-                document.getElementById('n').value = ''; 
+                document.getElementById('n').value = '';
                 document.getElementById('q').value = '';
             } catch (err) { alert("Cloud Sync Failed!"); }
         }
     };
-    
 
     window.del = function(id) {
-        if(window.role !== 'Admin') {
+        if(window.role!== 'Admin') {
             return window.toast("❌ Access Denied: Only Admin can delete.");
         }
         if(confirm("Permanently delete from Cloud?")) {
             remove(ref(fdb, `stock_final_v10/${id}`))
-            .then(() => { window.toast("🗑️ Entry Removed"); })
-            .catch(() => { window.toast("🔒 Permission Denied by Cloud"); });
+           .then(() => { window.toast("🗑️ Entry Removed"); })
+           .catch(() => { window.toast("🔒 Permission Denied by Cloud"); });
         }
     };
-window.draw = function() {
-    let b = document.getElementById('table-body');
-    let searchTerm = document.getElementById('find').value.toLowerCase();
-    const filteredData = window.db.filter(i => i.name.toLowerCase().includes(searchTerm));
 
-    b.innerHTML = ''; // Clear before drawing
+    window.verifyStock = function(id) {
+        update(ref(fdb, 'stock_final_v10/' + id), { status: 'verified' })
+       .then(() => { window.toast("✅ Asset Verified"); })
+       .catch(() => { window.toast("❌ Verify failed"); });
+    };
 
-    filteredData.forEach(i => {
-        // This is the "Safe" logic:
-        // It converts the database status to lowercase so 'Verified' and 'verified' both work.
-        let rawStatus = i.status ? i.status.toString().trim().toLowerCase() : "pending";
+    window.draw = function() {
+        let b = document.getElementById('table-body');
+        let searchTerm = document.getElementById('find').value.toLowerCase();
+        const filteredData = window.db.filter(i => i.name.toLowerCase().includes(searchTerm));
 
-        const isVerified = rawStatus === "verified";
+        b.innerHTML = '';
 
-        const invBadge = isVerified 
-            ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>' 
-            : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
+        filteredData.forEach(i => {
+            let rawStatus = i.status? i.status.toString().trim().toLowerCase() : "pending";
+            const isVerified = rawStatus === "verified";
 
-        const borderColor = isVerified ? '#4CAF50' : '#ffa500';
+            const invBadge = isVerified
+               ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
+                : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
 
-        b.innerHTML += `
-        <div class="card" style="margin-bottom: 12px; padding: 15px; border-left: 6px solid ${borderColor}; background: #1e1e2d; border-radius: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div style="flex: 1;">
-                    <strong style="font-size: 16px; color: #ffffff;">${i.name}</strong>
-                    <div style="margin-top: 8px;">${invBadge}</div>
+            const borderColor = isVerified? '#4CAF50' : '#ffa500';
+
+            let buttons = '';
+            if (!isVerified) {
+                buttons += '<button class="btn-main" style="background: #25D366;" onclick="window.initPay(\'' + i.firebaseId + '\', \'' + (i.price || 0) + '\', \'' + i.name + '\')">Pay</button>';
+                buttons += '<button class="btn-main" style="background: #38bdf8;" onclick="verifyStock(\'' + i.firebaseId + '\')">Verify</button>';
+            }
+            buttons += '<button class="btn-danger" style="background: #ff4d4d;" onclick="del(\'' + i.firebaseId + '\')">Delete</button>';
+
+            b.innerHTML += `
+            <div class="card" style="margin-bottom: 12px; padding: 15px; border-left: 6px solid ${borderColor}; background: #1e1e2d; border-radius: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <strong style="font-size: 16px; color: #ffffff;">${i.name}</strong>
+                        <div style="margin-top: 8px;">${invBadge}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 20px; font-weight: bold; color: #38bdf8;">${i.qty}</span>
+                    </div>
                 </div>
-                <div style="text-align: right;">
-                    <span style="font-size: 20px; font-weight: bold; color: #38bdf8;">${i.qty}</span>
-                </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr ${!isVerified ? '1fr' : ''} 50px; gap: 8px; margin-top: 12px;">
-                <button class="btn-main" style="background: #25D366;" onclick="window.initPay('${i.firebaseId}', '${i.price || 0}', '${i.name}')">Pay</button>
-                
-                ${!isVerified ? `
-                <button class="btn-main" style="background: #38bdf8;" onclick="verifyStock('${i.firebaseId}')">Verify</button>
-                ` : ''}
 
-                <button class="btn-danger" style="background: #ff4d4d;" onclick="del('${i.firebaseId}')">Delete</button>
-            </div>
-        </div>`;
-    });
-};
-    
+                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
+                    ${buttons}
+                </div>
+            </div>`;
+        });
+    };
+
     // --- SCANNER ---
     window.toggleScanner = async function() {
         const qrBox = document.getElementById('qr-view');
@@ -349,12 +352,12 @@ window.draw = function() {
             btnText.innerText = "Kill Scanner";
             window.toast("📷 Opening Camera...");
             try {
-                await window.html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => { 
+                await window.html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 240 }, (t) => {
                     const foundName = itemDatabase[t] || t;
-                    document.getElementById('n').value = foundName; 
+                    document.getElementById('n').value = foundName;
                     document.getElementById('q').value = "1";
-                    window.toast("🔍 Scanned: " + foundName); 
-                    window.stopScanner(); 
+                    window.toast("🔍 Scanned: " + foundName);
+                    window.stopScanner();
                 });
             } catch (err) { alert("Enable Camera Permissions!"); window.stopScanner(); }
         } else { window.stopScanner(); }
@@ -365,7 +368,7 @@ window.draw = function() {
             try { await window.html5QrCode.stop(); } catch (e) {}
             window.html5QrCode = null;
             document.getElementById('qr-view').style.display = 'none';
-            document.getElementById('qr-view').innerHTML = ''; 
+            document.getElementById('qr-view').innerHTML = '';
             document.getElementById('scan-text').innerText = "Start Scanner";
         }
     };
@@ -383,7 +386,7 @@ window.draw = function() {
     };
 
     window.pdf = function() {
-        const { jsPDF } = window.jspdf; 
+        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.text("StockPro Cloud Audit", 14, 15);
         doc.autoTable({ head: [['Item', 'Qty', 'Category', 'Status']], body: window.db.map(i => [i.name, i.qty, i.cat, i.status]) });
@@ -401,22 +404,44 @@ window.draw = function() {
         window.open('https://wa.me/254112873218?text=' + m);
     };
 
-    window.toast = function(m) { 
-        let t=document.getElementById('toast'); 
-        t.innerText=m; t.style.display='block'; 
-        setTimeout(()=>t.style.display='none', 3000); 
-    };window.initPay = function(id, price, name) {
-    const modal = document.createElement('div');
-    modal.id = 'pay-modal-overlay';
-    modal.innerHTML = `
-        <div class="pay-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" class="mpesa-logo" style="width:120px;">
-            <p style="color:#aaa; margin-bottom:5px;">Payment for ${name}</p>
-            <div class="pay-amount" style="color:#25D366; font-size:32px; font-weight:800;">KES ${price}</div>
-            
-            <div class="till-box" style="background:#252525; padding:15px; border-radius:12px; margin:20px 0; border:1px dashed #444;">
-                <small style="color:#888; display:block;">LIPA NA M-PESA TILL</small>
-                <strong style="font-size:20px; color:#fff;">5962638</strong>
-            </div>
+    window.toast = function(m) {
+        let t=document.getElementById('toast');
+        t.innerText=m; t.style.display='block';
+        setTimeout(()=>t.style.display='none', 3000);
+    };
+        window.initPay = function(id, price, name) {
+        const modal = document.createElement('div');
+        modal.id = 'pay-modal-overlay';
+        modal.innerHTML = `
+            <div class="pay-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" class="mpesa-logo" style="width:120px;">
+                <p style="color:#aaa; margin-bottom:5px;">Payment for ${name}</p>
+                <div class="pay-amount" style="color:#25D366; font-size:32px; font-weight:800;">KES ${price}</div>
 
-            <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. RG8...)"
+                <div class="till-box" style="background:#252525; padding:15px; border-radius:12px; margin:20px 0; border:1px dashed #444;">
+                    <small style="color:#888; display:block;">LIPA NA M-PESA TILL</small>
+                    <strong style="font-size:20px; color:#fff;">5962638</strong>
+                </div>
+
+                <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. RG8...)" style="width:100%; padding:14px; margin:8px 0; border:1px solid #444; background:#252525; color:#fff; border-radius:10px; box-sizing:border-box;">
+
+                <button class="btn-confirm" onclick="window.confirmPayment('${id}')">Confirm Payment</button>
+                <button class="btn" style="background:#444; color:#fff; margin-top:10px;" onclick="document.getElementById('pay-modal-overlay').remove()">Cancel</button>
+            </div>`;
+        document.body.appendChild(modal);
+    };
+
+    window.confirmPayment = function(id) {
+        const code = document.getElementById('mpesa-code').value.trim();
+        if(!code) return alert('Enter M-PESA code');
+        update(ref(fdb, 'stock_final_v10/' + id), { status: 'verified', mpesaCode: code })
+       .then(() => {
+            window.toast("✅ Payment Confirmed");
+            document.getElementById('pay-modal-overlay').remove();
+        })
+       .catch(() => { window.toast("❌ Payment failed"); });
+    };
+
+</script>
+</body>
+</html>
