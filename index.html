@@ -328,20 +328,15 @@ window.draw = function() {
                     <span style="font-size: 20px; font-weight: bold; color: #38bdf8;">${i.qty}</span>
                 </div>
             </div>
-
-
-                    <div style="display: grid; grid-template-columns: 1fr ${!isVerified ? '1fr' : ''}; gap: 8px; margin-top: 12px;">
+                     <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
             <button class="btn-main" style="background: #25D366;" onclick="window.initPay('${i.id}')">Pay</button>
             
-            ${!isVerified ? `
-              <button class="btn-main" style="background: #38bdf8;" onclick="verifyStock('${i.id}')">Verify</button>
-            ` : ''}
+            ${!isVerified ? '<button class="btn-main" style="background: #38bdf8;" onclick="verifyStock(\'' + i.id + '\')">Verify</button>' : ''}
             
             <button class="btn-danger" style="background: #ff4d4d;" onclick="del('${i.id}')">Delete</button>
           </div>
         </div>`;
-            
- 
+
     });
 };
     
