@@ -151,7 +151,8 @@
     // 1. FIREBASE CORE (Cloud Engine)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-   window.set = set;
+    
+    window.set = set;
 window.ref = ref;
     const firebaseConfig = {
         apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
@@ -165,6 +166,7 @@ window.ref = ref;
 
     const app = initializeApp(firebaseConfig);
     const fdb = getDatabase(app);
+    window.fdb = fdb;
     const inventoryRef = ref(fdb, 'stock_final_v10');
 
     // --- GLOBAL VARIABLES ---
@@ -417,12 +419,10 @@ window.draw = function() {
             
             <div class="till-box" style="background:#252525; padding:15px; border-radius:12px; margin:20px 0; border:1px dashed #444;">
                 <small style="color:#888; display:block;">LIPA NA M-PESA TILL</small>
-                <strong style="font-size:20px; color:#fff;">5962638</strong>
+                <strong style="font-size:20px; color:#fff;">5637180</strong>
             </div>
-
-            <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. RG8...)" 
-                   style="text-align:center; text-transform:uppercase; margin-bottom:15px;">
-            
+             <input type="text" id="mpesa-code" placeholder="Enter M-PESA Code (e.g. RG8Q1X2Y3Z)" style="width:100%; padding:14px; margin:10px 0; background:#333; border:none; border-radius:10px; color:#fff; box-sizing:border-box; text-align:center; text-transform:uppercase;">
+                   
             <button class="btn-confirm" onclick="window.confirmPaid('${id}')" 
                     style="width:100%; padding:16px; background:#25D366; color:white; border:none; border-radius:12px; font-weight:bold;">
                 CONFIRM & VERIFY
@@ -445,10 +445,10 @@ window.draw = function() {
         
         window.toast("⏳ Sending to Cloud...");
         
-        set(ref(fdb, `stock_final_v10/${id}/status`), 'Verified');
-        set(ref(fdb, `stock_final_v10/${id}/mpesaCode`), mpesaInput);
-        set(ref(fdb, `stock_final_v10/${id}/verifiedBy`), window.userName);
-        set(ref(fdb, `stock_final_v10/${id}/verifiedAt`), new Date().toISOString());
+       set(ref(window.fdb, `stock_final_v10/${id}/status`), 'Verified');
+     set(ref(window.fdb, `stock_final_v10/${id}/mpesaCode`), mpesaInput);
+     set(ref(window.fdb, `stock_final_v10/${id}/verifiedBy`), window.userName);
+   set(ref(window.fdb, `stock_final_v10/${id}/verifiedAt`), new Date().toISOString());
         
         window.toast("✅ DATABASE UPDATED!");
         document.getElementById('pay-modal-overlay').remove();
