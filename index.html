@@ -463,35 +463,30 @@ window.draw = function() {
     document.body.appendChild(modal);
 };
 
-window.confirmPaid = function(itemId) {
-    // Force grab the input directly
-    const inputField = document.getElementById('mpesa-code');
-    const mpesaValue = inputField ? inputField.value.trim() : "";
-
-    if (mpesaValue.length < 5) {
-        return window.toast("❌ Enter M-PESA Code");
+window.confirmPaid = function(id) {
+    // 1. Grab the value directly from the box
+    const mpesaInput = document.getElementById('mpesa-code').value.trim();
+    
+    if (mpesaInput.length < 5) {
+        return window.toast("❌ Code too short!");
     }
 
-    window.toast("⏳ Syncing Code...");
+    window.toast("⏳ Sending to Cloud...");
 
-    // Using the global Firebase reference you already have
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js").then((db) => {
-        const itemRef = db.ref(window.fdb, 'stock_final_v10/' + itemId);
+        const itemRef = db.ref(window.fdb, 'stock_final_v10/' + id);
         
+        // 2. We send it as a hardcoded update to ensure it sticks
         db.update(itemRef, {
-            mpesaCode: mpesaValue.toUpperCase(),
-            status: "Verified", // Space removed for accuracy
-            paidAt: new Date().toISOString()
+            mpesaCode: mpesaInput.toUpperCase(),
+            status: "Verified",
+            lastUpdate: new Date().toISOString()
         }).then(() => {
-            window.toast("✅ Code Saved to Cloud!");
-            const modal = document.getElementById('pay-modal-overlay');
-            if (modal) modal.remove();
-        }).catch((err) => {
-            alert("Firebase Error: " + err.message);
-        });
+            window.toast("✅ DATABASE UPDATED!");
+            document.getElementById('pay-modal-overlay').remove();
+        }).catch(e => alert("Error: " + e.message));
     });
 };
-
     
 </script>
 <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
