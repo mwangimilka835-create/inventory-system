@@ -278,25 +278,32 @@
         document.body.appendChild(modal);
     }
 
+   window.confirmPaid = function(id) {
+    const codeInput = document.getElementById('mpesa-code');
+    if (!codeInput) {
+        alert("ERROR: Can't find M-Pesa input box");
+        return;
+    }
+    const code = codeInput.value.trim().toUpperCase();
+    
+    if (code.length < 5) {
+        alert("❌ Code too short. Enter full M-Pesa code like QK8G2H3J4K");
+        return;
+    }
 
-    window.confirmPaid = function(id) {
-    const code = document.getElementById('mpesa-code').value.trim().toUpperCase();
-    if (code.length < 5) return window.toast("❌ Invalid Code");
-
-    // Update Firebase: save code + verify + timestamp
+    // This is the exact same line that worked in your test
     update(ref(fdb, 'stock_final_v10/' + id), {
         status: "Verified",
-        mpesaCode: code,  // THIS IS THE M-PESA CODE FOR YOUR TILL RECORDS
+        mpesaCode: code,
         paidAt: new Date().toISOString()
     }).then(() => {
-        // ONLY after the database is updated, verify and update stock
-        window.verifyStock(id); 
-        window.toast("✅ Payment Verified & Code Saved: " + code);
+        alert("✅ SUCCESS: Code " + code + " saved to Firebase");
         document.getElementById('pay-modal-overlay').remove();
     }).catch((e) => {
-        window.toast("❌ Sync Failed: " + e.message);
+        alert("❌ FIREBASE ERROR: " + e.message);
     });
 };
+
 
 
     window.verifyStock = (id) => update(ref(fdb, 'stock_final_v10/' + id), { status: "Verified" });
