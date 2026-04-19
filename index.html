@@ -184,36 +184,57 @@
         draw(); // Automatically redraws Ledger when cloud updates
         if(window.chart) updateChart();
     });
-
-    // DRAWING THE LEDGER (FIXED)
     window.draw = function() {
-        const b = document.getElementById('table-body');
-        if(!b) return;
-        const search = document.getElementById('find').value.toLowerCase();
+        let b = document.getElementById('table-body');
+        let searchTerm = document.getElementById('find').value.toLowerCase().trim();
+        
+        if (!window.db) {
+            b.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6;">Loading...</div>';
+            return;
+        }
+        
+        // THIS LINE IS THE KEY: Skip any item where name is missing or "undefined"
+        const filteredData = window.db.filter(i => i && i.name && i.name !== "undefined" && i.name.toLowerCase().includes(searchTerm));
+        
         b.innerHTML = '';
-        
-        const filtered = window.db.filter(i => i.name.toLowerCase().includes(search));
-        
-        if(filtered.length === 0) {
-            b.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.5;">No items found in cloud.</div>';
+
+        if (filteredData.length === 0) {
+            b.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6;">No assets found. Add one above.</div>';
             return;
         }
 
-        filtered.forEach(i => {
-            const isVerified = i.status && i.status.trim() === "Verified";
+        filteredData.forEach(i => {
+            let rawStatus = i.status ? i.status.toString().trim() : "pending";
+            const isVerified = rawStatus.toLowerCase() === "verified";
+
+            const invBadge = isVerified
+               ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
+                : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
+
+            const borderColor = isVerified ? '#4CAF50' : '#ffa500';
+            const safeName = i.name.replace(/'/g, "\\'");
+            const safeId = i.firebaseId;
+            const safePrice = i.price || 0;
+            const safeQty = i.qty || 0;
+
+            let buttons = '';
+            if (!isVerified) {
+                buttons += `<button class="btn" style="background:#25D366; color:white; margin-bottom:8px;" onclick="window.initPay('${safeId}', '${safePrice}', '${safeName}')">Pay</button>`;
+                buttons += `<button class="btn" style="background:#38bdf8; color:white; margin-bottom:8px;" onclick="verifyStock('${safeId}')">Verify</button>`;
+            }
+            buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
+
             b.innerHTML += `
-            <div class="card" style="border-left: 5px solid ${isVerified ? '#25D366' : '#ffa500'}">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <strong style="font-size:18px;">${i.name}</strong>
-                    <span style="color:var(--secondary); font-size:20px; font-weight:900;">${i.qty}</span>
+            <div class="card" style="margin-bottom: 12px; padding: 15px; border-left: 6px solid ${borderColor}; background: #1e1e2d; border-radius: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <strong style="font-size: 16px; color: #ffffff;">${i.name}</strong>
+                        <div style="margin-top: 8px;">${invBadge}</div>
+                        <div style="font-size:12px; opacity:0.7; margin-top:4px;">KES ${safePrice} | Qty: ${safeQty}</div>
+                    </div>
                 </div>
-                <p style="font-size:12px; margin:5px 0; color:#888;">
-                    ${isVerified ? '✅ Stock Verified' : '⌛ Pending Approval'}
-                </p>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn-main" style="flex:1; height:42px; font-size:12px;" onclick="initPay('${i.firebaseId}', '${i.price}', '${i.name}')">PAY KES ${i.price}</button>
-                    ${window.role === 'Admin' ? `<button onclick="verifyStock('${i.firebaseId}')" style="background:var(--secondary); border:none; padding:0 15px; border-radius:8px;">Verify</button>` : ''}
-                    ${window.role === 'Admin' ? `<button onclick="del('${i.firebaseId}')" class="btn-danger"><i class="fas fa-trash"></i></button>` : ''}
+                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
+                    ${buttons}
                 </div>
             </div>`;
         });
