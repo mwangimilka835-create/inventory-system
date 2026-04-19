@@ -292,11 +292,11 @@
     }
 
     // This is the exact same line that worked in your test
-    update(ref(fdb, 'stock_final_v10/' + id), {
-        status: "Verified",
-        mpesaCode: code,
-        paidAt: new Date().toISOString()
-    }).then(() => {
+       update(ref(fdb, id), {
+    status: "Verified",
+    mpesaCode: code,
+    paidAt: new Date().toISOString()
+}).then(() => {
         alert("✅ SUCCESS: Code " + code + " saved to Firebase");
         document.getElementById('pay-modal-overlay').remove();
     }).catch((e) => {
@@ -305,9 +305,10 @@
 };
 
 
-
-    window.verifyStock = (id) => update(ref(fdb, 'stock_final_v10/' + id), { status: "Verified" });
-    window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, 'stock_final_v10/' + id));
+    
+    
+    window.verifyStock = (id) => update(ref(fdb, id), { status: "Verified" });
+window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
 
     // EXPORTS
     window.pdf = function() {
