@@ -185,7 +185,7 @@
         draw(); // Automatically redraws Ledger when cloud updates
         if(window.chart) updateChart();
     });
-    window.draw = function() {
+        window.draw = function() {
         let b = document.getElementById('table-body');
         let searchTerm = document.getElementById('find').value.toLowerCase().trim();
         
@@ -194,9 +194,7 @@
             return;
         }
         
-        // THIS LINE IS THE KEY: Skip any item where name is missing or "undefined"
         const filteredData = window.db.filter(i => i && i.name && i.name !== "undefined" && i.name.toLowerCase().includes(searchTerm));
-        
         b.innerHTML = '';
 
         if (filteredData.length === 0) {
@@ -205,18 +203,19 @@
         }
 
         filteredData.forEach(i => {
+            // SAFETY: Default everything so missing fields don't crash
             let rawStatus = i.status ? i.status.toString().trim() : "pending";
             const isVerified = rawStatus.toLowerCase() === "verified";
+            const safeName = (i.name || "Unnamed").replace(/'/g, "\\'");
+            const safeId = i.firebaseId || "";
+            const safePrice = i.price || 0;
+            const safeQty = i.qty || 0;
 
             const invBadge = isVerified
                ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
                 : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
 
             const borderColor = isVerified ? '#4CAF50' : '#ffa500';
-            const safeName = i.name.replace(/'/g, "\\'");
-            const safeId = i.firebaseId;
-            const safePrice = i.price || 0;
-            const safeQty = i.qty || 0;
 
             let buttons = '';
             if (!isVerified) {
@@ -229,11 +228,10 @@
             <div class="card" style="margin-bottom: 12px; padding: 15px; border-left: 6px solid ${borderColor}; background: #1e1e2d; border-radius: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                     <div style="flex: 1;">
-                        <strong style="font-size: 16px; color: #ffffff;">${i.name}</strong>
+                        <strong style="font-size: 16px; color: #ffffff;">${safeName}</strong>
                         <div style="margin-top: 8px;">${invBadge}</div>
                         <div style="font-size:12px; opacity:0.7; margin-top:4px;">KES ${safePrice} | Qty: ${safeQty}</div>
                     </div>
-                </div>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
                     ${buttons}
                 </div>
