@@ -187,18 +187,67 @@
         if(window.chart) updateChart();
     });
 
+window.draw = function() {
+    try {
+        let invData = window.db || []; // ← Your data is in window.db, not window.raw
+        let find = document.getElementById('find').value.toLowerCase();
+        
+        let filteredData = invData.filter(i => {
+            if (!i || !i.name) return false;
+            return i.name.toLowerCase().includes(find);
+        });
 
-    window.draw = function() {
-    console.log("DRAW RUNNING");
-    let listEl = document.getElementById('list');
-    listEl.innerHTML = '<div style="color:lime;padding:20px;">DRAW IS WORKING</div>';
-    
-    let invData = window.raw || [];
-    invData.forEach(i => {
-        listEl.innerHTML += `<div style="border:1px solid #fff; margin:10px; padding:10px;">
-            ${i.name || 'No name'} - ${i.status || 'No status'}
-        </div>`;
-    });
+        const listEl = document.getElementById('table-body'); // ← FIXED: was 'list'
+        listEl.innerHTML = '';
+
+        filteredData.forEach(i => {
+            let s = (i.status || "pending").toString().toLowerCase().trim();
+            let isUnverified = s === "unverified";
+            let isVerified = s === "verified";
+            let isPending = !isUnverified && !isVerified;
+
+            let invBadge = isUnverified
+             ? '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Approval</span>'
+             : isVerified
+             ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
+             : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Payment</span>';
+
+            let borderColor = isUnverified ? '#ff4d4d' : isVerified ? '#4CAF50' : '#ffa500';
+            let mpesaLine = isVerified && i.mpesaCode ? `<div style="color: #0ea5e9; font-size: 10px; margin-top: 2px;">M-Pesa: ${i.mpesaCode}</div>` : '';
+
+            let safeId = (i.firebaseId || '').replace(/'/g, "\\'");
+            let safeName = (i.name || '').replace(/'/g, "\\'");
+            let safePrice = i.price || 0;
+            let safeQty = i.qty || 0;
+
+            let buttons = '';
+            if (isUnverified && window.role === 'Admin') {
+                buttons += `<button class="btn" style="background:#9d81ff; color:white; margin-bottom:8px;" onclick="approveItem('${safeId}')">✅ Approve Stock</button>`;
+            }
+            if (isPending) {
+                buttons += `<button class="btn" style="background:#25D366; color:white; margin-bottom:8px;" onclick="window.initPay('${safeId}', '${safePrice}', '${safeName}')">Pay</button>`;
+                buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="confirmMpesa('${safeId}')">Confirm M-Pesa</button>`;
+                buttons += `<button class="btn" style="background:#38bdf8; color:white; margin-bottom:8px;" onclick="verifyStock('${safeId}')">Verify Only</button>`;
+            }
+            buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
+
+            listEl.innerHTML += `
+            <div class="card" style="border-left: 4px solid ${borderColor}; position: relative;">
+                <div style="position: absolute; top: 8px; right: 12px;">${invBadge}</div>
+                <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px; padding-right: 80px;">${safeName}</div>
+                <div style="font-size: 14px; color: #94a3b8; margin-bottom: 12px;">
+                    <span>${safeQty} PCS × KES ${safePrice}</span><br>
+                    <span style="font-weight: 600; color: #22c55e;">Total: KES ${safeQty * safePrice}</span>
+                    ${mpesaLine}
+                </div>
+                ${buttons}
+            </div>`;
+        });
+
+    } catch(e) {
+        document.getElementById('table-body').innerHTML = `<div style="color:red; padding:20px;">DRAW ERROR: ${e.message}</div>`;
+        console.error(e);
+    }
 };
         
     window.add = async function() {
