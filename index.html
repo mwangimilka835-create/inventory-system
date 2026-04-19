@@ -172,6 +172,7 @@
 
     window.toggleMode = function() { document.body.classList.toggle('light-mode'); };
 
+    
     // REAL-TIME CLOUD LISTENER (CRITICAL FOR LEDGER)
     onValue(inventoryRef, (snapshot) => {
         const data = snapshot.val();
@@ -269,19 +270,18 @@
             </div>`;
         document.body.appendChild(modal);
     };
-
-    window.confirmPaid = function(id) {
-        const code = document.getElementById('mpesa-code').value.trim();
-        if (code.length < 5) return window.toast("❌ Invalid Code");
-        update(ref(fdb, 'stock_final_v10/' + id), {
-            mpesaCode: code.toUpperCase(),
-            status: "Verified",
-            paidAt: new Date().toISOString()
-        }).then(() => {
-            window.toast("✅ Cloud Updated!");
-            document.getElementById('pay-modal-overlay').remove();
-        });
-    };
+   window.confirmPaid = function(id) {
+    const codeValue = document.getElementById('mpesa-code').value.trim();
+    if (codeValue.length < 5) return window.toast("❌ Invalid Code");
+    update(ref(fdb, 'stock_final_v10/' + id), {
+        mpesaCode: codeValue.toUpperCase(),
+        status: "Verified",
+        paidAt: new Date().toISOString()
+    }).then(() => {
+        window.toast("✅ Payment Saved!");
+        document.getElementById('pay-modal-overlay').remove();
+    });
+};
 
     window.verifyStock = (id) => update(ref(fdb, 'stock_final_v10/' + id), { status: "Verified" });
     window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, 'stock_final_v10/' + id));
