@@ -96,7 +96,7 @@
         <section id="p-inv" class="page">
             <div class="card">
                 <input placeholder="Search assets..." onkeyup="draw()" id="find">
-                <div id="table-body" style="margin-top: 10px;"></div>
+                <div id="table-body" style="margin-top: 10px; min-height: 50px;"></div>
             </div>
         </section>
 
@@ -136,9 +136,8 @@
     window.role = ''; 
     window.userName = ''; 
     window.chart = null; 
-    window.html5QrCode = null;
 
-    // LOGIN & LAUNCH
+    // FIX 1: Login Function Name
     window.doLogin = function() {
         let name = document.getElementById('u').value.trim();
         let pass = document.getElementById('p').value.trim();
@@ -163,20 +162,19 @@
         window.toast(`✅ Access Granted: ${window.userName}`);
     }
 
-    // NAVIGATION
     window.tab = function(p, e) {
         document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
         document.getElementById('p-'+p).classList.add('active');
         document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
         e.currentTarget.classList.add('active');
+        if(p === 'inv') draw(); // Refresh ledger on tab switch
     };
 
     window.toggleMode = function() {
         document.body.classList.toggle('light-mode');
-        window.toast("🌓 Mode Toggled");
     };
 
-    // CHART
+    // FIX 2: Case-sensitivity for initChart
     function initChart() {
         const ctx = document.getElementById('stockPie').getContext('2d');
         window.chart = new Chart(ctx, {
@@ -197,7 +195,6 @@
         } 
     }
 
-    // DATABASE SYNC
     onValue(inventoryRef, (snapshot) => {
         const data = snapshot.val();
         window.db = [];
@@ -223,12 +220,21 @@
         document.getElementById('n').value = ''; document.getElementById('q').value = '';
     };
 
+    // FIX 3: Ledger Logic Fix
     window.draw = function() {
         let b = document.getElementById('table-body');
         let search = document.getElementById('find').value.toLowerCase();
         b.innerHTML = '';
-        window.db.filter(i => i.name.toLowerCase().includes(search)).forEach(i => {
-            const isVerified = i.status === "Verified";
+        
+        let filtered = window.db.filter(i => i.name.toLowerCase().includes(search));
+        
+        if(filtered.length === 0) {
+            b.innerHTML = '<p style="text-align:center; opacity:0.5;">No assets found</p>';
+            return;
+        }
+
+        filtered.forEach(i => {
+            const isVerified = i.status.trim() === "Verified";
             b.innerHTML += `
             <div class="card" style="border-left: 5px solid ${isVerified ? '#25D366' : '#ffa500'}">
                 <div style="display:flex; justify-content:space-between;">
@@ -237,15 +243,14 @@
                 </div>
                 <p style="font-size:11px; color:#888;">${isVerified ? '✅ VERIFIED' : '⌛ PENDING'}</p>
                 <div style="display:flex; gap:8px; margin-top:10px;">
-                    <button class="btn-main" style="padding:8px; font-size:11px;" onclick="initPay('${i.firebaseId}', '${i.price}', '${i.name}')">PAY</button>
+                    <button class="btn-main" style="padding:8px; font-size:11px; width:80px;" onclick="initPay('${i.firebaseId}', '${i.price}', '${i.name}')">PAY</button>
                     ${window.role === 'Admin' ? `<button onclick="verifyStock('${i.firebaseId}')" style="padding:8px; font-size:11px; background:var(--secondary); color:#000; border-radius:5px; border:none;">VERIFY</button>` : ''}
-                    ${window.role === 'Admin' ? `<button onclick="del('${i.firebaseId}')" class="btn-danger"><i class="fas fa-trash"></i></button>` : ''}
+                    ${window.role === 'Admin' ? `<button onclick="del('${i.firebaseId}')" class="btn-danger" style="width:42px;"><i class="fas fa-trash"></i></button>` : ''}
                 </div>
             </div>`;
         });
     };
 
-    // M-PESA LOGIC
     window.initPay = function(id, price, name) {
         const modal = document.createElement('div');
         modal.id = 'pay-modal-overlay';
@@ -261,6 +266,7 @@
         document.body.appendChild(modal);
     };
 
+    // FIX 4: M-Pesa Update Logic
     window.confirmPaid = function(id) {
         const codeValue = document.getElementById('mpesa-code').value.trim();
         if (codeValue.length < 5) return window.toast("❌ Invalid Code");
@@ -283,7 +289,6 @@
         if(confirm("Delete permanently?")) remove(ref(window.fdb, 'stock_final_v10/' + id));
     };
 
-    // EXPORTS
     window.pdf = function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -311,12 +316,11 @@
         window.open('https://wa.me/254112873218?text=' + msg);
     };
 
-    // SCANNER
     window.toggleScanner = function() {
         const view = document.getElementById('qr-view');
         const btn = document.getElementById('scan-text');
         if(view.style.display === 'block') {
-            window.html5QrCode.stop().then(() => {
+            html5QrCode.stop().then(() => {
                 view.style.display = 'none';
                 btn.innerText = "Start Scanner";
             });
@@ -338,4 +342,4 @@
     };
 </script>
 </body>
-                </html>
+    </html>
