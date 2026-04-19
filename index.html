@@ -189,64 +189,69 @@
 
 
         window.draw = function() {
-        let b = document.getElementById('table-body');
-        let searchTerm = document.getElementById('find').value.toLowerCase().trim();
-        
-        if (!window.db) {
-            b.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6;">Loading...</div>';
-            return;
+    let invData = window.raw || [];
+    let startDate = document.getElementById('startDate')?.value;
+    let endDate = document.getElementById('endDate')?.value;
+
+    let filteredData = invData.filter(i => {
+        if (!i ||!i.addedAt) return false;
+        let itemDate = new Date(i.addedAt).toISOString().split('T')[0];
+        if (startDate && itemDate < startDate) return false;
+        if (endDate && itemDate > endDate) return false;
+        return true;
+    });
+
+    window.updateInvStats(filteredData);
+    const listEl = document.getElementById('list');
+    listEl.innerHTML = '';
+
+    filteredData.forEach(i => {
+        let status = (i.status || "pending").toString().trim().toLowerCase();
+        let isUnverified = status === "unverified";
+        let isPending = status === "pending";
+        let isVerified = status === "verified";
+
+        let invBadge = isUnverified
+          ? '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Approval</span>'
+           : isVerified
+          ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
+           : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Payment</span>';
+
+        let borderColor = isUnverified? '#ff4d4d' : isVerified? '#4CAF50' : '#ffa500';
+        let mpesaLine = isVerified && i.mpesaCode? `<div style="color: #0ea5e9; font-size: 10px; margin-top: 2px;">M-Pesa: ${i.mpesaCode}</div>` : '';
+
+        let safeId = i.id.replace(/'/g, "\\'");
+        let safeName = (i.name || '').replace(/'/g, "\\'");
+        let safePrice = i.price || 0;
+        let safeQty = i.qty || 0;
+
+        let buttons = '';
+        if (isUnverified && window.role === 'Admin') {
+            buttons += `<button class="btn" style="background:#9d81ff; color:white; margin-bottom:8px;" onclick="approveItem('${safeId}')">✅ Approve Stock</button>`;
         }
-        
-        const filteredData = window.db.filter(i => i && i.name && i.name !== "undefined" && i.name.toLowerCase().includes(searchTerm));
-        b.innerHTML = '';
-
-        if (filteredData.length === 0) {
-            b.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6;">No assets found. Add one above.</div>';
-            return;
+        if (isPending) {
+            buttons += `<button class="btn" style="background:#25D366; color:white; margin-bottom:8px;" onclick="window.initPay('${safeId}', '${safePrice}', '${safeName}')">Pay</button>`;
+            buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="confirmMpesa('${safeId}')">Confirm M-Pesa</button>`;
+            buttons += `<button class="btn" style="background:#38bdf8; color:white; margin-bottom:8px;" onclick="verifyStock('${safeId}')">Verify Only</button>`;
         }
+        buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
 
-        filteredData.forEach(i => {
+        listEl.innerHTML += `
+        <div class="card" style="border-left: 4px solid ${borderColor}; position: relative;">
+            <div style="position: absolute; top: 8px; right: 12px;">${invBadge}</div>
+            <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px; padding-right: 80px;">${safeName}</div>
+            <div style="font-size: 14px; color: #94a3b8; margin-bottom: 12px;">
+                <span>${safeQty} PCS × KES ${safePrice}</span><br>
+                <span style="font-weight: 600; color: #22c55e;">Total: KES ${safeQty * safePrice}</span>
+                ${mpesaLine}
+            </div>
+            ${buttons}
+        </div>`;
+    });
 
-    let rawStatus = i.status ? i.status.toString().trim() : "pending";
-const isUnverified = rawStatus.toLowerCase() === "unverified";
-const isPending = rawStatus.toLowerCase() === "pending";
-const isVerified = rawStatus.toLowerCase() === "verified";
-
-const invBadge = isUnverified 
-   ? '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Approval</span>'
-   : isVerified
-   ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
-   : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Payment</span>';
-
-const borderColor = isUnverified ? '#ff4d4d' : isVerified ? '#4CAF50' : '#ffa500';
-            
-            // NEW: Show M-Pesa code if it exists
-            const codeBadge = mpesaCode ? `<div style="font-size:11px; color:#38bdf8; margin-top:4px;">M-Pesa: ${mpesaCode}</div>` : '';
-
-            let buttons = '';
-            if (!isVerified) {
-                buttons += `<button class="btn" style="background:#25D366; color:white; margin-bottom:8px;" onclick="window.initPay('${safeId}', '${safePrice}', '${safeName}')">Pay</button>`;
-                buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="confirmMpesa('${safeId}')">Confirm M-Pesa</button>`; // NEW BUTTON
-                buttons += `<button class="btn" style="background:#38bdf8; color:white; margin-bottom:8px;" onclick="verifyStock('${safeId}')">Verify Only</button>`;
-            }
-            buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
-
-            b.innerHTML += `
-            <div class="card" style="margin-bottom: 12px; padding: 15px; border-left: 6px solid ${borderColor}; background: #1e1e2d; border-radius: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div style="flex: 1;">
-                        <strong style="font-size: 16px; color: #ffffff;">${safeName}</strong>
-                        <div style="margin-top: 8px;">${invBadge}</div>
-                        ${codeBadge}
-                        <div style="font-size:12px; opacity:0.7; margin-top:4px;">KES ${safePrice} | Qty: ${safeQty}</div>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
-                    ${buttons}
-                </div>
-            </div>`;
-        });
-    };
+    document.getElementById('salesCount').textContent = `${filteredData.length} Items`;
+    window.updateMiniSales();
+};
 
     window.add = async function() {
     let n = document.getElementById('n').value.trim();
