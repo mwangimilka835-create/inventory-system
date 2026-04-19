@@ -366,13 +366,15 @@
         let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; 
         setTimeout(()=>t.style.display='none', 3000); 
     };
-</script>
-    <button onclick="
+    // TEST FUNCTION FOR MOBILE
+window.testFirebase = function() {
     update(ref(fdb, 'stock_final_v10/test123'), {status: 'test'}).then(()=>{
         alert('WRITE OK: Firebase works!')
     }).catch(e=>{
         alert('WRITE FAILED: ' + e.message)
-    })
-" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:red; color:white; padding:10px;">TEST FIREBASE</button>
+    });
+};
+</script>
+<button onclick="testFirebase()" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:red; color:white; padding:10px;">TEST FIREBASE</button>
 </body>
                                                </html>
