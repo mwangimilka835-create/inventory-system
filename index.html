@@ -185,6 +185,8 @@
         draw(); // Automatically redraws Ledger when cloud updates
         if(window.chart) updateChart();
     });
+
+
         window.draw = function() {
         let b = document.getElementById('table-body');
         let searchTerm = document.getElementById('find').value.toLowerCase().trim();
@@ -203,24 +205,28 @@
         }
 
         filteredData.forEach(i => {
-            // SAFETY: Default everything so missing fields don't crash
             let rawStatus = i.status ? i.status.toString().trim() : "pending";
             const isVerified = rawStatus.toLowerCase() === "verified";
             const safeName = (i.name || "Unnamed").replace(/'/g, "\\'");
             const safeId = i.firebaseId || "";
             const safePrice = i.price || 0;
             const safeQty = i.qty || 0;
+            const mpesaCode = i.mpesaCode || ""; // NEW: get saved code
 
             const invBadge = isVerified
                ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
                 : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
 
             const borderColor = isVerified ? '#4CAF50' : '#ffa500';
+            
+            // NEW: Show M-Pesa code if it exists
+            const codeBadge = mpesaCode ? `<div style="font-size:11px; color:#38bdf8; margin-top:4px;">M-Pesa: ${mpesaCode}</div>` : '';
 
             let buttons = '';
             if (!isVerified) {
                 buttons += `<button class="btn" style="background:#25D366; color:white; margin-bottom:8px;" onclick="window.initPay('${safeId}', '${safePrice}', '${safeName}')">Pay</button>`;
-                buttons += `<button class="btn" style="background:#38bdf8; color:white; margin-bottom:8px;" onclick="verifyStock('${safeId}')">Verify</button>`;
+                buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="confirmMpesa('${safeId}')">Confirm M-Pesa</button>`; // NEW BUTTON
+                buttons += `<button class="btn" style="background:#38bdf8; color:white; margin-bottom:8px;" onclick="verifyStock('${safeId}')">Verify Only</button>`;
             }
             buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
 
@@ -230,15 +236,17 @@
                     <div style="flex: 1;">
                         <strong style="font-size: 16px; color: #ffffff;">${safeName}</strong>
                         <div style="margin-top: 8px;">${invBadge}</div>
+                        ${codeBadge}
                         <div style="font-size:12px; opacity:0.7; margin-top:4px;">KES ${safePrice} | Qty: ${safeQty}</div>
                     </div>
+                </div>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
                     ${buttons}
                 </div>
             </div>`;
         });
     };
-
+        
     window.add = async function() {
         let n = document.getElementById('n').value.trim();
         let q = parseInt(document.getElementById('q').value);
@@ -268,23 +276,27 @@
             </div>`;
         document.body.appendChild(modal);
     }
-window.confirmPaid = function(id) {
-    const code = document.getElementById('mpesa-code').value.trim();
+
+
+    window.confirmPaid = function(id) {
+    const code = document.getElementById('mpesa-code').value.trim().toUpperCase();
     if (code.length < 5) return window.toast("❌ Invalid Code");
 
-    // 1. Update the status to Verified first
+    // Update Firebase: save code + verify + timestamp
     update(ref(fdb, 'stock_final_v10/' + id), {
         status: "Verified",
+        mpesaCode: code,  // THIS IS THE M-PESA CODE FOR YOUR TILL RECORDS
         paidAt: new Date().toISOString()
     }).then(() => {
-        // 2. ONLY after the database is updated, verify and update stock
+        // ONLY after the database is updated, verify and update stock
         window.verifyStock(id); 
-        window.toast("✅ Payment Verified & Stock Updated!");
+        window.toast("✅ Payment Verified & Code Saved: " + code);
         document.getElementById('pay-modal-overlay').remove();
     }).catch((e) => {
         window.toast("❌ Sync Failed: " + e.message);
     });
 };
+
 
     window.verifyStock = (id) => update(ref(fdb, 'stock_final_v10/' + id), { status: "Verified" });
     window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, 'stock_final_v10/' + id));
