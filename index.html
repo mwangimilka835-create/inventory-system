@@ -242,8 +242,7 @@ window.draw = function() {
             }
             if (isSubmitted) {
                 buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="openMpesaModal('${safeId}', '${safeName}', ${safeQty * safePrice})">Confirm M-Pesa</button>`;
-                
-            
+            }
             if (window.role === 'Admin') {
                 buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
             }
