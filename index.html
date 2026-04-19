@@ -270,21 +270,23 @@
             </div>`;
         document.body.appendChild(modal);
     }
-    window.confirmPaid = function(id) {
-    const codeValue = document.getElementById('mpesa-code').value.trim();
-    if (codeValue.length < 5) return window.toast("❌ Invalid Code");
+window.confirmPaid = function(id) {
+    const code = document.getElementById('mpesa-code').value.trim();
+    if (code.length < 5) return window.toast("❌ Invalid Code");
 
+    // 1. Update the status to Verified first
     update(ref(fdb, 'stock_final_v10/' + id), {
-        mpesaCode: codeValue.toUpperCase(),
         status: "Verified",
         paidAt: new Date().toISOString()
     }).then(() => {
-        window.toast("✅ Payment Saved!");
+        // 2. ONLY after the database is updated, verify and update stock
+        window.verifyStock(id); 
+        window.toast("✅ Payment Verified & Stock Updated!");
         document.getElementById('pay-modal-overlay').remove();
-        draw(); 
+    }).catch((e) => {
+        window.toast("❌ Sync Failed: " + e.message);
     });
 };
-   
 
     window.verifyStock = (id) => update(ref(fdb, 'stock_final_v10/' + id), { status: "Verified" });
     window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, 'stock_final_v10/' + id));
