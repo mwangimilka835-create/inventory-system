@@ -206,19 +206,19 @@
         }
 
         filteredData.forEach(i => {
-            let rawStatus = i.status ? i.status.toString().trim() : "pending";
-            const isVerified = rawStatus.toLowerCase() === "verified";
-            const safeName = (i.name || "Unnamed").replace(/'/g, "\\'");
-            const safeId = i.firebaseId || "";
-            const safePrice = i.price || 0;
-            const safeQty = i.qty || 0;
-            const mpesaCode = i.mpesaCode || ""; // NEW: get saved code
 
-            const invBadge = isVerified
-               ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
-                : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Approval</span>';
+    let rawStatus = i.status ? i.status.toString().trim() : "pending";
+const isUnverified = rawStatus.toLowerCase() === "unverified";
+const isPending = rawStatus.toLowerCase() === "pending";
+const isVerified = rawStatus.toLowerCase() === "verified";
 
-            const borderColor = isVerified ? '#4CAF50' : '#ffa500';
+const invBadge = isUnverified 
+   ? '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Approval</span>'
+   : isVerified
+   ? '<span style="color: #4CAF50; font-size: 11px;">✅ Stock Verified</span>'
+   : '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Payment</span>';
+
+const borderColor = isUnverified ? '#ff4d4d' : isVerified ? '#4CAF50' : '#ffa500';
             
             // NEW: Show M-Pesa code if it exists
             const codeBadge = mpesaCode ? `<div style="font-size:11px; color:#38bdf8; margin-top:4px;">M-Pesa: ${mpesaCode}</div>` : '';
@@ -247,20 +247,32 @@
             </div>`;
         });
     };
-        
-    window.add = async function() {
-        let n = document.getElementById('n').value.trim();
-        let q = parseInt(document.getElementById('q').value);
-        if(!n || isNaN(q)) return alert("Check inputs!");
-        await push(inventoryRef, {
-            name: n, qty: q, price: document.getElementById('pr').value || 0,
-            cat: document.getElementById('cat').value, status: "Pending", 
-            addedBy: window.userName, timestamp: new Date().toISOString()
-        });
-        window.toast("📦 Cloud Sync Success");
-        document.getElementById('n').value = ''; document.getElementById('q').value = '';
-    };
 
+    window.add = async function() {
+    let n = document.getElementById('n').value.trim();
+    let q = parseInt(document.getElementById('q').value);
+    let p = document.getElementById('pr').value || 0;
+    
+    if(!n || isNaN(q) || q <= 0) return alert("Check name and quantity!");
+    if(p <= 0) return alert("Enter a valid price!");
+    
+    await push(inventoryRef, {
+        name: n, 
+        qty: q, 
+        price: p,
+        cat: document.getElementById('cat').value, 
+        status: "Unverified", // Stays here until YOU approve
+        addedBy: window.userName, 
+        addedAt: new Date().toISOString(),
+        approved: false
+    });
+    
+    window.toast("📦 Item logged. Waiting for admin approval.");
+    document.getElementById('n').value = ''; 
+    document.getElementById('q').value = '';
+    document.getElementById('pr').value = '';
+};
+    
     // M-PESA MODAL
     window.initPay = function(id, price, name) {
         const modal = document.createElement('div');
@@ -309,6 +321,17 @@
     
     window.verifyStock = (id) => update(ref(fdb, id), { status: "Verified" });
 window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
+    window.approveItem = (id) => {
+    if (window.role !== 'Admin') return alert("Only admin can approve");
+    update(ref(fdb, id), { 
+        status: "Pending", // Moves to payment stage
+        approved: true,
+        approvedBy: window.userName,
+        approvedAt: new Date().toISOString()
+    }).then(() => {
+        window.toast("✅ Approved. Item ready for payment.");
+    });
+};
 
     // EXPORTS
     window.pdf = function() {
