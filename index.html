@@ -269,10 +269,11 @@
                 <p onclick="document.getElementById('pay-modal-overlay').remove()" style="cursor:pointer; color:#888; margin-top:15px;">CANCEL</p>
             </div>`;
         document.body.appendChild(modal);
-    };
-   window.confirmPaid = function(id) {
+    }
+    window.confirmPaid = function(id) {
     const codeValue = document.getElementById('mpesa-code').value.trim();
     if (codeValue.length < 5) return window.toast("❌ Invalid Code");
+
     update(ref(fdb, 'stock_final_v10/' + id), {
         mpesaCode: codeValue.toUpperCase(),
         status: "Verified",
@@ -280,8 +281,10 @@
     }).then(() => {
         window.toast("✅ Payment Saved!");
         document.getElementById('pay-modal-overlay').remove();
+        draw(); 
     });
 };
+   
 
     window.verifyStock = (id) => update(ref(fdb, 'stock_final_v10/' + id), { status: "Verified" });
     window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, 'stock_final_v10/' + id));
