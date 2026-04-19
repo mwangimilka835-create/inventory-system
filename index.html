@@ -96,7 +96,7 @@
         <section id="p-inv" class="page">
             <div class="card">
                 <input placeholder="Search assets..." onkeyup="draw()" id="find">
-                <div id="table-body" style="margin-top: 10px; min-height: 50px;"></div>
+                <div id="table-body" style="margin-top: 10px; width:100%;"></div>
             </div>
         </section>
 
@@ -129,25 +129,22 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    window.fdb = getDatabase(app);
-    const inventoryRef = ref(window.fdb, 'stock_final_v10');
+    const fdb = getDatabase(app);
+    const inventoryRef = ref(fdb, 'stock_final_v10');
 
     window.db = []; 
     window.role = ''; 
     window.userName = ''; 
     window.chart = null; 
+    window.html5QrCode = null;
 
-    // FIX 1: Login Function Name
+    // LOGIN & AUTH
     window.doLogin = function() {
         let name = document.getElementById('u').value.trim();
         let pass = document.getElementById('p').value.trim();
         let r = document.getElementById('r_select').value;
-        if (!name || !pass || !r) return alert("Please fill all fields!");
+        if (!name || !pass || !r) return alert("Fill all fields!");
         window.userName = name;
-        launch(r);
-    };
-
-    function launch(r) {
         window.role = r;
         document.getElementById('auth-overlay').style.display='none';
         document.getElementById('navbar').style.display='flex';
@@ -159,42 +156,21 @@
             setTimeout(initChart, 500);
         }
         draw(); 
-        window.toast(`✅ Access Granted: ${window.userName}`);
-    }
+        window.toast(`✅ Welcome ${name}`);
+    };
 
+    // NAVIGATION
     window.tab = function(p, e) {
         document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
         document.getElementById('p-'+p).classList.add('active');
         document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
         e.currentTarget.classList.add('active');
-        if(p === 'inv') draw(); // Refresh ledger on tab switch
+        draw(); 
     };
 
-    window.toggleMode = function() {
-        document.body.classList.toggle('light-mode');
-    };
+    window.toggleMode = function() { document.body.classList.toggle('light-mode'); };
 
-    // FIX 2: Case-sensitivity for initChart
-    function initChart() {
-        const ctx = document.getElementById('stockPie').getContext('2d');
-        window.chart = new Chart(ctx, {
-            type: 'pie',
-            data: { 
-                labels: ['H/W', 'S/W', 'MAT'], 
-                datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'], borderWidth: 0 }] 
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-        updateChart();
-    }
-
-    function updateChart() { 
-        if(window.chart && window.db.length > 0) { 
-            window.chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => window.db.filter(i=>i.cat===c).length); 
-            window.chart.update(); 
-        } 
-    }
-
+    // REAL-TIME CLOUD LISTENER (CRITICAL FOR LEDGER)
     onValue(inventoryRef, (snapshot) => {
         const data = snapshot.val();
         window.db = [];
@@ -203,9 +179,43 @@
                 window.db.push({ ...data[id], firebaseId: id });
             });
         }
-        draw();
-        updateChart();
+        draw(); // Automatically redraws Ledger when cloud updates
+        if(window.chart) updateChart();
     });
+
+    // DRAWING THE LEDGER (FIXED)
+    window.draw = function() {
+        const b = document.getElementById('table-body');
+        if(!b) return;
+        const search = document.getElementById('find').value.toLowerCase();
+        b.innerHTML = '';
+        
+        const filtered = window.db.filter(i => i.name.toLowerCase().includes(search));
+        
+        if(filtered.length === 0) {
+            b.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.5;">No items found in cloud.</div>';
+            return;
+        }
+
+        filtered.forEach(i => {
+            const isVerified = i.status && i.status.trim() === "Verified";
+            b.innerHTML += `
+            <div class="card" style="border-left: 5px solid ${isVerified ? '#25D366' : '#ffa500'}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="font-size:18px;">${i.name}</strong>
+                    <span style="color:var(--secondary); font-size:20px; font-weight:900;">${i.qty}</span>
+                </div>
+                <p style="font-size:12px; margin:5px 0; color:#888;">
+                    ${isVerified ? '✅ Stock Verified' : '⌛ Pending Approval'}
+                </p>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn-main" style="flex:1; height:42px; font-size:12px;" onclick="initPay('${i.firebaseId}', '${i.price}', '${i.name}')">PAY KES ${i.price}</button>
+                    ${window.role === 'Admin' ? `<button onclick="verifyStock('${i.firebaseId}')" style="background:var(--secondary); border:none; padding:0 15px; border-radius:8px;">Verify</button>` : ''}
+                    ${window.role === 'Admin' ? `<button onclick="del('${i.firebaseId}')" class="btn-danger"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+            </div>`;
+        });
+    };
 
     window.add = async function() {
         let n = document.getElementById('n').value.trim();
@@ -216,130 +226,107 @@
             cat: document.getElementById('cat').value, status: "Pending", 
             addedBy: window.userName, timestamp: new Date().toISOString()
         });
-        window.toast("📦 Asset Saved");
+        window.toast("📦 Cloud Sync Success");
         document.getElementById('n').value = ''; document.getElementById('q').value = '';
     };
 
-    // FIX 3: Ledger Logic Fix
-    window.draw = function() {
-        let b = document.getElementById('table-body');
-        let search = document.getElementById('find').value.toLowerCase();
-        b.innerHTML = '';
-        
-        let filtered = window.db.filter(i => i.name.toLowerCase().includes(search));
-        
-        if(filtered.length === 0) {
-            b.innerHTML = '<p style="text-align:center; opacity:0.5;">No assets found</p>';
-            return;
-        }
-
-        filtered.forEach(i => {
-            const isVerified = i.status.trim() === "Verified";
-            b.innerHTML += `
-            <div class="card" style="border-left: 5px solid ${isVerified ? '#25D366' : '#ffa500'}">
-                <div style="display:flex; justify-content:space-between;">
-                    <strong>${i.name}</strong>
-                    <span style="color:var(--secondary); font-weight:bold;">${i.qty}</span>
-                </div>
-                <p style="font-size:11px; color:#888;">${isVerified ? '✅ VERIFIED' : '⌛ PENDING'}</p>
-                <div style="display:flex; gap:8px; margin-top:10px;">
-                    <button class="btn-main" style="padding:8px; font-size:11px; width:80px;" onclick="initPay('${i.firebaseId}', '${i.price}', '${i.name}')">PAY</button>
-                    ${window.role === 'Admin' ? `<button onclick="verifyStock('${i.firebaseId}')" style="padding:8px; font-size:11px; background:var(--secondary); color:#000; border-radius:5px; border:none;">VERIFY</button>` : ''}
-                    ${window.role === 'Admin' ? `<button onclick="del('${i.firebaseId}')" class="btn-danger" style="width:42px;"><i class="fas fa-trash"></i></button>` : ''}
-                </div>
-            </div>`;
-        });
-    };
-
+    // M-PESA MODAL
     window.initPay = function(id, price, name) {
         const modal = document.createElement('div');
         modal.id = 'pay-modal-overlay';
         modal.innerHTML = `
             <div class="pay-card">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" class="mpesa-logo">
-                <p>KES ${price} for ${name}</p>
+                <p>Payment for ${name}</p>
+                <div class="pay-amount">KES ${price}</div>
                 <div class="till-box">TILL: 5637180</div>
-                <input type="text" id="mpesa-code" placeholder="Enter Code">
-                <button class="btn-confirm" onclick="confirmPaid('${id}')">CONFIRM</button>
-                <p onclick="document.getElementById('pay-modal-overlay').remove()" style="cursor:pointer; color:red; margin-top:15px;">CANCEL</p>
+                <input type="text" id="mpesa-code" style="text-align:center; text-transform:uppercase;" placeholder="ENTER CODE">
+                <button class="btn-confirm" onclick="confirmPaid('${id}')">CONFIRM & SYNC</button>
+                <p onclick="document.getElementById('pay-modal-overlay').remove()" style="cursor:pointer; color:#888; margin-top:15px;">CANCEL</p>
             </div>`;
         document.body.appendChild(modal);
     };
 
-    // FIX 4: M-Pesa Update Logic
     window.confirmPaid = function(id) {
-        const codeValue = document.getElementById('mpesa-code').value.trim();
-        if (codeValue.length < 5) return window.toast("❌ Invalid Code");
-        update(ref(window.fdb, 'stock_final_v10/' + id), {
-            mpesaCode: codeValue.toUpperCase(),
+        const code = document.getElementById('mpesa-code').value.trim();
+        if (code.length < 5) return window.toast("❌ Invalid Code");
+        update(ref(fdb, 'stock_final_v10/' + id), {
+            mpesaCode: code.toUpperCase(),
             status: "Verified",
             paidAt: new Date().toISOString()
         }).then(() => {
-            window.toast("✅ Payment Saved!");
+            window.toast("✅ Cloud Updated!");
             document.getElementById('pay-modal-overlay').remove();
         });
     };
 
-    window.verifyStock = function(id) {
-        update(ref(window.fdb, 'stock_final_v10/' + id), { status: "Verified" });
-        window.toast("✅ Verified");
-    };
+    window.verifyStock = (id) => update(ref(fdb, 'stock_final_v10/' + id), { status: "Verified" });
+    window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, 'stock_final_v10/' + id));
 
-    window.del = function(id) {
-        if(confirm("Delete permanently?")) remove(ref(window.fdb, 'stock_final_v10/' + id));
-    };
-
+    // EXPORTS
     window.pdf = function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.text("StockPro Audit Report", 14, 15);
+        doc.text("StockPro Audit - 2026", 14, 15);
         const rows = window.db.map(i => [i.name, i.qty, i.cat, i.status]);
         doc.autoTable({ head: [['Item', 'Qty', 'Category', 'Status']], body: rows });
         doc.save('Stock_Audit.pdf');
-        window.toast("📕 PDF Saved");
     };
 
     window.csv = function() {
-        let csv = "Item,Qty,Price,Category,Status\n";
-        window.db.forEach(i => csv += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.status}"\n`);
-        const blob = new Blob([csv], { type: 'text/csv' });
+        let csv = "Item,Qty,Price,Status\n";
+        window.db.forEach(i => csv += `"${i.name}",${i.qty},${i.price},"${i.status}"\n`);
         const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "Stock_Ledger.csv";
+        link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+        link.download = "StockPro_Ledger.csv";
         link.click();
-        window.toast("📊 CSV Saved");
     };
 
     window.wa = function() {
-        let msg = '*STOCKPRO UPDATE*%0A';
+        let msg = '*STOCKPRO CLOUD UPDATE*%0A';
         window.db.forEach(i => msg += `• ${i.name}: ${i.qty} (${i.status})%0A`);
         window.open('https://wa.me/254112873218?text=' + msg);
     };
 
+    // SCANNER
     window.toggleScanner = function() {
         const view = document.getElementById('qr-view');
-        const btn = document.getElementById('scan-text');
         if(view.style.display === 'block') {
-            html5QrCode.stop().then(() => {
-                view.style.display = 'none';
-                btn.innerText = "Start Scanner";
-            });
+            window.html5QrCode.stop().then(() => { view.style.display = 'none'; document.getElementById('scan-text').innerText = "Start Scanner"; });
         } else {
-            view.style.display = 'block';
-            btn.innerText = "Stop Scanner";
+            view.style.display = 'block'; document.getElementById('scan-text').innerText = "Stop Scanner";
             window.html5QrCode = new Html5Qrcode("qr-view");
             window.html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
                 document.getElementById('n').value = text;
-                window.toast("🔍 Scanned!");
+                window.toast("🔍 Item Identified");
                 window.toggleScanner();
             });
         }
     };
 
-    window.toast = function(m) { 
+    // CHART
+    function initChart() {
+        const ctx = document.getElementById('stockPie').getContext('2d');
+        window.chart = new Chart(ctx, {
+            type: 'pie',
+            data: { 
+                labels: ['H/W', 'S/W', 'MAT'], 
+                datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'] }] 
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+        updateChart();
+    }
+
+    function updateChart() { 
+        window.chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => window.db.filter(i=>i.cat===c).length); 
+        window.chart.update(); 
+    }
+
+    window.toast = (m) => { 
         let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; 
         setTimeout(()=>t.style.display='none', 3000); 
     };
 </script>
 </body>
-    </html>
+                                               </html>
