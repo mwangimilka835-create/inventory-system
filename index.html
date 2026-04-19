@@ -339,17 +339,40 @@ window.draw = function() {
     
     window.verifyStock = (id) => update(ref(fdb, id), { status: "Verified" });
 window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
-    window.approveItem = (id) => {
-    if (window.role !== 'Admin') return alert("Only admin can approve");
+    
+    // STAGE 1→2: Only Admin can approve - stops hackers adding fake stock
+window.approveItem = (id) => {
+    if (window.role !== 'Admin') return alert("❌ Only Admin can approve stock. Tell Milka.");
     update(ref(fdb, id), { 
-        status: "Pending", // Moves to payment stage
-        approved: true,
+        status: "Pending",
         approvedBy: window.userName,
         approvedAt: new Date().toISOString()
-    }).then(() => {
-        window.toast("✅ Approved. Item ready for payment.");
-    });
+    }).then(() => window.toast("✅ Stock approved. Ready for payment."));
 };
+
+// STAGE 2→3: Anyone can submit code, but you still verify it
+window.submitMpesa = (id) => {
+    let code = prompt("Enter M-Pesa Code from customer:");
+    if (!code || code.trim().length < 5) return alert("Enter valid M-Pesa code");
+    update(ref(fdb, id), { 
+        status: "Submitted", 
+        mpesaCode: code.trim().toUpperCase(),
+        submittedBy: window.userName,
+        submittedAt: new Date().toISOString()
+    }).then(() => window.toast("💰 Code submitted. Admin will verify."));
+};
+
+// STAGE 3→4: Only Admin can mark as PAID - you check code first
+window.verifyPayment = (id) => {
+    if (window.role !== 'Admin') return alert("❌ Only Admin can verify payment. Tell Milka.");
+    update(ref(fdb, id), { 
+        status: "Verified",
+        verifiedBy: window.userName,
+        verifiedAt: new Date().toISOString()
+    }).then(() => window.toast("✅ PAID. Stock verified."));
+};
+    
+    
 
     // EXPORTS
     window.pdf = function() {
