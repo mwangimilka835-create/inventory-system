@@ -132,7 +132,7 @@
 
     const app = initializeApp(firebaseConfig);
     const fdb = getDatabase(app);
-    const inventoryRef = ref(fdb, 'stock_final_v10');
+    const inventoryRef = ref(fdb);
 
     window.db = []; 
     window.role = ''; 
