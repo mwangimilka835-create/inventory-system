@@ -132,6 +132,7 @@
 
     const app = initializeApp(firebaseConfig);
     const fdb = getDatabase(app);
+    window.fdb = fdb; // Makes fdb visible to buttons
     const inventoryRef = ref(fdb);
 
     window.db = []; 
@@ -366,5 +367,12 @@
         setTimeout(()=>t.style.display='none', 3000); 
     };
 </script>
+    <button onclick="
+    update(ref(fdb, 'stock_final_v10/test123'), {status: 'test'}).then(()=>{
+        alert('WRITE OK: Firebase works!')
+    }).catch(e=>{
+        alert('WRITE FAILED: ' + e.message)
+    })
+" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:red; color:white; padding:10px;">TEST FIREBASE</button>
 </body>
                                                </html>
