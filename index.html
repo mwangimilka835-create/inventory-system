@@ -241,8 +241,8 @@ window.draw = function() {
                 buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="submitMpesa('${safeId}')">Confirm M-Pesa</button>`;
             }
             if (isSubmitted) {
-                buttons += `<button class="btn" style="background:#22c55e; color:white; margin-bottom:8px;" onclick="verifyPayment('${safeId}')">✅ Verify Payment</button>`;
-            }
+                buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="openMpesaModal('${safeId}', '${safeName}', ${safeQty * safePrice})">Confirm M-Pesa</button>`;
+                
             
             if (window.role === 'Admin') {
                 buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
@@ -350,16 +350,52 @@ window.approveItem = (id) => {
     }).then(() => window.toast("✅ Stock approved. Ready for payment."));
 };
 
-// STAGE 2→3: Anyone can submit code, but you still verify it
-window.submitMpesa = (id) => {
-    let code = prompt("Enter M-Pesa Code from customer:");
-    if (!code || code.trim().length < 5) return alert("Enter valid M-Pesa code");
+// NEW: Proper modal for submitting M-Pesa code - works on mobile
+window.openMpesaModal = function(id, name, total) {
+    if (document.getElementById('mpesa-modal')) return; // prevent double
+    
+    const modal = document.createElement('div');
+    modal.id = 'mpesa-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+    
+    modal.innerHTML = `
+        <div style="background:#1a1a1a;width:100%;max-width:340px;border-radius:20px;padding:25px;text-align:center;border:1px solid #25D366;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" style="width:100px;margin-bottom:15px;">
+            <div style="color:#94a3b8;font-size:14px;">Payment for</div>
+            <div style="color:white;font-weight:800;font-size:18px;margin:5px 0;">${name}</div>
+            <div style="color:#25D366;font-size:28px;font-weight:800;margin:10px 0;">KES ${total}</div>
+            <div style="background:#252525;padding:12px;border-radius:10px;margin:15px 0;border:1px dashed #444;">
+                <div style="color:#888;font-size:11px;">TILL NUMBER</div>
+                <div style="color:white;font-size:20px;font-weight:900;">5637180</div>
+            </div>
+            <input id="mpesa-code-input" type="text" placeholder="PASTE M-PESA CODE HERE" 
+                style="width:100%;padding:14px;margin:10px 0;border:1px solid #444;background:#000;color:white;border-radius:10px;text-align:center;text-transform:uppercase;font-size:16px;box-sizing:border-box;">
+            <button onclick="saveMpesaCode('${id}')" 
+                style="width:100%;padding:16px;background:#25D366;color:white;border:none;border-radius:12px;font-weight:800;cursor:pointer;margin-top:10px;">
+                SUBMIT CODE TO ADMIN
+            </button>
+            <p onclick="document.getElementById('mpesa-modal').remove()" 
+                style="cursor:pointer;color:#888;margin-top:15px;font-size:14px;">CANCEL</p>
+        </div>`;
+    document.body.appendChild(modal);
+};
+
+window.saveMpesaCode = function(id) {
+    const codeInput = document.getElementById('mpesa-code-input');
+    if (!codeInput) return alert("Error: Can't find input");
+    
+    const code = codeInput.value.trim().toUpperCase();
+    if (code.length < 8) return alert("❌ Code too short. M-Pesa codes are 10 characters like QK8G2H3J4K");
+    
     update(ref(fdb, id), { 
         status: "Submitted", 
-        mpesaCode: code.trim().toUpperCase(),
+        mpesaCode: code,
         submittedBy: window.userName,
         submittedAt: new Date().toISOString()
-    }).then(() => window.toast("💰 Code submitted. Admin will verify."));
+    }).then(() => {
+        window.toast("💰 Code sent to Admin for verification");
+        document.getElementById('mpesa-modal').remove();
+    }).catch(e => alert("❌ Firebase Error: " + e.message));
 };
 
 // STAGE 3→4: Only Admin can mark as PAID - you check code first
