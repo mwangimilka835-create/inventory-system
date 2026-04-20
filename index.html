@@ -308,33 +308,26 @@ window.draw = function() {
                 <p onclick="document.getElementById('pay-modal-overlay').remove()" style="cursor:pointer; color:#888; margin-top:15px;">CANCEL</p>
             </div>`;
         document.body.appendChild(modal);
-    }
+    }window.confirmPaid = function(id) {
+    const code = document.getElementById('mpesa-code').value.trim();
+    if (code.length < 5) return window.toast("❌ Invalid Code");
 
-   window.confirmPaid = function(id) {
-    const codeInput = document.getElementById('mpesa-code');
-    if (!codeInput) {
-        alert("ERROR: Can't find M-Pesa input box");
-        return;
-    }
-    const code = codeInput.value.trim().toUpperCase();
-    
-    if (code.length < 5) {
-        alert("❌ Code too short. Enter full M-Pesa code like QK8G2H3J4K");
-        return;
-    }
-
-    // This is the exact same line that worked in your test
-       update(ref(fdb, id), {
-    status: "Verified",
-    mpesaCode: code,
-    paidAt: new Date().toISOString()
-}).then(() => {
-        alert("✅ SUCCESS: Code " + code + " saved to Firebase");
+    // 1. Update Firebase
+    update(ref(fdb, 'stock_final_v10/' + id), {
+        mpesaCode: code.toUpperCase(),
+        status: "Verified",
+        paidAt: new Date().toISOString()
+    }).then(() => {
+        // 2. Clear the UI
         document.getElementById('pay-modal-overlay').remove();
-    }).catch((e) => {
-        alert("❌ FIREBASE ERROR: " + e.message);
+        window.toast("✅ Cloud Updated!");
+
+        // 3. FORCE REDRAW (This is the missing step)
+        // This will check the database again and hide the 'PAY' button
+        draw(); 
     });
 };
+
 
 
     
