@@ -140,27 +140,39 @@
     window.userName = ''; 
     window.chart = null; 
     window.html5QrCode = null;
-
-    // LOGIN & AUTH
-    window.doLogin = function() {
-        let name = document.getElementById('u').value.trim();
-        let pass = document.getElementById('p').value.trim();
-        let r = document.getElementById('r_select').value;
-        if (!name || !pass || !r) return alert("Fill all fields!");
-        window.userName = name;
-        window.role = r;
-        document.getElementById('auth-overlay').style.display='none';
-        document.getElementById('navbar').style.display='flex';
-        document.getElementById('app').style.display='block';
-        if(r === 'Admin') {
-            document.getElementById('adm-pr').style.display = 'block';
-            document.getElementById('adm-csv').style.display = 'flex';
-            document.getElementById('chart-card').style.display = 'block';
-            setTimeout(initChart, 500);
+window.doLogin = function() {
+    let name = document.getElementById('u').value.trim();
+    let pass = document.getElementById('p').value.trim();
+    let r = document.getElementById('r_select').value;
+    if (!name || !pass || !r) return alert("Fill all fields!");
+    
+    window.userName = name;
+    window.role = r;
+    
+    // Hide login, show app
+    document.getElementById('auth-overlay').style.display='none';
+    document.getElementById('navbar').style.display='flex';
+    document.getElementById('app').style.display='block';
+    
+    // Show admin features if needed
+    if(r === 'Admin') {
+        document.getElementById('adm-pr').style.display = 'block';
+        document.getElementById('adm-csv').style.display = 'flex';
+        document.getElementById('chart-card').style.display = 'block';
+        setTimeout(initChart, 500);
+    }
+    
+    // Small delay to ensure DOM is ready before drawing
+    setTimeout(() => {
+        try {
+            draw(); 
+        } catch(e) {
+            console.error("Draw error:", e);
         }
-        draw(); 
-        window.toast(`✅ Welcome ${name}`);
-    };
+    }, 100);
+    
+    window.toast(`✅ Welcome ${name}`);
+};
 
     // NAVIGATION
     window.tab = function(p, e) {
