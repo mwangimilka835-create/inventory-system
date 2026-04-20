@@ -350,7 +350,7 @@ window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
 window.approveItem = (id) => {
     if (window.role !== 'Admin') return alert("❌ Only Admin can approve stock. Tell Milka.");
     update(ref(fdb, id), { 
-        status: "Pending",
+       status: "pending",    // lowercase p
         approvedBy: window.userName,
         approvedAt: new Date().toISOString()
     }).then(() => window.toast("✅ Stock approved. Ready for payment."));
@@ -394,7 +394,7 @@ window.saveMpesaCode = function(id) {
     if (code.length < 8) return alert("❌ Code too short. M-Pesa codes are 10 characters like QK8G2H3J4K");
     
     update(ref(fdb, id), { 
-        status: "Submitted", 
+    status: "submitted",  // lowercase s
         mpesaCode: code,
         submittedBy: window.userName,
         submittedAt: new Date().toISOString()
@@ -414,69 +414,6 @@ window.verifyPayment = (id) => {
     }).then(() => window.toast("✅ PAID. Stock verified."));
 };
     
-    // EXPORTS
-    window.pdf = function() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("StockPro Audit - 2026", 14, 15);
-        const rows = window.db.map(i => [i.name, i.qty, i.cat, i.status]);
-        doc.autoTable({ head: [['Item', 'Qty', 'Category', 'Status']], body: rows });
-        doc.save('Stock_Audit.pdf');
-    };
-
-    window.csv = function() {
-        let csv = "Item,Qty,Price,Status\n";
-        window.db.forEach(i => csv += `"${i.name}",${i.qty},${i.price},"${i.status}"\n`);
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-        link.download = "StockPro_Ledger.csv";
-        link.click();
-    };
-
-    window.wa = function() {
-        let msg = '*STOCKPRO CLOUD UPDATE*%0A';
-        window.db.forEach(i => msg += `• ${i.name}: ${i.qty} (${i.status})%0A`);
-        window.open('https://wa.me/254112873218?text=' + msg);
-    };
-            // SCANNER
-    window.toggleScanner = function() {
-        const view = document.getElementById('qr-view');
-        if(view.style.display === 'block') {
-            window.html5QrCode.stop().then(() => { view.style.display = 'none'; document.getElementById('scan-text').innerText = "Start Scanner"; });
-        } else {
-            view.style.display = 'block'; document.getElementById('scan-text').innerText = "Stop Scanner";
-            window.html5QrCode = new Html5Qrcode("qr-view");
-            window.html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-                document.getElementById('n').value = text;
-                window.toast("🔍 Item Identified");
-                window.toggleScanner();
-            });
-        }
-    };
-
-    // CHART
-    function initChart() {
-        const ctx = document.getElementById('stockPie').getContext('2d');
-        window.chart = new Chart(ctx, {
-            type: 'pie',
-            data: { 
-                labels: ['H/W', 'S/W', 'MAT'], 
-                datasets: [{ data: [0,0,0], backgroundColor: ['#d4af37', '#38bdf8', '#9d81ff'] }] 
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-        updateChart();
-        }
-    
-    function updateChart() { 
-        window.chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => window.db.filter(i=>i.cat===c).length); 
-        window.chart.update(); 
-    }
-
-    window.toast = (m) => { 
-        let t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; 
-        setTimeout(()=>t.style.display='none', 3000); 
-    };
     // TEST FUNCTION FOR MOBILE
 window.testFirebase = function() {
     update(ref(fdb, 'stock_final_v10/test123'), {status: 'test'}).then(()=>{
