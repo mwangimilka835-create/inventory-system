@@ -233,25 +233,20 @@ window.draw = function() {
 
             // ALL BUTTONS SHOW FOR EVERYONE
             let buttons = '';
-            
-            if (isUnverified) {
-                buttons += `<button class="btn" style="background:#9d81ff; color:white; margin-bottom:8px;" onclick="approveItem('${safeId}')">✅ Approve Stock</button>`;
-            }
-            if (isPending) {
-                buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="submitMpesa('${safeId}')">Confirm M-Pesa</button>`;
-            }
 
-// 1. Show PAY button for anyone if item is Unpaid
-if (i.status === "Unpaid") {
-    buttons += `<button class="btn" style="background:#2ecc71; color:white;" onclick="window.initPay('${i.id}', '${i.price}', '${i.name}')">Pay</button>`;
-}
+        // 1. Show PAY button for anyone if item is Unpaid or Unverified
+        if (s === "unpaid" || s === "unverified") {
+            buttons += `<button class="btn" style="background:#2ecc71; color:white; margin-right:5px;" onclick="window.initPay('${i.id}', '${safePrice}', '${safeName}')">Pay</button>`;
+        }
 
-// 2. Only you (Admin) see the DELETE button
-if (window.role === 'Admin') {
-    buttons += `<button class="btn" style="background:#ff4d4d; color:white; margin-left:5px;" onclick="deleteItem('${i.id}')">Delete</button>`;
+        // 2. Only show DELETE and VERIFY if you are the Admin
+        if (window.role === 'Admin') {
+            buttons += `<button class="btn" style="background:#ff4d4d; color:white; margin-right:5px;" onclick="window.deleteItem('${i.id}')">Delete</button>`;
+            
+            if (s === "submitted") {
+                buttons += `<button class="btn" style="background:#3498db; color:white;" onclick="window.verifyPayment('${i.id}')">Verify</button>`;
+            }
 }
-            
-            
 
             listEl.innerHTML += `
             <div class="card" style="border-left: 4px solid ${borderColor}; position: relative;">
