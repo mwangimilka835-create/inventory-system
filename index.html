@@ -273,22 +273,28 @@ window.draw = function() {
     let q = parseInt(document.getElementById('q').value);
     let p = document.getElementById('pr').value || 0;
     
+    // Safety check for inputs
     if(!n || isNaN(q) || q <= 0) return alert("Check name and quantity!");
     if(p <= 0) return alert("Enter a valid price!");
-    
+
+    // Ask for M-Pesa code right away
+    let mpesa = prompt("Enter M-Pesa Transaction Code:");
+    if(!mpesa) return alert("M-Pesa code is required to add an item!");
+
     await push(inventoryRef, {
-        name: n, 
-        qty: q, 
+        name: n,
+        qty: q,
         price: p,
-        cat: document.getElementById('cat').value, 
+        cat: document.getElementById('cat').value,
         status: "Unverified", // Stays here until YOU approve
-        addedBy: window.userName, 
+        mpesaCode: mpesa.toUpperCase(), // Records the code
+        addedBy: window.userName,
         addedAt: new Date().toISOString(),
         approved: false
     });
-    
+
     window.toast("📦 Item logged. Waiting for admin approval.");
-    document.getElementById('n').value = ''; 
+    document.getElementById('n').value = '';
     document.getElementById('q').value = '';
     document.getElementById('pr').value = '';
 };
