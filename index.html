@@ -115,15 +115,33 @@
 
     <div id="toast"></div>
 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
+        const firebaseConfig = {
+        apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
+        authDomain: "stockpro-9be18.firebaseapp.com",
+        databaseURL: "https://stockpro-9be18-default-rtdb.firebaseio.com",
+        projectId: "stockpro-9be18",
+        storageBucket: "stockpro-9be18.firebasestorage.app",
+        messagingSenderId: "1025574986774",
+        appId: "1:1025574986774:web:78fb24039432c921b84137",
+        measurementId: "G-PWNYV0Y8G7"
+    };
 
-    <script>
-    window.db = [];
-    window.role = '';
-    window.userName = '';
-    window.chart = null;
+    const app = initializeApp(firebaseConfig);
+    const fdb = getDatabase(app);
+    window.fdb = fdb; // Makes fdb visible to buttons
+    const inventoryRef = ref(fdb);
+
+    window.db = []; 
+    window.role = ''; 
+    window.userName = ''; 
+    window.chart = null; 
     window.html5QrCode = null;
 
+    // LOGIN & AUTH
     window.doLogin = function() {
         let name = document.getElementById('u').value.trim();
         let pass = document.getElementById('p').value.trim();
@@ -140,68 +158,35 @@
             document.getElementById('chart-card').style.display = 'block';
             setTimeout(initChart, 500);
         }
-        setTimeout(() => {
-            try { draw(); } catch(e) { console.error("Draw error:", e); }
-        }, 100);
+        draw(); 
         window.toast(`✅ Welcome ${name}`);
     };
 
+    // NAVIGATION
     window.tab = function(p, e) {
         document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
         document.getElementById('p-'+p).classList.add('active');
         document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
         e.currentTarget.classList.add('active');
-        draw();
+        draw(); 
     };
 
     window.toggleMode = function() { document.body.classList.toggle('light-mode'); };
 
-    window.toast = function(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 3000);
-    };
-
-    window.initChart = function() {
-        if (!window.chart) {
-            const ctx = document.getElementById('stockPie');
-            window.chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#d4af37','#38bdf8','#9d81ff','#ff4d4d','#25D366'] }] },
-                options: { responsive: true, maintainAspectRatio: false }
+    
+    // REAL-TIME CLOUD LISTENER (CRITICAL FOR LEDGER)
+    onValue(inventoryRef, (snapshot) => {
+        const data = snapshot.val();
+        window.db = [];
+        if (data) {
+            Object.keys(data).forEach(id => {
+                window.db.push({ ...data[id], firebaseId: id });
             });
         }
-        updateChart();
-    };
-
-    window.updateChart = function() {
-        if (!window.chart) return;
-        const cats = {};
-        window.db.forEach(i => { cats[i.cat] = (cats[i.cat] || 0) + i.qty; });
-        window.chart.data.labels = Object.keys(cats);
-        window.chart.data.datasets[0].data = Object.values(cats);
-        window.chart.update();
-    };
-
-    window.toggleScanner = function() { window.toast("Scanner coming soon"); };
-    window.pdf = function() { window.toast("PDF export coming soon"); };
-    window.csv = function() {
-        if (window.role!== 'Admin') return alert("Admin only");
-        let csv = "Name,Qty,Price,Category,Status,M-Pesa Code\n";
-        window.db.forEach(i => { csv += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.status}","${i.mpesaCode || ''}"\n`; });
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'StockPro_Ledger.csv'; a.click();
-    };
-    window.wa = function() {
-        let msg = "StockPro Summary%0A";
-        window.db.forEach(i => { msg += `${i.name}: ${i.qty}pcs @ KES${i.price} - ${i.status}%0A`; });
-        window.open(`https://wa.me/?text=${msg}`);
-    };
-
-        window.draw = function() {
+        draw(); // Automatically redraws Ledger when cloud updates
+        if(window.chart) updateChart();
+    });
+window.draw = function() {
     try {
         let invData = window.db || [];
         let find = document.getElementById('find').value.toLowerCase();
@@ -275,7 +260,6 @@
                     ${mpesaLine}
                 </div>
                 ${buttons}
-                
             </div>`;
         });
 
@@ -308,7 +292,8 @@
     document.getElementById('q').value = '';
     document.getElementById('pr').value = '';
 };
-        // M-PESA MODAL
+    
+    // M-PESA MODAL
     window.initPay = function(id, price, name) {
         const modal = document.createElement('div');
         modal.id = 'pay-modal-overlay';
@@ -323,26 +308,37 @@
                 <p onclick="document.getElementById('pay-modal-overlay').remove()" style="cursor:pointer; color:#888; margin-top:15px;">CANCEL</p>
             </div>`;
         document.body.appendChild(modal);
-    }window.confirmPaid = function(id) {
-    const code = document.getElementById('mpesa-code').value.trim();
-    if (code.length < 5) return window.toast("❌ Invalid Code");
+    }
 
-    // 1. Update Firebase
-        update(ref(fdb, id), {
-        mpesaCode: code.toUpperCase(),
-        status: "Verified",
-        paidAt: new Date().toISOString()
-    }).then(() => {
-        // 2. Clear the UI
+   window.confirmPaid = function(id) {
+    const codeInput = document.getElementById('mpesa-code');
+    if (!codeInput) {
+        alert("ERROR: Can't find M-Pesa input box");
+        return;
+    }
+    const code = codeInput.value.trim().toUpperCase();
+    
+    if (code.length < 5) {
+        alert("❌ Code too short. Enter full M-Pesa code like QK8G2H3J4K");
+        return;
+    }
+
+    // This is the exact same line that worked in your test
+       update(ref(fdb, id), {
+    status: "Verified",
+    mpesaCode: code,
+    paidAt: new Date().toISOString()
+}).then(() => {
+        alert("✅ SUCCESS: Code " + code + " saved to Firebase");
         document.getElementById('pay-modal-overlay').remove();
-        window.toast("✅ Cloud Updated!");
-
-        // 3. FORCE REDRAW (This is the missing step)
-        // This will check the database again and hide the 'PAY' button
-        draw(); 
+    }).catch((e) => {
+        alert("❌ FIREBASE ERROR: " + e.message);
     });
 };
 
+
+    
+    
     window.verifyStock = (id) => update(ref(fdb, id), { status: "Verified" });
 window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
     
@@ -350,7 +346,7 @@ window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
 window.approveItem = (id) => {
     if (window.role !== 'Admin') return alert("❌ Only Admin can approve stock. Tell Milka.");
     update(ref(fdb, id), { 
-       status: "pending",    // lowercase p
+        status: "Pending",
         approvedBy: window.userName,
         approvedAt: new Date().toISOString()
     }).then(() => window.toast("✅ Stock approved. Ready for payment."));
@@ -381,7 +377,7 @@ window.openMpesaModal = function(id, name, total) {
                 SUBMIT CODE TO ADMIN
             </button>
             <p onclick="document.getElementById('mpesa-modal').remove()" 
-            style="cursor:pointer;color:#888;margin-top:15px;font-size:14px;">CANCEL</p>
+                style="cursor:pointer;color:#888;margin-top:15px;font-size:14px;">CANCEL</p>
         </div>`;
     document.body.appendChild(modal);
 };
@@ -390,79 +386,4 @@ window.saveMpesaCode = function(id) {
     const codeInput = document.getElementById('mpesa-code-input');
     if (!codeInput) return alert("Error: Can't find input");
     
-    const code = codeInput.value.trim().toUpperCase();
-    if (code.length < 8) return alert("❌ Code too short. M-Pesa codes are 10 characters like QK8G2H3J4K");
-    
-    update(ref(fdb, id), { 
-    status: "submitted",  // lowercase s
-        mpesaCode: code,
-        submittedBy: window.userName,
-        submittedAt: new Date().toISOString()
-    }).then(() => {
-        window.toast("💰 Code sent to Admin for verification");
-        document.getElementById('mpesa-modal').remove();
-    }).catch(e => alert("❌ Firebase Error: " + e.message));
-};
-
-// STAGE 3→4: Only Admin can mark as PAID - you check code first
-window.verifyPayment = (id) => {
-    if (window.role !== 'Admin') return alert("❌ Only Admin can verify payment. Tell Milka.");
-    update(ref(fdb, id), { 
-        status: "Verified",
-        verifiedBy: window.userName,
-        verifiedAt: new Date().toISOString()
-    }).then(() => window.toast("✅ PAID. Stock verified."));
-};
-    
-    // TEST FUNCTION FOR MOBILE
-window.testFirebase = function() {
-    update(ref(fdb, 'stock_final_v10/test123'), {status: 'test'}).then(()=>{
-        alert('WRITE OK: Firebase works!')
-    }).catch(e=>{
-        alert('WRITE FAILED: ' + e.message)
-    });
-};
- console.log('Modal function exists:', typeof window.openMpesaModal);       
-    
-        
-                    </script>
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-
-        const firebaseConfig = {
-        apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
-        authDomain: "stockpro-9be18.firebaseapp.com",
-        databaseURL: "https://stockpro-9be18-default-rtdb.firebaseio.com",
-        projectId: "stockpro-9be18",
-        storageBucket: "stockpro-9be18.firebasestorage.app",
-        messagingSenderId: "1025574986774",
-        appId: "1:1025574986774:web:78fb24039432c921b84137",
-        measurementId: "G-PWNYV0Y8G7"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const fdb = getDatabase(app);
-    window.fdb = fdb; // Makes fdb visible to buttons
-    const inventoryRef = ref(fdb);
-    window.fdb = fdb;
-    window.inventoryRef = inventoryRef;
-    window.update = update;
-    window.ref = ref;
-    window.remove = remove;
-    window.push = push;
-
-    // This 1 listener updates your app when data changes
-    onValue(inventoryRef, (snapshot) => {
-        const data = snapshot.val();
-        window.db = [];
-        if (data) {
-            Object.keys(data).forEach(id => {
-                window.db.push({...data[id], firebaseId: id });
-            });
-        }
-        draw();
-        if(window.chart) updateChart();
-    });
-</script>
-           
+    const co
