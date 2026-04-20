@@ -241,14 +241,19 @@ window.draw = function() {
                 buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="submitMpesa('${safeId}')">Confirm M-Pesa</button>`;
             }
 
+let buttons = "";
 
+// 1. Show PAY button for anyone if item is Unpaid
+if (i.status === "Unpaid") {
+    buttons += `<button class="btn" style="background:#2ecc71; color:white;" onclick="window.initPay('${i.id}', '${i.price}', '${i.name}')">Pay</button>`;
+}
+
+// 2. Only you (Admin) see the DELETE button
+if (window.role === 'Admin') {
+    buttons += `<button class="btn" style="background:#ff4d4d; color:white; margin-left:5px;" onclick="deleteItem('${i.id}')">Delete</button>`;
+}
             
-            if (isSubmitted) {
-                buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="openMpesaModal('${safeId}', '${safeName}', ${safeQty * safePrice})">Confirm M-Pesa</button>`;
-            }
-            if (window.role === 'Admin') {
-                buttons += `<button class="btn" style="background:#ff4d4d; color:white;" onclick="del('${safeId}')">Delete</button>`;
-            }
+            
 
             listEl.innerHTML += `
             <div class="card" style="border-left: 4px solid ${borderColor}; position: relative;">
