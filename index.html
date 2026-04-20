@@ -335,31 +335,28 @@ window.confirmPaid = function(id) {
         document.getElementById('pay-modal-overlay').remove();
     });
 };
-
-   window.confirmPaid = function(id) {
-    const codeInput = document.getElementById('mpesa-code');
+    window.confirmPaid = function(id) {
+    // We must use 'mpesa-code-input' to match the modal I gave you
+    const codeInput = document.getElementById('mpesa-code-input');
+    
     if (!codeInput) {
         alert("ERROR: Can't find M-Pesa input box");
         return;
     }
-    const code = codeInput.value.trim().toUpperCase();
-    
-    if (code.length < 5) {
-        alert("❌ Code too short. Enter full M-Pesa code like QK8G2H3J4K");
-        return;
-    }
 
-    // This is the exact same line that worked in your test
-       update(ref(fdb, id), {
-    status: "Verified",
-    mpesaCode: code,
-    paidAt: new Date().toISOString()
-}).then(() => {
-        alert("✅ SUCCESS: Code " + code + " saved to Firebase");
-        document.getElementById('pay-modal-overlay').remove();
-    }).catch((e) => {
-        alert("❌ FIREBASE ERROR: " + e.message);
-    });
+    const code = codeInput.value.trim().toUpperCase();
+    if (code.length < 5) return alert("Please enter a valid M-Pesa code");
+
+    // This updates the status and saves the code to your database
+    update(ref(fdb, 'inventory/' + id), {
+        status: "Submitted",
+        mpesaCode: code,
+        submittedAt: new Date().toISOString()
+    }).then(() => {
+        window.toast("✅ Code submitted! Admin will verify.");
+        const modal = document.getElementById('pay-modal-overlay');
+        if (modal) modal.remove();
+    }).catch(e => alert("Firebase Error: " + e.message));
 };
 
 
