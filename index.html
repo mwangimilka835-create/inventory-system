@@ -241,8 +241,6 @@ window.draw = function() {
                 buttons += `<button class="btn" style="background:#7c3aed; color:white; margin-bottom:8px;" onclick="submitMpesa('${safeId}')">Confirm M-Pesa</button>`;
             }
 
-let buttons = "";
-
 // 1. Show PAY button for anyone if item is Unpaid
 if (i.status === "Unpaid") {
     buttons += `<button class="btn" style="background:#2ecc71; color:white;" onclick="window.initPay('${i.id}', '${i.price}', '${i.name}')">Pay</button>`;
