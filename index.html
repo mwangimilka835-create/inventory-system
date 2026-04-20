@@ -325,7 +325,7 @@ window.draw = function() {
     if (code.length < 5) return window.toast("❌ Invalid Code");
 
     // 1. Update Firebase
-    update(ref(fdb, 'stock_final_v10/' + id), {
+        update(ref(fdb, id), {
         mpesaCode: code.toUpperCase(),
         status: "Verified",
         paidAt: new Date().toISOString()
