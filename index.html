@@ -115,90 +115,93 @@
 
     <div id="toast"></div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-        const firebaseConfig = {
-        apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
-        authDomain: "stockpro-9be18.firebaseapp.com",
-        databaseURL: "https://stockpro-9be18-default-rtdb.firebaseio.com",
-        projectId: "stockpro-9be18",
-        storageBucket: "stockpro-9be18.firebasestorage.app",
-        messagingSenderId: "1025574986774",
-        appId: "1:1025574986774:web:78fb24039432c921b84137",
-        measurementId: "G-PWNYV0Y8G7"
+
+    <script>
+    window.db = [];
+    window.role = '';
+    window.userName = '';
+    window.chart = null;
+    window.html5QrCode = null;
+
+    window.doLogin = function() {
+        let name = document.getElementById('u').value.trim();
+        let pass = document.getElementById('p').value.trim();
+        let r = document.getElementById('r_select').value;
+        if (!name || !pass || !r) return alert("Fill all fields!");
+        window.userName = name;
+        window.role = r;
+        document.getElementById('auth-overlay').style.display='none';
+        document.getElementById('navbar').style.display='flex';
+        document.getElementById('app').style.display='block';
+        if(r === 'Admin') {
+            document.getElementById('adm-pr').style.display = 'block';
+            document.getElementById('adm-csv').style.display = 'flex';
+            document.getElementById('chart-card').style.display = 'block';
+            setTimeout(initChart, 500);
+        }
+        setTimeout(() => {
+            try { draw(); } catch(e) { console.error("Draw error:", e); }
+        }, 100);
+        window.toast(`✅ Welcome ${name}`);
     };
 
-    const app = initializeApp(firebaseConfig);
-    const fdb = getDatabase(app);
-    window.fdb = fdb; // Makes fdb visible to buttons
-    const inventoryRef = ref(fdb);
-
-    window.db = []; 
-    window.role = ''; 
-    window.userName = ''; 
-    window.chart = null; 
-    window.html5QrCode = null;
-window.doLogin = function() {
-    let name = document.getElementById('u').value.trim();
-    let pass = document.getElementById('p').value.trim();
-    let r = document.getElementById('r_select').value;
-    if (!name || !pass || !r) return alert("Fill all fields!");
-    
-    window.userName = name;
-    window.role = r;
-    
-    // Hide login, show app
-    document.getElementById('auth-overlay').style.display='none';
-    document.getElementById('navbar').style.display='flex';
-    document.getElementById('app').style.display='block';
-    
-    // Show admin features if needed
-    if(r === 'Admin') {
-        document.getElementById('adm-pr').style.display = 'block';
-        document.getElementById('adm-csv').style.display = 'flex';
-        document.getElementById('chart-card').style.display = 'block';
-        setTimeout(initChart, 500);
-    }
-    
-    // Small delay to ensure DOM is ready before drawing
-    setTimeout(() => {
-        try {
-            draw(); 
-        } catch(e) {
-            console.error("Draw error:", e);
-        }
-    }, 100);
-    
-    window.toast(`✅ Welcome ${name}`);
-};
-
-    // NAVIGATION
     window.tab = function(p, e) {
         document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
         document.getElementById('p-'+p).classList.add('active');
         document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
         e.currentTarget.classList.add('active');
-        draw(); 
+        draw();
     };
 
     window.toggleMode = function() { document.body.classList.toggle('light-mode'); };
 
-    
-    // REAL-TIME CLOUD LISTENER (CRITICAL FOR LEDGER)
-    onValue(inventoryRef, (snapshot) => {
-        const data = snapshot.val();
-        window.db = [];
-        if (data) {
-            Object.keys(data).forEach(id => {
-                window.db.push({ ...data[id], firebaseId: id });
+    window.toast = function(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    };
+
+    window.initChart = function() {
+        if (!window.chart) {
+            const ctx = document.getElementById('stockPie');
+            window.chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#d4af37','#38bdf8','#9d81ff','#ff4d4d','#25D366'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
             });
         }
-        draw(); // Automatically redraws Ledger when cloud updates
-        if(window.chart) updateChart();
-    });
-window.draw = function() {
+        updateChart();
+    };
+
+    window.updateChart = function() {
+        if (!window.chart) return;
+        const cats = {};
+        window.db.forEach(i => { cats[i.cat] = (cats[i.cat] || 0) + i.qty; });
+        window.chart.data.labels = Object.keys(cats);
+        window.chart.data.datasets[0].data = Object.values(cats);
+        window.chart.update();
+    };
+
+    window.toggleScanner = function() { window.toast("Scanner coming soon"); };
+    window.pdf = function() { window.toast("PDF export coming soon"); };
+    window.csv = function() {
+        if (window.role!== 'Admin') return alert("Admin only");
+        let csv = "Name,Qty,Price,Category,Status,M-Pesa Code\n";
+        window.db.forEach(i => { csv += `"${i.name}",${i.qty},${i.price},"${i.cat}","${i.status}","${i.mpesaCode || ''}"\n`; });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'StockPro_Ledger.csv'; a.click();
+    };
+    window.wa = function() {
+        let msg = "StockPro Summary%0A";
+        window.db.forEach(i => { msg += `${i.name}: ${i.qty}pcs @ KES${i.price} - ${i.status}%0A`; });
+        window.open(`https://wa.me/?text=${msg}`);
+    };
+
+        window.draw = function() {
     try {
         let invData = window.db || [];
         let find = document.getElementById('find').value.toLowerCase();
@@ -272,6 +275,7 @@ window.draw = function() {
                     ${mpesaLine}
                 </div>
                 ${buttons}
+                
             </div>`;
         });
 
@@ -304,8 +308,7 @@ window.draw = function() {
     document.getElementById('q').value = '';
     document.getElementById('pr').value = '';
 };
-    
-    // M-PESA MODAL
+        // M-PESA MODAL
     window.initPay = function(id, price, name) {
         const modal = document.createElement('div');
         modal.id = 'pay-modal-overlay';
@@ -340,10 +343,6 @@ window.draw = function() {
     });
 };
 
-
-
-    
-    
     window.verifyStock = (id) => update(ref(fdb, id), { status: "Verified" });
 window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
     
@@ -382,7 +381,7 @@ window.openMpesaModal = function(id, name, total) {
                 SUBMIT CODE TO ADMIN
             </button>
             <p onclick="document.getElementById('mpesa-modal').remove()" 
-                style="cursor:pointer;color:#888;margin-top:15px;font-size:14px;">CANCEL</p>
+            style="cursor:pointer;color:#888;margin-top:15px;font-size:14px;">CANCEL</p>
         </div>`;
     document.body.appendChild(modal);
 };
@@ -415,8 +414,6 @@ window.verifyPayment = (id) => {
     }).then(() => window.toast("✅ PAID. Stock verified."));
 };
     
-    
-
     // EXPORTS
     window.pdf = function() {
         const { jsPDF } = window.jspdf;
@@ -441,8 +438,7 @@ window.verifyPayment = (id) => {
         window.db.forEach(i => msg += `• ${i.name}: ${i.qty} (${i.status})%0A`);
         window.open('https://wa.me/254112873218?text=' + msg);
     };
-
-    // SCANNER
+            // SCANNER
     window.toggleScanner = function() {
         const view = document.getElementById('qr-view');
         if(view.style.display === 'block') {
@@ -470,8 +466,8 @@ window.verifyPayment = (id) => {
             options: { responsive: true, maintainAspectRatio: false }
         });
         updateChart();
-    }
-
+        }
+    
     function updateChart() { 
         window.chart.data.datasets[0].data = ['Hardware','Software','Materials'].map(c => window.db.filter(i=>i.cat===c).length); 
         window.chart.update(); 
@@ -489,8 +485,47 @@ window.testFirebase = function() {
         alert('WRITE FAILED: ' + e.message)
     });
 };
-    console.log('Modal function exists:', typeof window.openMpesaModal);
+        
+    console.log('Modal function exists:', typeof window.openMpesaModal
+        
+                    </script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        const firebaseConfig = {
+        apiKey: "AIzaSyBAVRljN13EB1J8w4jJ3Qjk8iqjgxSqfAI",
+        authDomain: "stockpro-9be18.firebaseapp.com",
+        databaseURL: "https://stockpro-9be18-default-rtdb.firebaseio.com",
+        projectId: "stockpro-9be18",
+        storageBucket: "stockpro-9be18.firebasestorage.app",
+        messagingSenderId: "1025574986774",
+        appId: "1:1025574986774:web:78fb24039432c921b84137",
+        measurementId: "G-PWNYV0Y8G7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const fdb = getDatabase(app);
+    window.fdb = fdb; // Makes fdb visible to buttons
+    const inventoryRef = ref(fdb);
+    window.fdb = fdb;
+    window.inventoryRef = inventoryRef;
+    window.update = update;
+    window.ref = ref;
+    window.remove = remove;
+    window.push = push;
+
+    // This 1 listener updates your app when data changes
+    onValue(inventoryRef, (snapshot) => {
+        const data = snapshot.val();
+        window.db = [];
+        if (data) {
+            Object.keys(data).forEach(id => {
+                window.db.push({...data[id], firebaseId: id });
+            });
+        }
+        draw();
+        if(window.chart) updateChart();
+    });
 </script>
-<button onclick="testFirebase()" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:red; color:white; padding:10px;">TEST FIREBASE</button>
-</body>
-                                               </html>
+           
