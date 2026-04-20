@@ -385,5 +385,106 @@ window.openMpesaModal = function(id, name, total) {
 window.saveMpesaCode = function(id) {
     const codeInput = document.getElementById('mpesa-code-input');
     if (!codeInput) return alert("Error: Can't find input");
-    
-    const co
+
+    const code = codeInput.value.trim().toUpperCase();
+    if (code.length < 8) return alert("❌ Code too short. M-Pesa codes are 10 characters");
+
+    update(ref(fdb, id), {
+        status: "Submitted",
+        mpesaCode: code,
+        submittedBy: window.userName,
+        submittedAt: new Date().toISOString()
+    }).then(() => {
+        window.toast("💰 Code sent to Admin for verification");
+        document.getElementById('mpesa-modal').remove();
+    }).catch(e => alert("❌ Firebase Error: " + e.message));
+};
+
+// STAGE 3-4: Only Admin can mark as PAID - you check code first
+window.verifyPayment = (id) => {
+    if (window.role !== 'Admin') return alert("❌ Only Admin can verify payment.");
+    update(ref(fdb, id), {
+        status: "Verified",
+        verifiedBy: window.userName,
+        verifiedAt: new Date().toISOString()
+    }).then(() => window.toast("✅ PAID. Stock verified."));
+};
+
+// EXPORTS
+window.pdf = function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("StockPro Audit - 2026", 14, 15);
+    const rows = window.db.map(i => [i.name, i.qty, i.cat, i.status]);
+    doc.autoTable({ head: [['Item', 'Qty', 'Category', 'Status']], body: rows });
+    doc.save('Stock_Audit.pdf');
+};
+
+window.csv = function() {
+    let csv = "Item,Qty,Price,Status\n";
+    window.db.forEach(i => csv += `${i.name},${i.qty},${i.price},${i.status}\n`);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    link.download = "StockPro_Ledger.csv";
+    link.click();
+};
+
+window.wa = function() {
+    let msg = '*STOCKPRO CLOUD UPDATE*%0A';
+    window.db.forEach(i => msg += ' • ' + `${i.name}: ${i.qty} (${i.status})%0A`);
+    window.open('https://wa.me/254112873218?text=' + msg);
+};
+
+// SCANNER
+window.toggleScanner = function() {
+    const view = document.getElementById('qr-view');
+    if (view.style.display === 'block') {
+        window.html5QrCode.stop().then(() => { view.style.display = 'none'; });
+    } else {
+        view.style.display = 'block'; document.getElementById('scan-text').innerText = 'Scanning...';
+        window.html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+            document.getElementById('n').value = text;
+            window.toast("🔍 Item Identified");
+            window.toggleScanner();
+        });
+    }
+};
+
+// CHART
+function initChart() {
+    const ctx = document.getElementById('stockPie').getContext('2d');
+    window.chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['H/W', 'S/W', 'MAT'],
+            datasets: [{ data: [0, 0, 0], backgroundColor: ["#d4af37", "#38bdf8", "#94a3b8"] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+    updateChart();
+}
+
+function updateChart() {
+    window.chart.data.datasets[0].data = ['Hardware', 'Software', 'Materials'].map(cat => window.db.filter(i => i.cat === cat).length);
+    window.chart.update();
+}
+
+window.toast = (m) => {
+    let t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none' }, 3000);
+};
+
+// TEST FUNCTION FOR MOBILE
+window.testFirebase = function() {
+    update(ref(fdb, 'stock_final_v10/test123'), {status: 'test'}).then(() => {
+        alert('WRITE OK: Firebase works!')
+    }).catch(e => {
+        alert('WRITE ERROR: ' + e.message)
+    });
+};
+
+console.log('Modal function exists:', typeof window.openMpesaModal);
+</script>
+<button onclick="testFirebase()" style="position:fixed; bottom:10px; right:10px; z-index:1000;">Test Firebase</button>
+</body>
+</html>
