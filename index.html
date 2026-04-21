@@ -73,7 +73,6 @@
                 <canvas id="stockPie"></canvas>
             </div>
             <div class="card">
-                <div id="qr-view"></div>
                         <div id="reader" style="width: 100%; display: none; margin-bottom: 15px; border-radius: 8px; overflow: hidden;"></div>
         <button class="btn" style="width: 100%; margin-bottom: 15px; background:var(--accent); color:var(--text);" onclick="toggleScanner()">
             📷 <span id="scanBtnText">START SCANNER</span>
@@ -389,7 +388,8 @@ window.toggleScanner = async function() {
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText, decodedResult) => {
                     // Success! We got a code
-                    document.getElementById('itemName').value = decodedText;
+                    document.getElementById('n').value = decodedText;
+                    
                     window.toast(`Scanned: ${decodedText}`);
                     stopScan();
                 },
