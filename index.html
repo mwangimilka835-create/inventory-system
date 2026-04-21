@@ -423,7 +423,46 @@ function stopScan() {
         });
     }
             }
-
+    
+window.csv = function() {
+    if (window.role !== 'Admin') return window.toast("❌ Admin only");
+    
+    let data = window.db || [];
+    if (data.length === 0) return window.toast("No data to export");
+    
+    // CSV Headers
+    let headers = ["Name", "Quantity", "Price", "Total", "Category", "Status", "M-Pesa Code", "Added By", "Added At", "Submitted At"];
+    let rows = data.map(i => [
+        i.name || "",
+        i.qty || 0,
+        i.price || 0,
+        (i.qty || 0) * (i.price || 0),
+        i.cat || "",
+        i.status || "",
+        i.mpesaCode || "",
+        i.addedBy || "",
+        i.addedAt ? new Date(i.addedAt).toLocaleString() : "",
+        i.submittedAt ? new Date(i.submittedAt).toLocaleString() : ""
+    ]);
+    
+    // Build CSV string
+    let csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+    
+    // Download it
+    let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    let link = document.createElement("a");
+    let url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `StockPro_Ledger_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    window.toast("📊 CSV Downloaded");
+};
                                             
 </script>
 </body>
