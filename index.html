@@ -201,31 +201,29 @@ window.draw = function() {
 
         filteredData.forEach(i => {
             let s = (i.status || "unverified").toString().toLowerCase().trim();
-            
-            // 4 STAGES
-            let isUnverified = s === "unverified";
-            let isPending = s === "pending";
-            let isSubmitted = s === "submitted"; 
-            let isVerified = s === "verified";
+            // 4 STAGES - Logic for Badge and Colors
+        let isUnverified = s === "unverified" || s === "unpaid";
+        let isPending = s === "pending";
+        let isSubmitted = s === "submitted";
+        let isVerified = s === "verified" || s === "paid";
 
-            let invBadge = '';
-            let borderColor = '';
-            if (isUnverified) {
-                invBadge = '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Approval</span>';
-                borderColor = '#ff4d4d';
-            } else if (isPending) {
-                invBadge = '<span style="color: #ffa500; font-size: 11px;">⏳ Pending Payment</span>';
-                borderColor = '#ffa500';
-            } else if (isSubmitted) {
-                invBadge = '<span style="color: #facc15; font-size: 11px;">💰 Code Submitted - Verify Me</span>';
-                borderColor = '#facc15';
-            } else if (isVerified) {
-                invBadge = '<span style="color: #4CAF50; font-size: 11px;">✅ PAID - Stock Verified</span>';
-                borderColor = '#4CAF50';
-            }
+        if (isUnverified) {
+            invBadge = '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Payment</span>';
+            borderColor = '#ff4d4d';
+        } else if (isPending) {
+            invBadge = '<span style="color: #ffa500; font-size: 11px;">⌛ Pending Processing</span>';
+            borderColor = '#ffa500';
+        } else if (isSubmitted) {
+            invBadge = '<span style="color: #facc15; font-size: 11px;">💰 Code Submitted</span>';
+            borderColor = '#facc15';
+        } else if (isVerified) {
+            invBadge = '<span style="color: #4CAF50; font-size: 11px;">✅ PAID - Stock Verified</span>';
+            borderColor = '#4CAF50';
+        }
 
-            let mpesaLine = i.mpesaCode ? `<div style="color: #0ea5e9; font-size: 10px; margin-top: 2px;">M-Pesa: ${i.mpesaCode}</div>` : '';
-
+        // This ensures the M-Pesa code shows up under the item name
+        let mpesaLine = i.mpesaCode ? `<div style="color: #0ea5e9; font-size: 10px; font-weight: 700; margin-top: 4px;">M-Pesa: ${i.mpesaCode}</div>` : "";
+           
             let safeId = (i.firebaseId || '').replace(/'/g, "\\'");
             let safeName = (i.name || '').replace(/'/g, "\\'");
             let safePrice = i.price || 0;
