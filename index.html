@@ -245,8 +245,9 @@ window.draw = function() {
                 buttons += `<button class="btn" style="background:#3498db; color:white;" onclick="window.verifyPayment('${i.id}')">Verify</button>`;
             }
 }
-             
-            listEl.innerHTML += `
+
+
+    listEl.innerHTML += `
             <div class="card" style="border-left: 5px solid ${borderColor}; position: relative; margin-bottom: 12px; padding: 15px; background: #fff; border-radius: 8px;">
                 <div style="position: absolute; top: 10px; right: 12px;">${invBadge}</div>
                 <div style="font-size: 15px; font-weight: 800; color: #1e293b;">
@@ -254,13 +255,14 @@ window.draw = function() {
                     ${mpesaLine} 
                 </div>
                 <div style="font-size: 13px; color: #64748b; margin-top: 8px;">
-                    <span>${safeQty} PCS × KES ${safePrice}</span><br>
-                    <span style="font-weight: 800; color: #22c55e;">Total: KES ${safeQty * safePrice}</span>
+                    <span>${i.qty} PCS × KES ${safePrice}</span><br>
+                    <span style="font-weight: 800; color: #22c55e;">Total: KES ${i.qty * safePrice}</span>
                 </div>
                 <div style="margin-top: 10px;">
                     ${buttons}
                 </div>
             </div>`;
+             
             
             
         });
