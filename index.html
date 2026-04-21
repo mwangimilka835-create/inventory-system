@@ -539,52 +539,40 @@ window.csv = function() {
     window.toast("📄 PDF Generated");
 };
  window.wa = function() {
+    console.log("WA DEBUG - Full DB:", window.db); // Check browser console
+    
     let data = window.db || [];
     
     if (data.length === 0) {
-        return window.toast("No items in ledger yet");
+        alert("DEBUG: Database is empty. window.db length = 0. Check if items show in Ledger tab first.");
+        return window.toast("No items found in database");
     }
     
-    // Build WhatsApp message with ALL items
+    // If we get here, we have data
     let totalValue = data.reduce((sum, i) => sum + ((i.qty || 0) * (i.price || 0)), 0);
     let totalQty = data.reduce((sum, i) => sum + (i.qty || 0), 0);
     
-    let message = `*STOCKPRO FULL LEDGER* 📦\n`;
+    let message = `*STOCKPRO LEDGER* 📦\n`;
     message += `_Generated: ${new Date().toLocaleString()}_\n\n`;
-    message += `*Total Items:* ${data.length}\n`;
-    message += `*Total Qty:* ${totalQty} PCS\n`;
-    message += `*Total Value:* KES ${totalValue.toLocaleString()}\n\n`;
-    message += `*--- ALL ASSETS ---*\n`;
+    message += `*Items:* ${data.length} | *Qty:* ${totalQty} | *Value:* KES ${totalValue.toLocaleString()}\n\n`;
     
     data.forEach((i, index) => {
-        let statusEmoji = "";
         let s = (i.status || "unverified").toLowerCase();
-        if (s === "unpaid" || s === "unverified") statusEmoji = "🚫";
-        else if (s === "submitted") statusEmoji = "💰";
-        else if (s === "verified" || s === "paid") statusEmoji = "✅";
-        else if (s === "pending") statusEmoji = "⌛";
+        let emoji = s.includes("paid") || s.includes("verified") ? "✅" : s.includes("submit") ? "💰" : "🚫";
         
-        message += `${index + 1}. *${i.name}* ${statusEmoji}\n`;
-        message += `   Qty: ${i.qty} × KES ${i.price || 0} = *KES ${(i.qty || 0) * (i.price || 0)}*\n`;
-        message += `   Cat: ${i.cat || "N/A"}\n`;
+        message += `${index + 1}. *${i.name}* ${emoji}\n`;
+        message += `   ${i.qty} × KES ${i.price || 0} = *KES ${(i.qty || 0) * (i.price || 0)}*\n`;
         message += `   Status: ${i.status}\n`;
-        if (i.mpesaCode) message += `   M-Pesa: *${i.mpesaCode}*\n`;
+        if (i.mpesaCode) message += `   M-Pesa: ${i.mpesaCode}\n`;
         message += `   By: ${i.addedBy}\n\n`;
     });
     
-    message += `_StockPro Ultimate 2026_`;
-    
-    // Encode for URL
     let encodedMsg = encodeURIComponent(message);
-    
-    // Your WhatsApp number - CHANGE THIS
-    let yourNumber = "254712345678"; // Replace with your number, no + or spaces
-    
-    // Open WhatsApp
+    let yourNumber = "254712345678"; // CHANGE THIS TO YOUR NUMBER
     let waUrl = `https://wa.me/${yourNumber}?text=${encodedMsg}`;
     window.open(waUrl, '_blank');
     
-    window.toast("📲 Sending full ledger to WhatsApp...");
+    window.toast(`📲 Sent ${data.length} items to WhatsApp`);
 };
                                             
 </script>
