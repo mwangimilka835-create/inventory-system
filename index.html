@@ -335,7 +335,10 @@
     };
 
     window.verifyStock = (id) => update(ref(fdb, id), { status: "Verified" });
-    window.del = (id) => confirm("Delete permanently?") && remove(ref(fdb, id));
+    window.del = (id) => {
+    window.toast("🔐 deletion denied by cloud");
+};
+
 
     window.approveItem = (id) => {
         if (window.role!== 'Admin') return alert("❌ Only Admin can approve stock.");
