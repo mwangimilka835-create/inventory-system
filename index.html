@@ -538,49 +538,54 @@ window.csv = function() {
     doc.save(`StockPro_Audit_${new Date().toISOString().split('T')[0]}.pdf`);
     window.toast("📄 PDF Generated");
 };
-    window.wa = function() {
+ window.wa = function() {
     let data = window.db || [];
     
-    // Get all items that need your attention
-    let submittedItems = data.filter(i => i.status === 'Submitted');
-    
-    if (submittedItems.length === 0) {
-        return window.toast("✅ No pending codes to verify");
+    if (data.length === 0) {
+        return window.toast("No items in ledger yet");
     }
     
-    // Build WhatsApp message
-    let totalValue = submittedItems.reduce((sum, i) => sum + ((i.qty || 0) * (i.price || 0)), 0);
-    let totalQty = submittedItems.reduce((sum, i) => sum + (i.qty || 0), 0);
+    // Build WhatsApp message with ALL items
+    let totalValue = data.reduce((sum, i) => sum + ((i.qty || 0) * (i.price || 0)), 0);
+    let totalQty = data.reduce((sum, i) => sum + (i.qty || 0), 0);
     
-    let message = `*STOCKPRO VERIFICATION NEEDED* 💰\n`;
+    let message = `*STOCKPRO FULL LEDGER* 📦\n`;
     message += `_Generated: ${new Date().toLocaleString()}_\n\n`;
-    message += `*${submittedItems.length} items pending verification*\n`;
+    message += `*Total Items:* ${data.length}\n`;
     message += `*Total Qty:* ${totalQty} PCS\n`;
     message += `*Total Value:* KES ${totalValue.toLocaleString()}\n\n`;
-    message += `*--- ITEMS ---*\n`;
+    message += `*--- ALL ASSETS ---*\n`;
     
-    submittedItems.forEach((i, index) => {
-        message += `${index + 1}. *${i.name}*\n`;
-        message += `   Qty: ${i.qty} × KES ${i.price} = KES ${i.qty * i.price}\n`;
-        message += `   M-Pesa: *${i.mpesaCode}*\n`;
-        message += `   Added by: ${i.addedBy}\n\n`;
+    data.forEach((i, index) => {
+        let statusEmoji = "";
+        let s = (i.status || "unverified").toLowerCase();
+        if (s === "unpaid" || s === "unverified") statusEmoji = "🚫";
+        else if (s === "submitted") statusEmoji = "💰";
+        else if (s === "verified" || s === "paid") statusEmoji = "✅";
+        else if (s === "pending") statusEmoji = "⌛";
+        
+        message += `${index + 1}. *${i.name}* ${statusEmoji}\n`;
+        message += `   Qty: ${i.qty} × KES ${i.price || 0} = *KES ${(i.qty || 0) * (i.price || 0)}*\n`;
+        message += `   Cat: ${i.cat || "N/A"}\n`;
+        message += `   Status: ${i.status}\n`;
+        if (i.mpesaCode) message += `   M-Pesa: *${i.mpesaCode}*\n`;
+        message += `   By: ${i.addedBy}\n\n`;
     });
     
-    message += `_Open StockPro to verify these items_ ✅`;
+    message += `_StockPro Ultimate 2026_`;
     
     // Encode for URL
     let encodedMsg = encodeURIComponent(message);
     
     // Your WhatsApp number - CHANGE THIS
-    let yourNumber = "254112873218"; 
+    let yourNumber = "254712345678"; // Replace with your number, no + or spaces
     
     // Open WhatsApp
     let waUrl = `https://wa.me/${yourNumber}?text=${encodedMsg}`;
     window.open(waUrl, '_blank');
     
-    window.toast("📲 Opening WhatsApp...");
+    window.toast("📲 Sending full ledger to WhatsApp...");
 };
-    
                                             
 </script>
 </body>
