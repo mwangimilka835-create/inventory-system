@@ -201,8 +201,8 @@ window.draw = function() {
 
         filteredData.forEach(i => {
             let s = (i.status || "unverified").toString().toLowerCase().trim();
-            let invBadge = ";
-                let borderColor= ";
+            let invBadge = "";
+let borderColor = "";
             // 4 STAGES - Logic for Badge and Colors
         let isUnverified = s === "unverified" || s === "unpaid";
         let isPending = s === "pending";
@@ -318,7 +318,6 @@ window.draw = function() {
                 style="background:#2ecc71; color:white; width:100%; padding:12px; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
                 SUBMIT CODE
             </button>
-            
             <button onclick="document.getElementById('pay-modal-overlay').remove()" 
                 style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer; font-size:13px;">
                 CANCEL
@@ -327,19 +326,6 @@ window.draw = function() {
     document.body.appendChild(modal);
 };
 
-window.confirmPaid = function(id) {
-    const code = document.getElementById('mpesa-code').value.trim().toUpperCase();
-    if (code.length < 5) return alert("Please enter a valid M-Pesa code");
-
-    update(ref(fdb, 'inventory/' + id), {
-        status: "Submitted",
-        mpesaCode: code,
-        submittedAt: new Date().toISOString()
-    }).then(() => {
-        alert("✅ Code submitted! Admin will verify shortly.");
-        document.getElementById('pay-modal-overlay').remove();
-    });
-};
     window.confirmPaid = function(id) {
     // We must use 'mpesa-code-input' to match the modal I gave you
     const codeInput = document.getElementById('mpesa-code-input');
