@@ -201,6 +201,8 @@ window.draw = function() {
 
         filteredData.forEach(i => {
             let s = (i.status || "unverified").toString().toLowerCase().trim();
+            let invBadge = ";
+                let borderColor= ";
             // 4 STAGES - Logic for Badge and Colors
         let isUnverified = s === "unverified" || s === "unpaid";
         let isPending = s === "pending";
