@@ -538,6 +538,49 @@ window.csv = function() {
     doc.save(`StockPro_Audit_${new Date().toISOString().split('T')[0]}.pdf`);
     window.toast("📄 PDF Generated");
 };
+    window.wa = function() {
+    let data = window.db || [];
+    
+    // Get all items that need your attention
+    let submittedItems = data.filter(i => i.status === 'Submitted');
+    
+    if (submittedItems.length === 0) {
+        return window.toast("✅ No pending codes to verify");
+    }
+    
+    // Build WhatsApp message
+    let totalValue = submittedItems.reduce((sum, i) => sum + ((i.qty || 0) * (i.price || 0)), 0);
+    let totalQty = submittedItems.reduce((sum, i) => sum + (i.qty || 0), 0);
+    
+    let message = `*STOCKPRO VERIFICATION NEEDED* 💰\n`;
+    message += `_Generated: ${new Date().toLocaleString()}_\n\n`;
+    message += `*${submittedItems.length} items pending verification*\n`;
+    message += `*Total Qty:* ${totalQty} PCS\n`;
+    message += `*Total Value:* KES ${totalValue.toLocaleString()}\n\n`;
+    message += `*--- ITEMS ---*\n`;
+    
+    submittedItems.forEach((i, index) => {
+        message += `${index + 1}. *${i.name}*\n`;
+        message += `   Qty: ${i.qty} × KES ${i.price} = KES ${i.qty * i.price}\n`;
+        message += `   M-Pesa: *${i.mpesaCode}*\n`;
+        message += `   Added by: ${i.addedBy}\n\n`;
+    });
+    
+    message += `_Open StockPro to verify these items_ ✅`;
+    
+    // Encode for URL
+    let encodedMsg = encodeURIComponent(message);
+    
+    // Your WhatsApp number - CHANGE THIS
+    let yourNumber = "254112873218"; 
+    
+    // Open WhatsApp
+    let waUrl = `https://wa.me/${yourNumber}?text=${encodedMsg}`;
+    window.open(waUrl, '_blank');
+    
+    window.toast("📲 Opening WhatsApp...");
+};
+    
                                             
 </script>
 </body>
