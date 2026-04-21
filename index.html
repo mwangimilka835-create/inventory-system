@@ -74,9 +74,10 @@
             </div>
             <div class="card">
                 <div id="qr-view"></div>
-                <button id="scan-btn" class="btn" style="background:var(--accent); color:var(--text); margin-bottom:12px;" onclick="toggleScanner()">
-                    <i class="fas fa-camera"></i> <span id="scan-text">Start Scanner</span>
-                </button>
+                        <div id="reader" style="width: 100%; display: none; margin-bottom: 15px; border-radius: 8px; overflow: hidden;"></div>
+        <button class="btn" style="width: 100%; margin-bottom: 15px; background:var(--accent); color:var(--text);" onclick="toggleScanner()">
+            📷 <span id="scanBtnText">START SCANNER</span>
+        </button>
                 <input id="n" placeholder="Item Name">
                 <input id="q" type="number" placeholder="Quantity">
                 <div id="adm-pr" style="display:none;"><input id="pr" type="number" placeholder="Price (KES)"></div>
@@ -368,12 +369,62 @@
         window.chart.data.datasets[0].data = Object.values(cats);
         window.chart.update();
     };
+    let html5QrCode;
+let isScanning = false;
 
-    window.toggleScanner = function() { window.toast("Scanner coming soon"); };
-    window.pdf = function() { window.toast("PDF export coming soon"); };
-    window.csv = function() { window.toast("CSV export coming soon"); };
-    window.wa = function() { window.toast("WhatsApp sync coming soon"); };
+window.toggleScanner = async function() {
+    const readerEl = document.getElementById('reader');
+    const btnText = document.getElementById('scanBtnText');
+    
+    if (!isScanning) {
+        readerEl.style.display = 'block';
+        btnText.innerText = 'STOP SCANNER';
+        isScanning = true;
+        
+        html5QrCode = new Html5Qrcode("reader");
+        
+        try {
+            await html5QrCode.start(
+                { facingMode: "environment" }, // Use back camera
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText, decodedResult) => {
+                    // Success! We got a code
+                    document.getElementById('itemName').value = decodedText;
+                    window.toast(`Scanned: ${decodedText}`);
+                    stopScan();
+                },
+                (errorMessage) => {
+                    // Ignore scan errors, it scans continuously
+                }
+            );
+        } catch (err) {
+            window.toast("Camera failed: " + err);
+            stopScan();
+        }
+        
+    } else {
+        stopScan();
+    }
+};
 
+function stopScan() {
+    const readerEl = document.getElementById('reader');
+    const btnText = document.getElementById('scanBtnText');
+    
+    if (html5QrCode && isScanning) {
+        html5QrCode.stop().then(() => {
+            readerEl.style.display = 'none';
+            btnText.innerText = 'START SCANNER';
+            isScanning = false;
+        }).catch(() => {
+            readerEl.style.display = 'none';
+            btnText.innerText = 'START SCANNER';
+            isScanning = false;
+        });
+    }
+            }
+
+                                            
 </script>
 </body>
     </html>
