@@ -211,12 +211,7 @@
             let isSubmitted = s === "submitted";
             let isVerified = s === "verified" || s === "paid";
             let isLowStock = i.qty <= 5 && isVerified; // 5 = reorder level
-if (isLowStock) {
-    invBadge = '<span style="color: #ffa500; font-size: 11px;">⚠️ LOW STOCK: ' + i.qty + ' left</span>';
-    borderColor = '#ffa500';
-}
             
-
             if (isUnverified) {
                 invBadge = '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Payment</span>';
                 borderColor = '#ff4d4d';
@@ -233,7 +228,14 @@ if (isLowStock) {
 
             // FIXED: Now shows mpesaCode correctly
             let mpesaLine = i.mpesaCode? `<div style="color: #0ea5e9; font-size: 10px; font-weight: 700; margin-top: 4px;">M-Pesa: ${i.mpesaCode}</div>` : "";
+             
+         let isLowStock = i.qty <= 5 && isVerified; // 5 = reorder level
+        if (isLowStock) {
+            invBadge = '<span style="color: #ffa500; font-size: 11px;">⚠️ LOW STOCK: ' + i.qty + ' left</span>';
+             borderColor = '#ffa500';
+         }
 
+         // FIXED: Now shows mpesaCode correctly
             let safeId = (i.firebaseId || '').replace(/'/g, "\\'");
             let safeName = (i.name || '').replace(/'/g, "\\'");
             let safePrice = i.price || 0;
