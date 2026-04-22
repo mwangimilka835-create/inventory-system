@@ -216,13 +216,6 @@ window.tab = function(p, e) {
     if(p === 'stats') window.showStats(); // <-- THIS LINE MAKES THE MAGIC HAPPEN
     draw();
 };
-        
-        document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-        document.getElementById('p-'+p).classList.add('active');
-        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        draw();
-    };
 
     window.toggleMode = function() { document.body.classList.toggle('light-mode'); };
 
