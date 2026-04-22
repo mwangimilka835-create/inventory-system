@@ -65,6 +65,7 @@
             <div class="tab active" onclick="tab('dash', event)">Home</div>
             <div class="tab" onclick="tab('inv', event)">Ledger</div>
             <div class="tab" onclick="tab('rep', event)">Docs</div>
+            <div class="tab" onclick="tab('stats', event)">Stats</div>
             <i class="fas fa-moon" id="mode-icon" onclick="toggleMode()" style="cursor:pointer; color:var(--primary); font-size: 1.3rem;"></i>
         </div>
     </nav>
@@ -108,6 +109,16 @@
             <button class="btn" style="background:#25D366; color:white;" onclick="wa()">
                 <i class="fab fa-whatsapp"></i> Sync to WhatsApp
             </button>
+        </section>
+        <section id="p-stats" class="page">
+    <div class="card">
+        <h3 style="margin:0 0 15px; color:var(--primary)">📊 Stock Analytics</h3>
+        <div id="top-items" style="margin-bottom:20px;"></div>
+        <div id="low-stock-list"></div>
+    </div>
+    <div class="card" style="height:300px;">
+        <canvas id="categoryChart"></canvas>
+    </div>
         </section>
     </div>
 
@@ -159,7 +170,53 @@
         window.toast(`✅ Welcome ${name}`);
     };
 
-    window.tab = function(p, e) {
+    window.showStats = function() {
+    let items = window.db || [];
+    
+    // 1. Top 5 items by quantity
+    let topItems = [...items].sort((a,b) => (b.qty||0) - (a.qty||0)).slice(0,5);
+    let topHtml = '<h4 style="color:var(--secondary); margin:0 0 10px;">🏆 Top Stocked Items</h4>';
+    if(topItems.length === 0) topHtml += '<div style="opacity:0.6;">No items yet</div>';
+    topItems.forEach(i => {
+        topHtml += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--accent);">
+            <span>${i.name}</span><span style="color:var(--primary); font-weight:800;">${i.qty} units</span>
+        </div>`;
+    });
+    document.getElementById('top-items').innerHTML = topHtml;
+    
+    // 2. Low stock alerts
+    let lowItems = items.filter(i => i.qty <= 5 && i.status === 'Verified');
+    let lowHtml = '<h4 style="color:#ffa500; margin:15px 0 10px;">⚠️ Needs Reorder</h4>';
+    if(lowItems.length === 0) lowHtml += '<div style="opacity:0.6;">All stock levels healthy ✅</div>';
+    lowItems.forEach(i => {
+        lowHtml += `<div style="color:#ffa500;">• ${i.name}: ${i.qty} left</div>`;
+    });
+    document.getElementById('low-stock-list').innerHTML = lowHtml;
+    
+    // 3. Category pie chart
+    let cats = {};
+    items.forEach(i => { cats[i.cat] = (cats[i.cat] || 0) + (i.qty || 0); });
+    let ctx = document.getElementById('categoryChart');
+    if(window.catChart) window.catChart.destroy();
+    window.catChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: { 
+            labels: Object.keys(cats), 
+            datasets: [{ data: Object.values(cats), backgroundColor: ['#d4af37','#38bdf8','#9d81ff'] }] 
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{labels:{color:'#f0ebff'}}} }
+    });
+}
+
+window.tab = function(p, e) {
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    document.getElementById('p-'+p).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    if(p === 'stats') window.showStats(); // <-- THIS LINE MAKES THE MAGIC HAPPEN
+    draw();
+};
+        
         document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
         document.getElementById('p-'+p).classList.add('active');
         document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
