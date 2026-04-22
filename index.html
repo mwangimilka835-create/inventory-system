@@ -587,12 +587,13 @@ window.csv = function() {
     window.open(waUrl, '_blank');
     
     window.toast(`📲 Sent ${data.length} items to WhatsApp`);
-};window.alertOwner = function(name, qty) {
-    let msg = `STOCKPRO ALERT ⚠️%0A${name} is LOW%0AOnly ${qty} units remaining%0AReorder now to avoid stock-out`;
-    window.open(`https://wa.me/?text=${msg}`, '_blank');
-    window.toast("WhatsApp alert ready to send");
 };
-                                            
+    window.alertOwner = function(name, qty) {
+    let myNumber = "254112873218"; // <-- PUT YOUR NUMBER HERE with country code, no + or spaces
+    let msg = `STOCKPRO ALERT ⚠️%0A${name} is LOW%0AOnly ${qty} units remaining%0AReorder now to avoid stock-out`;
+    window.open(`https://wa.me/${myNumber}?text=${msg}`, '_blank');
+    window.toast("Alert sent to your WhatsApp");
+};   
 </script>
 </body>
     </html>
