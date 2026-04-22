@@ -194,7 +194,7 @@
         let find = document.getElementById('find').value.toLowerCase();
 
         let filteredData = invData.filter(i => {
-            if (!i ||!i.name) return false;
+            if (!i || !i.name) return false;
             return i.name.toLowerCase().includes(find);
         });
 
@@ -210,7 +210,6 @@
             let isPending = s === "pending";
             let isSubmitted = s === "submitted";
             let isVerified = s === "verified" || s === "paid";
-            let isLowStock = i.qty <= 5 && isVerified; // 5 = reorder level
             
             if (isUnverified) {
                 invBadge = '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Payment</span>';
@@ -226,16 +225,16 @@
                 borderColor = '#4CAF50';
             }
 
-            // FIXED: Now shows mpesaCode correctly
-            let mpesaLine = i.mpesaCode? `<div style="color: #0ea5e9; font-size: 10px; font-weight: 700; margin-top: 4px;">M-Pesa: ${i.mpesaCode}</div>` : "";
-             
-         let isLowStock = i.qty <= 5 && isVerified; // 5 = reorder level
-        if (isLowStock) {
-            invBadge = '<span style="color: #ffa500; font-size: 11px;">⚠️ LOW STOCK: ' + i.qty + ' left</span>';
-             borderColor = '#ffa500';
-         }
+            // LOW STOCK OVERRIDE - must be after verified check
+            let isLowStock = i.qty <= 5 && isVerified; // 5 = reorder level
+            if (isLowStock) {
+                invBadge = '<span style="color: #ffa500; font-size: 11px;">⚠️ LOW STOCK: ' + i.qty + ' left</span>';
+                borderColor = '#ffa500';
+            }
 
-         // FIXED: Now shows mpesaCode correctly
+            // FIXED: Now shows mpesaCode correctly
+            let mpesaLine = i.mpesaCode ? `<div style="color: #0ea5e9; font-size: 10px; font-weight: 700; margin-top: 4px;">M-Pesa: ${i.mpesaCode}</div>` : "";
+            
             let safeId = (i.firebaseId || '').replace(/'/g, "\\'");
             let safeName = (i.name || '').replace(/'/g, "\\'");
             let safePrice = i.price || 0;
@@ -251,6 +250,11 @@
             // ONLY Admin sees Verify button. NO delete button for anyone.
             if (window.role === 'Admin' && s === "submitted") {
                 buttons += `<button class="btn" style="background:#3498db; color:white;" onclick="window.verifyStock('${safeId}')">Verify</button>`;
+            }
+
+            // Alert Owner button for low stock
+            if (window.role === 'Admin' && isLowStock) {
+                buttons += `<button class="btn" style="background:#ffa500; color:#000; margin-right:5px;" onclick="window.alertOwner('${safeName}', ${safeQty})">Alert Owner</button>`;
             }
 
             listEl.innerHTML += `
