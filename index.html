@@ -19,6 +19,8 @@
         body.light-mode {
             --bg: #fdfdfd; --card: #ffffff; --text: #1a1a1a; --accent: #f0f0f0;
         }
+        .low-stock { border-left: 5px solid #ffa500 !important; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 rgba(255,165,0,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,165,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,165,0,0); } }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; overflow-x: hidden; }
         nav { background: var(--card); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
@@ -208,6 +210,12 @@
             let isPending = s === "pending";
             let isSubmitted = s === "submitted";
             let isVerified = s === "verified" || s === "paid";
+            let isLowStock = i.qty <= 5 && isVerified; // 5 = reorder level
+if (isLowStock) {
+    invBadge = '<span style="color: #ffa500; font-size: 11px;">⚠️ LOW STOCK: ' + i.qty + ' left</span>';
+    borderColor = '#ffa500';
+}
+            
 
             if (isUnverified) {
                 invBadge = '<span style="color: #ff4d4d; font-size: 11px;">🚫 Awaiting Payment</span>';
@@ -237,14 +245,14 @@
             if (s === "unpaid" || s === "unverified") {
                 buttons += `<button class="btn" style="background:#2ecc71; color:white; margin-right:5px;" onclick="window.initPay('${safeId}', '${safePrice}', '${safeName}')">Pay</button>`;
             }
-
+        
             // ONLY Admin sees Verify button. NO delete button for anyone.
             if (window.role === 'Admin' && s === "submitted") {
                 buttons += `<button class="btn" style="background:#3498db; color:white;" onclick="window.verifyStock('${safeId}')">Verify</button>`;
             }
 
             listEl.innerHTML += `
-            <div class="card" style="border-left: 5px solid ${borderColor}; position: relative; margin-bottom: 12px; padding: 15px; background: var(--card); border-radius: 8px;">
+            <div class="card ${isLowStock ? 'low-stock' : ''}" style="border-left: 5px solid ${borderColor}; position: relative; margin-bottom: 12px; padding: 15px; background: var(--card); border-radius: 8px;">
                 <div style="position: absolute; top: 10px; right: 12px;">${invBadge}</div>
                 <div style="font-size: 15px; font-weight: 800; color: var(--text);">
                     ${safeName}
@@ -573,6 +581,10 @@ window.csv = function() {
     window.open(waUrl, '_blank');
     
     window.toast(`📲 Sent ${data.length} items to WhatsApp`);
+};window.alertOwner = function(name, qty) {
+    let msg = `STOCKPRO ALERT ⚠️%0A${name} is LOW%0AOnly ${qty} units remaining%0AReorder now to avoid stock-out`;
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+    window.toast("WhatsApp alert ready to send");
 };
                                             
 </script>
